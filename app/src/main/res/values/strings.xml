@@ -1,0 +1,13 @@
+<resources>
+    <string name="app_name">EggManager</string>
+    <string name="action_settings">Einstellungen</string>
+    <string name="action_save">Speichern</string>
+
+    <string name="button_save">@string/action_save</string>
+    <string name="empty_not_saved">Kein neuer Eintrag erstellt</string>
+    <string name="new_entity_saved">Eintrag gespeichert</string>
+    <string name="changes_not_saved">Änderungen wurden nicht übernommen</string>
+
+    <string name="euro_symbol" translatable="false">&#8364;</string>
+    <string name="egg_symbol">&#xf7fb;</string>
+</resources>

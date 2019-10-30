@@ -1,0 +1,101 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    android:id="@+id/linLay_recycler_item"
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:paddingTop="@dimen/small_padding"
+    android:paddingBottom="@dimen/small_padding"
+    android:layout_marginTop="@dimen/small_padding"
+    android:layout_marginBottom="@dimen/small_padding"
+    android:paddingStart="@dimen/small_padding"
+    android:paddingEnd="@dimen/small_padding"
+    android:layout_marginStart="@dimen/small_padding"
+    android:layout_marginEnd="@dimen/small_padding"
+    android:background="@drawable/recycler_item_background">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+
+        <TextView
+            android:id="@+id/txtv_date"
+            style="@style/date_style"
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:layout_height="wrap_content"/>
+
+        <ImageButton
+            android:id="@+id/imgbtn_edit"
+            style="@style/recycler_item_small_icon"
+            android:background="@color/transparent"
+            android:paddingStart="@dimen/small_padding"
+            android:paddingEnd="@dimen/small_padding"
+            android:src="@drawable/ic_edit_black_24dp"
+            android:tint="@color/secondary_text_color">
+        </ImageButton>
+
+        <ImageButton
+            android:id="@+id/imgbtn_delete"
+            style="@style/recycler_item_small_icon"
+            android:background="@color/transparent"
+            android:paddingStart="@dimen/small_padding"
+            android:paddingEnd="0dp"
+            android:src="@drawable/ic_delete_black_24dp"
+            android:tint="@color/secondary_text_color">
+        </ImageButton>
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/small_padding">
+
+        <ImageView
+            style="@style/recycler_item_icon"
+            android:src="@drawable/ic_egg_nest"
+            android:layout_marginStart="0dp">
+        </ImageView>
+
+        <TextView
+            android:id="@+id/txtv_recycler_item_eggs_collected"
+            style="@style/recylcer_item_text">
+        </TextView>
+
+        <ImageView
+            style="@style/recycler_item_icon"
+            android:src="@drawable/ic_eggs_black">
+        </ImageView>
+
+        <TextView
+            android:id="@+id/txtv_recycler_item_eggs_sold"
+            style="@style/recylcer_item_text">
+        </TextView>
+
+        <TextView
+            android:id="@+id/txtv_earned_money"
+            android:width="0dp"
+            android:layout_weight="1"
+            android:layout_height="wrap_content"
+            style="@style/recylcer_item_text"
+            android:layout_gravity="center_vertical"
+            android:layout_marginEnd="@dimen/small_padding"
+            android:gravity="end">
+        </TextView>
+
+        <TextView
+            android:id="@+id/txtv_earned_money_currency"
+            style="@style/recycler_item_icon"
+            android:layout_marginStart="0dp"
+            android:text="@string/euro_symbol"
+            android:textSize="@dimen/textAppearanceHeadline5"
+            android:textColor="@color/main_text_color">
+        </TextView>
+
+    </LinearLayout>
+
+
+</LinearLayout>
