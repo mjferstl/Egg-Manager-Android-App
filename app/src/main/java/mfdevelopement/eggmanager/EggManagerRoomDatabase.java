@@ -22,7 +22,6 @@ public abstract class EggManagerRoomDatabase extends RoomDatabase {
             synchronized (EggManagerRoomDatabase.class) {
                 if (INSTANCE == null) {
                     // Create database here
-                    // Create database here
                     INSTANCE = Room.databaseBuilder(context.getApplicationContext(),
                             EggManagerRoomDatabase.class, dataBaseName).addCallback(sRoomDatabaseCallback).build();
                 }

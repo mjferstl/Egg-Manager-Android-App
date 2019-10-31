@@ -10,6 +10,9 @@ import androidx.room.Query;
 import java.util.List;
 
 import static mfdevelopement.eggmanager.DailyBalance.COL_DATE_PRIMARY_KEY;
+import static mfdevelopement.eggmanager.DailyBalance.COL_EGGS_COLLECTED_NAME;
+import static mfdevelopement.eggmanager.DailyBalance.COL_EGGS_SOLD_NAME;
+import static mfdevelopement.eggmanager.DailyBalance.COL_MONEY_EARNED;
 
 @Dao
 public interface DailyBalanceDao {
@@ -33,4 +36,12 @@ public interface DailyBalanceDao {
     @Query("SELECT * FROM " + tableName + " WHERE " + COL_DATE_PRIMARY_KEY + " = :dateKey")
     DailyBalance getDailyBalance(String dateKey);
 
+    @Query("SELECT SUM(" + COL_EGGS_SOLD_NAME + ") FROM " + tableName)
+    LiveData<Integer> getTotalEggsSold();
+
+    @Query("SELECT SUM(" + COL_MONEY_EARNED + ") FROM " + tableName)
+    LiveData<Double> getTotalMoneyEarned();
+
+    @Query("SELECT SUM(" + COL_EGGS_COLLECTED_NAME + ") FROM " + tableName)
+    LiveData<Integer> getTotalEggsCollected();
 }

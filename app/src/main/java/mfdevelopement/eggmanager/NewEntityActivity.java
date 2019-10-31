@@ -1,6 +1,7 @@
 package mfdevelopement.eggmanager;
 
-import android.content.Intent;
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
@@ -36,7 +37,7 @@ public class NewEntityActivity extends AppCompatActivity implements DatePickerFr
     private final SimpleDateFormat sdf_key = new SimpleDateFormat(DailyBalance.dateKeyFormat, Locale.getDefault());
     private final SimpleDateFormat sdf_weekday = new SimpleDateFormat("EE, dd.MM.yyyy", Locale.getDefault());
     private NewEntityViewModel newEntityViewModel;
-    private final int NOT_SET = -1;
+    private final int NOT_SET = DailyBalance.NOT_SET;
     private final String PRICE_FORMAT = "%.2f";
     private int requestCode;
     private DailyBalance loadedDailyBalance;
@@ -69,6 +70,13 @@ public class NewEntityActivity extends AppCompatActivity implements DatePickerFr
 
                 // Create and show the dialog.
                 DialogFragment newFragment = DatePickerFragment.newInstance();
+                if (!dateTextView.getText().toString().equals("")) {
+                    try {
+                        newFragment = DatePickerFragment.newInstance(getDateFromString(dateTextView.getText().toString()));
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                }
                 //newFragment.setTargetFragment(this, 1);
                 newFragment.show(getSupportFragmentManager(), "datePicker");
             }
@@ -96,7 +104,7 @@ public class NewEntityActivity extends AppCompatActivity implements DatePickerFr
         requestCode = getIntent().getIntExtra(MainActivity.EXTRA_REQUEST_CODE_NAME,MainActivity.NEW_ENTITY_ACTIVITY_REQUEST_CODE);
         Log.d(LOG_TAG,"activity startet with request code " + requestCode);
         if (requestCode == MainActivity.EDIT_ENTITY_ACTIVITY_REQUEST_CODE) {
-            loadedDailyBalance = (DailyBalance)getIntent().getSerializableExtra("dd");
+            loadedDailyBalance = (DailyBalance)getIntent().getSerializableExtra(MainActivity.EXTRA_DAILY_BALANCE);
             String dateKey = loadedDailyBalance.getDateKey();
 
             eggsCollectedEditText.setText(String.valueOf(loadedDailyBalance.getEggsCollected()));
@@ -131,16 +139,6 @@ public class NewEntityActivity extends AppCompatActivity implements DatePickerFr
     }
 
     @Override
-    public void onBackPressed() {
-        super.onBackPressed();
-        if (requestCode == MainActivity.EDIT_ENTITY_ACTIVITY_REQUEST_CODE)
-            Toast.makeText(getApplicationContext(),R.string.changes_not_saved,Toast.LENGTH_SHORT).show();
-        else
-            Toast.makeText(getApplicationContext(),R.string.empty_not_saved,Toast.LENGTH_SHORT).show();
-        finish();
-    }
-
-    @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             // action with ID action_save was selected
@@ -156,21 +154,39 @@ public class NewEntityActivity extends AppCompatActivity implements DatePickerFr
                     break;
                 }
 
-                // delete loaded item
-                if (requestCode == MainActivity.EDIT_ENTITY_ACTIVITY_REQUEST_CODE)
-                    newEntityViewModel.deleteDailyBalance(loadedDailyBalance);
-                // save created item
-                DailyBalance dailyBalance = createDailyBalance();
-                newEntityViewModel.addDailyBalance(dailyBalance);
+                final DailyBalance dailyBalance = createDailyBalance();
+                Log.e(LOG_TAG,"converted number of sold eggs to " + dailyBalance.getEggsSold());
+                if (requestCode == MainActivity.EDIT_ENTITY_ACTIVITY_REQUEST_CODE && loadedDailyBalance.getDateKey().equals(dailyBalance.getDateKey())) {
+                    new AlertDialog.Builder(this)
+                            .setTitle("Eintrag überschreiben")
+                            .setMessage("Für den ausgewählten Tag ist bereits ein Eintrag vorhanden. Soll dieser Eintrag überschrieben werden?")
 
-                Toast.makeText(getApplicationContext(), R.string.new_entity_saved,Toast.LENGTH_SHORT).show();
+                            // Specifying a listener allows you to take an action before dismissing the dialog.
+                            // The dialog is automatically dismissed when a dialog button is clicked.
+                            .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
+                                public void onClick(DialogInterface dialog, int which) {
+                                    // Continue with delete operation
+                                    newEntityViewModel.deleteDailyBalance(loadedDailyBalance);
+                                    newEntityViewModel.addDailyBalance(dailyBalance);
 
-                // send intent with result to parent activity
-                Intent replyIntent = new Intent();
-                setResult(RESULT_OK, replyIntent);
+                                    Toast.makeText(getApplicationContext(), R.string.new_entity_saved,Toast.LENGTH_SHORT).show();
+                                    // finish activity
+                                    finish();
+                                }
+                            })
 
-                // finish activity
-                finish();
+                            // A null listener allows the button to dismiss the dialog and take no further action.
+                            .setNegativeButton(android.R.string.no, null)
+                            .setIcon(R.drawable.ic_warning_black_24dp)
+                            .show();
+                } else {
+                    // save created item
+                    newEntityViewModel.addDailyBalance(dailyBalance);
+                    Toast.makeText(getApplicationContext(), R.string.new_entity_saved,Toast.LENGTH_SHORT).show();
+                    // finish activity
+                    finish();
+                }
+
                 break;
             default:
                 break;
@@ -219,6 +235,10 @@ public class NewEntityActivity extends AppCompatActivity implements DatePickerFr
         return sdf_key.parse(dateKey);
     }
 
+    private Date getDateFromString(String dateWeekday) throws ParseException{
+        return sdf_weekday.parse(dateWeekday);
+    }
+
     private String dateToString(Date date) {
         return sdf_key.format(date);
     }
@@ -232,6 +252,11 @@ public class NewEntityActivity extends AppCompatActivity implements DatePickerFr
      * @return int
      */
     private int parseInt(String string) {
+
+        // if the string is empty, then 0 is returned as the user did not enter a value
+        if (string.isEmpty())
+            return 0;
+
         try {
             return Integer.parseInt(string);
         } catch (Exception e) {

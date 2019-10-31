@@ -15,12 +15,13 @@ import java.util.Locale;
 public class DailyBalance implements Serializable {
 
     public static final String COL_DATE_PRIMARY_KEY = "dateKey";
-    private static final String COL_EGGS_COLLECTED_NAME = "eggsFetched";
-    private static final String COL_EGGS_SOLD_NAME = "eggsSold";
+    public static final String COL_EGGS_COLLECTED_NAME = "eggsFetched";
+    public static final String COL_EGGS_SOLD_NAME = "eggsSold";
     private static final String COL_PRICE_PER_EGG = "pricePerEgg";
     private static final String COL_NUMBER_HENS = "numberOfHens";
-    private static final String COL_MONEY_EARNED = "moneyEarned";
+    public static final String COL_MONEY_EARNED = "moneyEarned";
     public static final String dateKeyFormat = "yyyyMMdd";
+    public static final int NOT_SET = 0;
 
     @PrimaryKey
     @NonNull

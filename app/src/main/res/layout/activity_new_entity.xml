@@ -54,7 +54,8 @@
         app:layout_constraintTop_toBottomOf="@+id/linLay_new_entity_datepicker"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintBottom_toTopOf="@+id/linLay_new_entity_price">
+        app:layout_constraintBottom_toTopOf="@+id/linLay_new_entity_price"
+        android:focusableInTouchMode="true">
 
         <LinearLayout
             android:layout_width="0dp"
@@ -67,12 +68,15 @@
                 android:src="@drawable/ic_egg_nest"
                 style="@style/new_entity_icon"
                 android:layout_gravity="center_horizontal"
-                android:layout_marginBottom="@dimen/big_padding">
+                android:layout_marginBottom="@dimen/big_padding"
+                android:transitionName="imageEggsCollected">
             </ImageView>
 
             <EditText
                 android:id="@+id/etxt_fetched_eggs"
-                style="@style/new_entity_edit_text">
+                style="@style/new_entity_edit_text"
+                android:transitionName="@string/transition_txtv_eggs_collected"
+                android:singleLine="true">
             </EditText>
 
         </LinearLayout>
@@ -88,12 +92,14 @@
                 android:src="@drawable/ic_eggs_black"
                 style="@style/new_entity_icon"
                 android:layout_gravity="center_horizontal"
-                android:layout_marginBottom="@dimen/big_padding">
+                android:layout_marginBottom="@dimen/big_padding"
+                android:transitionName="@string/transition_imgv_eggs_sold">
             </ImageView>
 
             <EditText
                 android:id="@+id/etxt_sold_eggs"
-                style="@style/new_entity_edit_text">
+                style="@style/new_entity_edit_text"
+                android:transitionName="@string/transition_txtv_eggs_sold">
             </EditText>
 
         </LinearLayout>

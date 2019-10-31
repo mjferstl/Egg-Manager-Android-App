@@ -1,15 +1,18 @@
 package mfdevelopement.eggmanager;
 
+import android.app.Activity;
+import android.app.ActivityOptions;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.util.Log;
+import android.util.Pair;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageButton;
-import android.widget.LinearLayout;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -25,10 +28,11 @@ public class DailyBalanceListAdapter extends RecyclerView.Adapter<DailyBalanceLi
     private final String LOG_TAG = "DailyBalanceListAdapter";
     private final SimpleDateFormat sdf = new SimpleDateFormat("EE, dd.MM.yyyy", Locale.getDefault());
 
+
     class DailyBalanceViewHolder extends RecyclerView.ViewHolder {
         private final TextView txtv_date, txtv_eggs_collected, txtv_eggs_sold, txtv_money_earned, txtv_money_earned_currency;
         private final ImageButton imgbtn_delete_item, imgbtn_edit_item;
-        private final LinearLayout linearLayout;
+        private final ImageView imgv_eggs_collected, imgv_eggs_sold;
 
         private DailyBalanceViewHolder(View itemView) {
             super(itemView);
@@ -39,7 +43,8 @@ public class DailyBalanceListAdapter extends RecyclerView.Adapter<DailyBalanceLi
             txtv_money_earned_currency = itemView.findViewById(R.id.txtv_earned_money_currency);
             imgbtn_delete_item = itemView.findViewById(R.id.imgbtn_delete);
             imgbtn_edit_item = itemView.findViewById(R.id.imgbtn_edit);
-            linearLayout = itemView.findViewById(R.id.linLay_recycler_item);
+            imgv_eggs_collected = itemView.findViewById(R.id.imgv_eggs_collected);
+            imgv_eggs_sold = itemView.findViewById(R.id.imgv_eggs_sold);
         }
     }
 
@@ -64,15 +69,28 @@ public class DailyBalanceListAdapter extends RecyclerView.Adapter<DailyBalanceLi
             final DailyBalance current = mDailyBalances.get(position);
 
             holder.txtv_date.setText(sdf.format(current.getDate()));
-            holder.txtv_eggs_collected.setText(String.valueOf(current.getEggsCollected()));
-            holder.txtv_eggs_sold.setText(String.valueOf(current.getEggsSold()));
 
-            if (current.getMoneyEarned() == 0) {
+            if (current.getEggsCollected() != DailyBalance.NOT_SET)
+                holder.txtv_eggs_collected.setText(String.valueOf(current.getEggsCollected()));
+            else
+                holder.txtv_eggs_collected.setText("0");
+
+            if (current.getEggsSold() != DailyBalance.NOT_SET) {
+                holder.txtv_eggs_sold.setText(String.valueOf(current.getEggsSold()));
+                holder.imgv_eggs_sold.setVisibility(View.VISIBLE);
+            } else {
+                holder.txtv_eggs_sold.setText("");
+                holder.imgv_eggs_sold.setVisibility(View.GONE);
+            }
+
+            if (current.getMoneyEarned() > 0) {
+                holder.txtv_money_earned.setText(String.format(Locale.getDefault(),"%.2f",current.getMoneyEarned()));
+                holder.txtv_money_earned.setVisibility(View.VISIBLE);
+                holder.txtv_money_earned_currency.setVisibility(View.VISIBLE);
+            } else {
+                holder.txtv_money_earned.setText("");
                 holder.txtv_money_earned.setVisibility(View.GONE);
                 holder.txtv_money_earned_currency.setVisibility(View.GONE);
-            } else {
-                holder.txtv_money_earned.setText(String.format(Locale.getDefault(),"%.2f",current.getMoneyEarned()));
-                holder.txtv_money_earned_currency.setVisibility(View.VISIBLE);
             }
 
             // listener for image button
@@ -107,10 +125,27 @@ public class DailyBalanceListAdapter extends RecyclerView.Adapter<DailyBalanceLi
                 @Override
                 public void onClick(View v) {
                     Log.d(LOG_TAG,"editing item at position " + position);
+
+                    Context context = v.getContext();
+
                     Intent intent = new Intent(v.getContext(), NewEntityActivity.class);
                     intent.putExtra(MainActivity.EXTRA_REQUEST_CODE_NAME,MainActivity.EDIT_ENTITY_ACTIVITY_REQUEST_CODE);
-                    intent.putExtra("dd",current);
-                    v.getContext().startActivity(intent);
+                    intent.putExtra(MainActivity.EXTRA_DAILY_BALANCE,current);
+
+                    int numPairs = 2;
+                    if (current.getEggsSold() != DailyBalance.NOT_SET) {numPairs = 4;}
+
+                    Pair[] pairs = new Pair[numPairs];
+                    pairs[0] = new Pair<View, String>(holder.imgv_eggs_collected,context.getString(R.string.transition_imgv_eggs_collected));
+                    pairs[1] = new Pair<View, String>(holder.txtv_eggs_collected,context.getString(R.string.transition_txtv_eggs_collected));
+
+                    if (numPairs == 4) {
+                        pairs[2] = new Pair<View, String>(holder.imgv_eggs_sold, context.getString(R.string.transition_imgv_eggs_sold));
+                        pairs[3] = new Pair<View, String>(holder.txtv_eggs_sold, context.getString(R.string.transition_txtv_eggs_sold));
+                    }
+
+                    ActivityOptions options = ActivityOptions.makeSceneTransitionAnimation((Activity) context,pairs);
+                    context.startActivity(intent, options.toBundle());
                 }
             });
         } else {
@@ -119,7 +154,7 @@ public class DailyBalanceListAdapter extends RecyclerView.Adapter<DailyBalanceLi
         }
     }
 
-    void setWords(List<DailyBalance> dailyBalances){
+    void setDailyBalances(List<DailyBalance> dailyBalances){
         mDailyBalances = dailyBalances;
         notifyDataSetChanged();
     }

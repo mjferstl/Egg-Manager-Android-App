@@ -13,10 +13,12 @@ import androidx.annotation.NonNull;
 import androidx.fragment.app.DialogFragment;
 
 import java.util.Calendar;
+import java.util.Date;
 
 public class DatePickerFragment extends DialogFragment {
 
     private final String LOG_TAG = "DatePickerFragment";
+    private static Date initialDate;
 
     // Define the listener of the interface type
     // listener will the activity instance containing fragment
@@ -46,12 +48,23 @@ public class DatePickerFragment extends DialogFragment {
         return new DatePickerFragment();
     }
 
+    public static DatePickerFragment newInstance(Date date) {
+        initialDate = date;
+        return new DatePickerFragment();
+    }
+
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View v = inflater.inflate(R.layout.fragment_date_picker, container);
 
         final DatePicker datePicker = v.findViewById(R.id.datepicker);
+
+        if (initialDate != null) {
+            Calendar cal = Calendar.getInstance();
+            cal.setTime(initialDate);
+            datePicker.updateDate(cal.get(Calendar.YEAR),cal.get(Calendar.MONTH),cal.get(Calendar.DAY_OF_MONTH));
+        }
 
         Button btn_cancel = v.findViewById(R.id.btn_datepicker_cancel);
         btn_cancel.setOnClickListener(new View.OnClickListener() {

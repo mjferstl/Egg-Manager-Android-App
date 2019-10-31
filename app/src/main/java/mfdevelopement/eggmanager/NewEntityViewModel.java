@@ -13,11 +13,13 @@ public class NewEntityViewModel extends AndroidViewModel {
     private double pricePerEgg;
     private LiveData<List<DailyBalance>> mAllData;
 
+
     public NewEntityViewModel(Application application) {
         super(application);
         repository = new EggManagerRepository(application);
         pricePerEgg = repository.getPricePerEgg();
         mAllData = repository.getAllData();
+
     }
 
     public double getPricePerEgg() {
@@ -32,4 +34,6 @@ public class NewEntityViewModel extends AndroidViewModel {
     public void deleteDailyBalance(DailyBalance dailyBalance) {
         repository.delete(dailyBalance);
     }
+
+
 }

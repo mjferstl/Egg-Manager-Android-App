@@ -7,7 +7,14 @@
     <string name="empty_not_saved">Kein neuer Eintrag erstellt</string>
     <string name="new_entity_saved">Eintrag gespeichert</string>
     <string name="changes_not_saved">Änderungen wurden nicht übernommen</string>
+    <string name="summary">Zusammenfassung</string>
 
     <string name="euro_symbol" translatable="false">&#8364;</string>
     <string name="egg_symbol">&#xf7fb;</string>
+
+    <!-- strings for use in transitions -->
+    <string name="transition_txtv_eggs_collected" translatable="false">textEggsCollected</string>
+    <string name="transition_txtv_eggs_sold" translatable="false">textEggsSold</string>
+    <string name="transition_imgv_eggs_collected" translatable="false">imageEggsCollected</string>
+    <string name="transition_imgv_eggs_sold" translatable="false">imageEggsSold</string>
 </resources>

@@ -8,6 +8,85 @@
     tools:context=".MainActivity"
     tools:showIn="@layout/activity_main">
 
+    <LinearLayout
+        android:id="@+id/linLay_summary"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:paddingStart="@dimen/small_padding"
+        android:paddingEnd="@dimen/small_padding"
+        android:paddingTop="@dimen/small_padding"
+        android:paddingBottom="@dimen/small_padding"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toTopOf="@+id/recyclerview"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:background="@drawable/summary_background">
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textColor="@color/colorAccent"
+            android:textSize="@dimen/textAppearanceBody1"
+            android:textStyle="bold"
+            android:layout_marginBottom="@dimen/small_padding"
+            android:paddingStart="@dimen/small_padding"
+            android:paddingEnd="@dimen/small_padding"
+            android:text="@string/summary">
+        </TextView>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="horizontal">
+
+            <ImageView
+                style="@style/recycler_item_icon"
+                android:src="@drawable/ic_egg_nest"
+                android:layout_marginStart="0dp">
+            </ImageView>
+
+            <TextView
+                android:id="@+id/txtv_summary_eggsCollected"
+                style="@style/basic_text"
+                android:text="222">
+            </TextView>
+
+            <ImageView
+                style="@style/recycler_item_icon"
+                android:src="@drawable/ic_eggs_black">
+            </ImageView>
+
+            <TextView
+                android:id="@+id/txtv_summary_eggsSold"
+                style="@style/basic_text"
+                android:text="222">
+            </TextView>
+
+            <TextView
+                android:id="@+id/txtv_summary_money_earned"
+                style="@style/basic_text"
+                android:layout_width="0dp"
+                android:layout_weight="1"
+                android:gravity="end"
+                android:text="111">
+            </TextView>
+
+            <TextView
+                android:id="@+id/txtv_earned_money_currency"
+                style="@style/basic_text"
+                android:layout_marginStart="0dp"
+                android:text="@string/euro_symbol"
+                android:textSize="@dimen/textAppearanceHeadline5"
+                android:textColor="@color/main_text_color">
+            </TextView>
+
+        </LinearLayout>
+
+
+
+    </LinearLayout>
+
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/recyclerview"
         android:layout_width="0dp"
@@ -18,6 +97,6 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toBottomOf="@id/linLay_summary" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

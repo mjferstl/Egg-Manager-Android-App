@@ -55,24 +55,30 @@
         android:layout_marginTop="@dimen/small_padding">
 
         <ImageView
+            android:id="@+id/imgv_eggs_collected"
             style="@style/recycler_item_icon"
             android:src="@drawable/ic_egg_nest"
-            android:layout_marginStart="0dp">
+            android:layout_marginStart="0dp"
+            android:transitionName="@string/transition_imgv_eggs_collected">
         </ImageView>
 
         <TextView
             android:id="@+id/txtv_recycler_item_eggs_collected"
-            style="@style/recylcer_item_text">
+            style="@style/recylcer_item_text"
+            android:transitionName="@string/transition_txtv_eggs_collected">
         </TextView>
 
         <ImageView
+            android:id="@+id/imgv_eggs_sold"
             style="@style/recycler_item_icon"
-            android:src="@drawable/ic_eggs_black">
+            android:src="@drawable/ic_eggs_black"
+            android:transitionName="@string/transition_imgv_eggs_sold">
         </ImageView>
 
         <TextView
             android:id="@+id/txtv_recycler_item_eggs_sold"
-            style="@style/recylcer_item_text">
+            style="@style/recylcer_item_text"
+            android:transitionName="@string/transition_txtv_eggs_sold">
         </TextView>
 
         <TextView

@@ -20,12 +20,17 @@ public class EggManagerRepository {
 
     private DailyBalanceDao dailyBalanceDao;
     private LiveData<List<DailyBalance>> mAllData;
+    private LiveData<Integer> ldTotalEggsSold, ldTotalEggsCollected;
+    private LiveData<Double> ldTotalMoneyEarned;
 
     EggManagerRepository(Application application) {
         this.application = application;
         EggManagerRoomDatabase db = EggManagerRoomDatabase.getDatabase(application);
         dailyBalanceDao = db.dailyBalanceDao();
         mAllData = dailyBalanceDao.getAscendingItems();
+        ldTotalEggsSold = dailyBalanceDao.getTotalEggsSold();
+        ldTotalMoneyEarned = dailyBalanceDao.getTotalMoneyEarned();
+        ldTotalEggsCollected = dailyBalanceDao.getTotalEggsCollected();
 
         pricePerEgg = getPricePerEgg();
     }
@@ -34,13 +39,25 @@ public class EggManagerRepository {
         return mAllData;
     }
 
-    public void insert (DailyBalance dailyBalance) {
+    public void insert(DailyBalance dailyBalance) {
         setPricePerEgg(dailyBalance.getPricePerEgg());
         new insertAsyncTask(dailyBalanceDao).execute(dailyBalance);
     }
 
-    public void delete (DailyBalance dailyBalance) {
+    public void delete(DailyBalance dailyBalance) {
         new deleteAsyncTask(dailyBalanceDao).execute(dailyBalance);
+    }
+
+    public LiveData<Integer> getTotalEggsSold() {
+        return ldTotalEggsSold;
+    }
+
+    public LiveData<Double> getTotalMoneyEarned() {
+        return ldTotalMoneyEarned;
+    }
+
+    public LiveData<Integer> getTotalEggsCollected() {
+        return ldTotalEggsCollected;
     }
 
     private static class insertAsyncTask extends AsyncTask<DailyBalance, Void, Void> {
@@ -75,12 +92,12 @@ public class EggManagerRepository {
 
     public double getPricePerEgg() {
         sharedPreferences = application.getSharedPreferences(PREFERENCE_FILE_KEY, Context.MODE_PRIVATE);
-        return sharedPreferences.getFloat(PRICE_PER_EGG,0);
+        return sharedPreferences.getFloat(PRICE_PER_EGG, 0);
     }
 
     public void setPricePerEgg(double pricePerEgg) {
         SharedPreferences.Editor editor = sharedPreferences.edit();
-        editor.putFloat(PRICE_PER_EGG,(float)pricePerEgg);
+        editor.putFloat(PRICE_PER_EGG, (float) pricePerEgg);
         editor.apply();
     }
 }
