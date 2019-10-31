@@ -155,7 +155,6 @@ public class NewEntityActivity extends AppCompatActivity implements DatePickerFr
                 }
 
                 final DailyBalance dailyBalance = createDailyBalance();
-                Log.e(LOG_TAG,"converted number of sold eggs to " + dailyBalance.getEggsSold());
                 if (requestCode == MainActivity.EDIT_ENTITY_ACTIVITY_REQUEST_CODE && loadedDailyBalance.getDateKey().equals(dailyBalance.getDateKey())) {
                     new AlertDialog.Builder(this)
                             .setTitle("Eintrag überschreiben")
@@ -186,7 +185,6 @@ public class NewEntityActivity extends AppCompatActivity implements DatePickerFr
                     // finish activity
                     finish();
                 }
-
                 break;
             default:
                 break;
@@ -197,10 +195,9 @@ public class NewEntityActivity extends AppCompatActivity implements DatePickerFr
     private void updatePriceColor(String priceString) {
         if (isValidPrice(priceString)) {
             pricePerEggEditText.setTextColor(ContextCompat.getColor(this, R.color.main_text_color));
-            Log.d(LOG_TAG, "price per egg is a valid number. price = " + priceString);
         } else {
             pricePerEggEditText.setTextColor(ContextCompat.getColor(this, R.color.error));
-            Log.d(LOG_TAG, "price per egg is not a valid number.");
+            Log.d(LOG_TAG, "price per egg is not a valid number: " + priceString);
         }
     }
 

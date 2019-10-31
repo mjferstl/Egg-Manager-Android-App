@@ -120,7 +120,7 @@
         <ImageView
             android:id="@+id/imgv_egg_price"
             style="@style/new_entity_icon"
-            android:src="@drawable/ic_egg_price"
+            android:src="@drawable/ic_egg_price_48dp"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintBottom_toBottomOf="parent"

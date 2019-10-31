@@ -132,16 +132,16 @@ public class DailyBalanceListAdapter extends RecyclerView.Adapter<DailyBalanceLi
                     intent.putExtra(MainActivity.EXTRA_REQUEST_CODE_NAME,MainActivity.EDIT_ENTITY_ACTIVITY_REQUEST_CODE);
                     intent.putExtra(MainActivity.EXTRA_DAILY_BALANCE,current);
 
-                    int numPairs = 2;
-                    if (current.getEggsSold() != DailyBalance.NOT_SET) {numPairs = 4;}
+                    int numPairs = 1;
+                    if (current.getEggsSold() != DailyBalance.NOT_SET) {numPairs = 2;}
 
                     Pair[] pairs = new Pair[numPairs];
                     pairs[0] = new Pair<View, String>(holder.imgv_eggs_collected,context.getString(R.string.transition_imgv_eggs_collected));
-                    pairs[1] = new Pair<View, String>(holder.txtv_eggs_collected,context.getString(R.string.transition_txtv_eggs_collected));
+                    //pairs[1] = new Pair<View, String>(holder.txtv_eggs_collected,context.getString(R.string.transition_txtv_eggs_collected));
 
-                    if (numPairs == 4) {
-                        pairs[2] = new Pair<View, String>(holder.imgv_eggs_sold, context.getString(R.string.transition_imgv_eggs_sold));
-                        pairs[3] = new Pair<View, String>(holder.txtv_eggs_sold, context.getString(R.string.transition_txtv_eggs_sold));
+                    if (numPairs == 2) {
+                        pairs[1] = new Pair<View, String>(holder.imgv_eggs_sold, context.getString(R.string.transition_imgv_eggs_sold));
+                        //pairs[3] = new Pair<View, String>(holder.txtv_eggs_sold, context.getString(R.string.transition_txtv_eggs_sold));
                     }
 
                     ActivityOptions options = ActivityOptions.makeSceneTransitionAnimation((Activity) context,pairs);

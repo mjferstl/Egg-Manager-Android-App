@@ -2,7 +2,6 @@ package mfdevelopement.eggmanager;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -43,8 +42,6 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
-
-        Log.e(LOG_TAG,"convert 0 to int: " + Integer.parseInt("0"));
 
         linLay_summary = findViewById(R.id.linLay_summary);
         hideSummary();
@@ -111,7 +108,7 @@ public class MainActivity extends AppCompatActivity {
 
         //noinspection SimplifiableIfStatement
         if (id == R.id.action_settings) {
-            return true;
+            return false;
         }
 
         return super.onOptionsItemSelected(item);
