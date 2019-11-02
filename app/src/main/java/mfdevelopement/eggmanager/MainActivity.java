@@ -2,6 +2,7 @@ package mfdevelopement.eggmanager;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -17,6 +18,7 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
+import com.google.android.material.snackbar.Snackbar;
 
 import java.util.List;
 import java.util.Locale;
@@ -24,8 +26,12 @@ import java.util.Locale;
 public class MainActivity extends AppCompatActivity {
 
     private DailyBalanceViewModel dailyBalanceViewModel;
-    public static final int NEW_ENTITY_ACTIVITY_REQUEST_CODE = 1;
-    public static final int EDIT_ENTITY_ACTIVITY_REQUEST_CODE = 2;
+    public static final int NEW_ENTITY_REQUEST_CODE = 2;
+    public static final int EDIT_ENTITY_REQUEST_CODE = 3;
+
+    public static final int NEW_ENTITY_RESULT_CODE = 2;
+    public static final int EDITED_ENTITY_RESULT_CODE = 3;
+
     public static final String EXTRA_REQUEST_CODE_NAME = "requestCode";
     public static final String EXTRA_PRIMATRY_KEY_NAME = "dateKeyPrimary";
     public static final String EXTRA_DAILY_BALANCE = "extraDailyBalance";
@@ -54,8 +60,9 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 Intent intent = new Intent(MainActivity.this, NewEntityActivity.class);
-                intent.putExtra(EXTRA_REQUEST_CODE_NAME,NEW_ENTITY_ACTIVITY_REQUEST_CODE);
-                startActivity(intent);
+                intent.putExtra(EXTRA_REQUEST_CODE_NAME, NEW_ENTITY_REQUEST_CODE);
+                //startActivity(intent);
+                startActivityForResult(intent, NEW_ENTITY_REQUEST_CODE);
             }
         });
 
@@ -112,6 +119,29 @@ public class MainActivity extends AppCompatActivity {
         }
 
         return super.onOptionsItemSelected(item);
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+
+        Log.d(LOG_TAG,"onActivityResult::requestCode=" + requestCode + ",resultCode=" + resultCode);
+
+        String snackbarText = "";
+
+        if (resultCode == RESULT_CANCELED) {
+            snackbarText = getString(R.string.entry_not_added);
+        }
+        else if (requestCode == NEW_ENTITY_REQUEST_CODE && resultCode == NEW_ENTITY_RESULT_CODE) {
+            snackbarText = getString(R.string.new_entity_saved);
+        }
+        else if (requestCode == EDIT_ENTITY_REQUEST_CODE && resultCode == EDITED_ENTITY_RESULT_CODE) {
+            snackbarText = getString(R.string.changes_saved);
+        }
+
+        // create a snackbar and display it
+        if (!snackbarText.isEmpty())
+            Snackbar.make(findViewById(R.id.main_container),snackbarText,Snackbar.LENGTH_SHORT).show();
     }
 
     private void setObservers() {

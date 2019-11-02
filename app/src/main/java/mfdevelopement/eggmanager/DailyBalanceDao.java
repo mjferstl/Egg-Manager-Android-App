@@ -44,4 +44,7 @@ public interface DailyBalanceDao {
 
     @Query("SELECT SUM(" + COL_EGGS_COLLECTED_NAME + ") FROM " + tableName)
     LiveData<Integer> getTotalEggsCollected();
+
+    @Query("SELECT " + COL_DATE_PRIMARY_KEY + " FROM " + tableName)
+    LiveData<List<String>> getDateKeys();
 }

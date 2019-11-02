@@ -1,14 +1,26 @@
 <resources>
     <string name="app_name">EggManager</string>
     <string name="action_settings">Einstellungen</string>
+    <string name="action_about">App-Info</string>
+    <string name="action_filter">Filtern</string>
     <string name="action_save">Speichern</string>
 
     <string name="button_save">@string/action_save</string>
-    <string name="empty_not_saved">Kein neuer Eintrag erstellt</string>
-    <string name="new_entity_saved">Eintrag gespeichert</string>
-    <string name="changes_not_saved">Änderungen wurden nicht übernommen</string>
+    <string name="entry_not_added">Kein Eintrag erstellt</string>
+    <string name="new_entity_saved">Neuer Eintrag gespeichert</string>
+    <string name="changes_saved">Änderungen gespeichert</string>
+    <string name="changes_not_saved">Änderungen nicht übernommen</string>
     <string name="summary">Zusammenfassung</string>
 
+    <string name="hint_eggs_collected">abgenommen</string>
+    <string name="hint_eggs_sold">verkauft</string>
+
+    <string name="numer_eggs_collected_empty">Anzahl abgenommener Eier fehlt</string>
+
+    <!-- dialogs -->
+    <string name="entry_delete_request">Eintrag löschen?</string>
+
+    <!-- symbols -->
     <string name="euro_symbol" translatable="false">&#8364;</string>
     <string name="egg_symbol">&#xf7fb;</string>
 

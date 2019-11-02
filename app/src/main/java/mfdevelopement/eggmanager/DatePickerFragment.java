@@ -81,7 +81,7 @@ public class DatePickerFragment extends DialogFragment {
             public void onClick(View v) {
                 Calendar cal = getDatePickerDate(datePicker);
                 listener.onAddDateSubmit(cal);
-                Log.d(LOG_TAG,"Button OK clicked");
+                Log.d(LOG_TAG,"Date selected");
                 dismiss();
             }
         });

@@ -22,6 +22,7 @@ public class EggManagerRepository {
     private LiveData<List<DailyBalance>> mAllData;
     private LiveData<Integer> ldTotalEggsSold, ldTotalEggsCollected;
     private LiveData<Double> ldTotalMoneyEarned;
+    private LiveData<List<String>> ldDateKeys;
 
     EggManagerRepository(Application application) {
         this.application = application;
@@ -31,6 +32,7 @@ public class EggManagerRepository {
         ldTotalEggsSold = dailyBalanceDao.getTotalEggsSold();
         ldTotalMoneyEarned = dailyBalanceDao.getTotalMoneyEarned();
         ldTotalEggsCollected = dailyBalanceDao.getTotalEggsCollected();
+        ldDateKeys = dailyBalanceDao.getDateKeys();
 
         pricePerEgg = getPricePerEgg();
     }
@@ -59,6 +61,8 @@ public class EggManagerRepository {
     public LiveData<Integer> getTotalEggsCollected() {
         return ldTotalEggsCollected;
     }
+
+    public LiveData<List<String>> getDateKeys() { return ldDateKeys; }
 
     private static class insertAsyncTask extends AsyncTask<DailyBalance, Void, Void> {
 

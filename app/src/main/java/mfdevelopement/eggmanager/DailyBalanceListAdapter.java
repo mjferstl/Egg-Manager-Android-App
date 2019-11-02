@@ -129,7 +129,7 @@ public class DailyBalanceListAdapter extends RecyclerView.Adapter<DailyBalanceLi
                     Context context = v.getContext();
 
                     Intent intent = new Intent(v.getContext(), NewEntityActivity.class);
-                    intent.putExtra(MainActivity.EXTRA_REQUEST_CODE_NAME,MainActivity.EDIT_ENTITY_ACTIVITY_REQUEST_CODE);
+                    intent.putExtra(MainActivity.EXTRA_REQUEST_CODE_NAME,MainActivity.EDIT_ENTITY_REQUEST_CODE);
                     intent.putExtra(MainActivity.EXTRA_DAILY_BALANCE,current);
 
                     int numPairs = 1;
@@ -145,7 +145,7 @@ public class DailyBalanceListAdapter extends RecyclerView.Adapter<DailyBalanceLi
                     }
 
                     ActivityOptions options = ActivityOptions.makeSceneTransitionAnimation((Activity) context,pairs);
-                    context.startActivity(intent, options.toBundle());
+                    ((Activity) context).startActivityForResult(intent, MainActivity.EDIT_ENTITY_REQUEST_CODE ,options.toBundle());
                 }
             });
         } else {
@@ -153,6 +153,8 @@ public class DailyBalanceListAdapter extends RecyclerView.Adapter<DailyBalanceLi
             holder.txtv_date.setText("Kein Datum");
         }
     }
+
+
 
     void setDailyBalances(List<DailyBalance> dailyBalances){
         mDailyBalances = dailyBalances;
