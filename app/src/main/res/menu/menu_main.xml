@@ -3,8 +3,20 @@
     xmlns:tools="http://schemas.android.com/tools"
     tools:context="mfdevelopement.eggmanager.MainActivity">
     <item
+        android:id="@+id/action_main_filter"
+        android:orderInCategory="99"
+        android:title="@string/action_filter"
+        android:icon="@drawable/ic_filter_list_black_24dp"
+        app:showAsAction="ifRoom"
+        app:iconTint="@color/white"/>
+    <item
         android:id="@+id/action_settings"
         android:orderInCategory="100"
         android:title="@string/action_settings"
         app:showAsAction="never" />
+    <item
+        android:id="@+id/action_main_about"
+        android:orderInCategory="101"
+        android:title="@string/action_about"
+        app:showAsAction="never"/>
 </menu>

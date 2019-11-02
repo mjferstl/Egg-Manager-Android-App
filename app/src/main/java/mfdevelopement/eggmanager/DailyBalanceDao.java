@@ -47,4 +47,7 @@ public interface DailyBalanceDao {
 
     @Query("SELECT " + COL_DATE_PRIMARY_KEY + " FROM " + tableName)
     LiveData<List<String>> getDateKeys();
+
+    @Query("SELECT * FROM " + tableName + " WHERE " + COL_DATE_PRIMARY_KEY + " LIKE :dateKey || '%'")
+    List<DailyBalance> getDailyBalancesByDateKey(String dateKey);
 }

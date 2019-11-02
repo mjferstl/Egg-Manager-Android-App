@@ -7,7 +7,9 @@ import android.os.AsyncTask;
 
 import androidx.lifecycle.LiveData;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.ExecutionException;
 
 public class EggManagerRepository {
 
@@ -23,8 +25,9 @@ public class EggManagerRepository {
     private LiveData<Integer> ldTotalEggsSold, ldTotalEggsCollected;
     private LiveData<Double> ldTotalMoneyEarned;
     private LiveData<List<String>> ldDateKeys;
+    private List<DailyBalance> listFilteredDailyBalances;
 
-    EggManagerRepository(Application application) {
+    EggManagerRepository(Application application){
         this.application = application;
         EggManagerRoomDatabase db = EggManagerRoomDatabase.getDatabase(application);
         dailyBalanceDao = db.dailyBalanceDao();
@@ -64,6 +67,20 @@ public class EggManagerRepository {
 
     public LiveData<List<String>> getDateKeys() { return ldDateKeys; }
 
+    public List<DailyBalance> getDailyBalancesByDateKey(String dateKeyPattern) {
+        List<DailyBalance> dailyBalanceList = new ArrayList<>();
+
+        try {
+            dailyBalanceList = new getDailyBalanceByDateKeyAsyncTask(dailyBalanceDao).execute(dateKeyPattern).get();
+        } catch (ExecutionException e) {
+            e.printStackTrace();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+
+        return dailyBalanceList;
+    }
+
     private static class insertAsyncTask extends AsyncTask<DailyBalance, Void, Void> {
 
         private DailyBalanceDao mAsyncTaskDao;
@@ -91,6 +108,20 @@ public class EggManagerRepository {
         protected Void doInBackground(final DailyBalance... params) {
             mAsyncTaskDao.delete(params[0]);
             return null;
+        }
+    }
+
+    private static class getDailyBalanceByDateKeyAsyncTask extends AsyncTask<String, Void, List<DailyBalance>> {
+
+        private DailyBalanceDao mAsyncTaskDao;
+
+        getDailyBalanceByDateKeyAsyncTask(DailyBalanceDao dao) {
+            mAsyncTaskDao = dao;
+        }
+
+        @Override
+        protected List<DailyBalance> doInBackground(final String... params) {
+            return mAsyncTaskDao.getDailyBalancesByDateKey(params[0]);
         }
     }
 

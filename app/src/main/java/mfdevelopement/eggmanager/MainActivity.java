@@ -12,6 +12,9 @@ import android.widget.TextView;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
+import androidx.fragment.app.DialogFragment;
+import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentTransaction;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -23,7 +26,7 @@ import com.google.android.material.snackbar.Snackbar;
 import java.util.List;
 import java.util.Locale;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity implements FilterDialogFragment.OnAddFilterListener{
 
     private DailyBalanceViewModel dailyBalanceViewModel;
     public static final int NEW_ENTITY_REQUEST_CODE = 2;
@@ -31,6 +34,8 @@ public class MainActivity extends AppCompatActivity {
 
     public static final int NEW_ENTITY_RESULT_CODE = 2;
     public static final int EDITED_ENTITY_RESULT_CODE = 3;
+
+    private List<String> allDateKeys;
 
     public static final String EXTRA_REQUEST_CODE_NAME = "requestCode";
     public static final String EXTRA_PRIMATRY_KEY_NAME = "dateKeyPrimary";
@@ -40,12 +45,16 @@ public class MainActivity extends AppCompatActivity {
     private double totalMoneyEarned;
 
     private TextView txtv_summary_eggs_collected, txtv_summary_eggs_sold, txtv_summary_money_earned;
+    private TextView txtv_summary_extra_info;
     private LinearLayout linLay_summary;
+
+    private boolean filtered = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
@@ -54,19 +63,13 @@ public class MainActivity extends AppCompatActivity {
         txtv_summary_eggs_collected = findViewById(R.id.txtv_summary_eggsCollected);
         txtv_summary_eggs_sold = findViewById(R.id.txtv_summary_eggsSold);
         txtv_summary_money_earned = findViewById(R.id.txtv_summary_money_earned);
+        txtv_summary_extra_info = findViewById(R.id.txtv_summary_extra_info);
 
-        FloatingActionButton fab = findViewById(R.id.fab);
-        fab.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Intent intent = new Intent(MainActivity.this, NewEntityActivity.class);
-                intent.putExtra(EXTRA_REQUEST_CODE_NAME, NEW_ENTITY_REQUEST_CODE);
-                //startActivity(intent);
-                startActivityForResult(intent, NEW_ENTITY_REQUEST_CODE);
-            }
-        });
+        initFab();
 
         dailyBalanceViewModel = new ViewModelProvider(this).get(DailyBalanceViewModel.class);
+
+        Log.d(LOG_TAG,"get number of entries for october 2019: number = " + dailyBalanceViewModel.getFilteredDailyBalanceList("201910").size());
 
         setObservers();
     }
@@ -99,6 +102,10 @@ public class MainActivity extends AppCompatActivity {
             linLay_summary.setVisibility(View.VISIBLE);
     }
 
+    private void setAllDateKeys(List<String> stringList) {
+        allDateKeys = stringList;
+    }
+
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
@@ -115,6 +122,25 @@ public class MainActivity extends AppCompatActivity {
 
         //noinspection SimplifiableIfStatement
         if (id == R.id.action_settings) {
+//            Intent intent = new Intent(this, SettingsActivity.class);
+//            startActivity(intent);
+            return false;
+        }
+        else if (id == R.id.action_main_filter) {
+
+            FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
+            Fragment prev = getSupportFragmentManager().findFragmentByTag("dialog");
+            if (prev != null) {
+                ft.remove(prev);
+            }
+            ft.addToBackStack(null);
+            ft.commit();
+
+            // Create and show the dialog.
+            DialogFragment newFragment = FilterDialogFragment.newInstance(allDateKeys, dailyBalanceViewModel);
+
+            //newFragment.setTargetFragment(this, 1);
+            newFragment.show(getSupportFragmentManager(), "filterDialog");
             return false;
         }
 
@@ -144,6 +170,19 @@ public class MainActivity extends AppCompatActivity {
             Snackbar.make(findViewById(R.id.main_container),snackbarText,Snackbar.LENGTH_SHORT).show();
     }
 
+    private void initFab() {
+        FloatingActionButton fab = findViewById(R.id.fab);
+        fab.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent intent = new Intent(MainActivity.this, NewEntityActivity.class);
+                intent.putExtra(EXTRA_REQUEST_CODE_NAME, NEW_ENTITY_REQUEST_CODE);
+                //startActivity(intent);
+                startActivityForResult(intent, NEW_ENTITY_REQUEST_CODE);
+            }
+        });
+    }
+
     private void setObservers() {
 
         RecyclerView recyclerView = findViewById(R.id.recyclerview);
@@ -153,13 +192,20 @@ public class MainActivity extends AppCompatActivity {
 
         dailyBalanceViewModel.getAllDailyBalances().observe(this, new Observer<List<DailyBalance>>() {
             @Override
-            public void onChanged(@Nullable final List<DailyBalance> dates) {
-                // Update the cached copy of the words in the adapter.
-                adapter.setDailyBalances(dates);
+            public void onChanged(@Nullable final List<DailyBalance> dailyBalanceList) {
+                // Update the cached copy of the items in the adapter, if the list is not in filtered mode
+                if (!filtered) { adapter.setDailyBalances(dailyBalanceList);}
 
-                int numItems = 0;
-                try { numItems = dates.size(); } catch (NullPointerException e) {e.printStackTrace();}
-                if (numItems >= 2) { displaySummary(); } else { hideSummary(); }
+                // show summary if the recycler view contains 2 or more items
+                int numItems = adapter.getItemCount();
+                if (numItems >= 2) {
+                    displaySummary();
+                    String extraInfo = "(" + numItems + " Einträge)";
+                    txtv_summary_extra_info.setText(extraInfo);
+                } else {
+                    hideSummary();
+                    txtv_summary_extra_info.setText("");
+                }
             }
         });
 
@@ -186,5 +232,17 @@ public class MainActivity extends AppCompatActivity {
                 updateSummary();
             }
         });
+
+        dailyBalanceViewModel.getDateKeys().observe(this, new Observer<List<String>>() {
+            @Override
+            public void onChanged(List<String> strings) {
+                setAllDateKeys(strings);
+            }
+        });
+    }
+
+    @Override
+    public void onAddFilterListenerSubmit(String filterString) {
+
     }
 }

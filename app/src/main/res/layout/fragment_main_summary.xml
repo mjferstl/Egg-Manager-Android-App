@@ -10,16 +10,35 @@
     android:paddingEnd="@dimen/big_padding"
     android:paddingBottom="@dimen/small_padding">
 
-    <TextView
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="@dimen/small_padding"
-        android:paddingStart="@dimen/small_padding"
-        android:paddingEnd="@dimen/small_padding"
-        android:text="@string/summary"
-        android:textColor="@color/colorAccent"
-        android:textSize="@dimen/textAppearanceBody1"
-        android:textStyle="bold"/>
+        android:orientation="horizontal"
+        android:layout_marginBottom="@dimen/small_padding">
+
+        <TextView
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_vertical"
+            android:paddingStart="@dimen/small_padding"
+            android:paddingEnd="@dimen/small_padding"
+            android:text="@string/summary"
+            android:textColor="@color/colorAccent"
+            android:textSize="@dimen/textAppearanceBody1"
+            android:textStyle="bold"/>
+
+        <TextView
+            android:id="@+id/txtv_summary_extra_info"
+            style="@style/basic_text"
+            android:text=""
+            android:paddingTop="0dp"
+            android:paddingBottom="0dp"
+            android:textSize="@dimen/textAppearanceBody2"
+            android:textColor="@color/main_text_color">
+        </TextView>
+
+    </LinearLayout>
 
     <LinearLayout
         android:layout_width="match_parent"

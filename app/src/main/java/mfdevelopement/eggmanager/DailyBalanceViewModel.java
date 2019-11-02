@@ -15,6 +15,8 @@ public class DailyBalanceViewModel extends AndroidViewModel {
     private LiveData<List<DailyBalance>> mAllDailyBalances;
     private LiveData<Integer> mNumberEggsSold, mTotalEggsCollected;
     private LiveData<Double> mMoneyEarned;
+    private List<DailyBalance> filteredDailyBalanceList;
+    private LiveData<List<String>> ldDateKeys;
 
     public DailyBalanceViewModel (Application application) {
         super(application);
@@ -23,6 +25,7 @@ public class DailyBalanceViewModel extends AndroidViewModel {
         mNumberEggsSold = mRepository.getTotalEggsSold();
         mMoneyEarned = mRepository.getTotalMoneyEarned();
         mTotalEggsCollected = mRepository.getTotalEggsCollected();
+        ldDateKeys = mRepository.getDateKeys();
     }
 
     LiveData<List<DailyBalance>> getAllDailyBalances() { return mAllDailyBalances; }
@@ -35,4 +38,11 @@ public class DailyBalanceViewModel extends AndroidViewModel {
     LiveData<Double> getTotalMoneyEarned() { return mMoneyEarned; }
 
     LiveData<Integer> getTotalEggsCollected() { return mTotalEggsCollected; }
+
+    public List<DailyBalance> getFilteredDailyBalanceList(String dateKeyPattern) {
+        filteredDailyBalanceList = mRepository.getDailyBalancesByDateKey(dateKeyPattern);
+        return  filteredDailyBalanceList;
+    }
+
+    public LiveData<List<String>> getDateKeys() { return ldDateKeys;}
 }

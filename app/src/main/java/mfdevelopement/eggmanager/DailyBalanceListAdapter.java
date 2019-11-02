@@ -27,7 +27,8 @@ public class DailyBalanceListAdapter extends RecyclerView.Adapter<DailyBalanceLi
     private DailyBalanceViewModel viewModel;
     private final String LOG_TAG = "DailyBalanceListAdapter";
     private final SimpleDateFormat sdf = new SimpleDateFormat("EE, dd.MM.yyyy", Locale.getDefault());
-
+    private final LayoutInflater mInflater;
+    private List<DailyBalance> mDailyBalances; // Cached copy of words
 
     class DailyBalanceViewHolder extends RecyclerView.ViewHolder {
         private final TextView txtv_date, txtv_eggs_collected, txtv_eggs_sold, txtv_money_earned, txtv_money_earned_currency;
@@ -47,9 +48,6 @@ public class DailyBalanceListAdapter extends RecyclerView.Adapter<DailyBalanceLi
             imgv_eggs_sold = itemView.findViewById(R.id.imgv_eggs_sold);
         }
     }
-
-    private final LayoutInflater mInflater;
-    private List<DailyBalance> mDailyBalances; // Cached copy of words
 
     DailyBalanceListAdapter(Context context, DailyBalanceViewModel viewModel) {
         this.viewModel = viewModel;
@@ -153,8 +151,6 @@ public class DailyBalanceListAdapter extends RecyclerView.Adapter<DailyBalanceLi
             holder.txtv_date.setText("Kein Datum");
         }
     }
-
-
 
     void setDailyBalances(List<DailyBalance> dailyBalances){
         mDailyBalances = dailyBalances;
