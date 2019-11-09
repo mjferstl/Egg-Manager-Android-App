@@ -1,4 +1,4 @@
-package mfdevelopement.eggmanager;
+package mfdevelopement.eggmanager.list_adapters;
 
 import android.app.Activity;
 import android.app.ActivityOptions;
@@ -22,6 +22,12 @@ import java.text.SimpleDateFormat;
 import java.util.List;
 import java.util.Locale;
 
+import mfdevelopement.eggmanager.data_models.DailyBalance;
+import mfdevelopement.eggmanager.activities.MainActivity;
+import mfdevelopement.eggmanager.R;
+import mfdevelopement.eggmanager.activities.NewEntityActivity;
+import mfdevelopement.eggmanager.viewmodels.DailyBalanceViewModel;
+
 public class DailyBalanceListAdapter extends RecyclerView.Adapter<DailyBalanceListAdapter.DailyBalanceViewHolder> {
 
     private DailyBalanceViewModel viewModel;
@@ -30,7 +36,7 @@ public class DailyBalanceListAdapter extends RecyclerView.Adapter<DailyBalanceLi
     private final LayoutInflater mInflater;
     private List<DailyBalance> mDailyBalances; // Cached copy of words
 
-    class DailyBalanceViewHolder extends RecyclerView.ViewHolder {
+    public class DailyBalanceViewHolder extends RecyclerView.ViewHolder {
         private final TextView txtv_date, txtv_eggs_collected, txtv_eggs_sold, txtv_money_earned, txtv_money_earned_currency;
         private final ImageButton imgbtn_delete_item, imgbtn_edit_item;
         private final ImageView imgv_eggs_collected, imgv_eggs_sold;
@@ -49,7 +55,7 @@ public class DailyBalanceListAdapter extends RecyclerView.Adapter<DailyBalanceLi
         }
     }
 
-    DailyBalanceListAdapter(Context context, DailyBalanceViewModel viewModel) {
+    public DailyBalanceListAdapter(Context context, DailyBalanceViewModel viewModel) {
         this.viewModel = viewModel;
         mInflater = LayoutInflater.from(context);
     }
@@ -152,7 +158,7 @@ public class DailyBalanceListAdapter extends RecyclerView.Adapter<DailyBalanceLi
         }
     }
 
-    void setDailyBalances(List<DailyBalance> dailyBalances){
+    public void setDailyBalances(List<DailyBalance> dailyBalances){
         mDailyBalances = dailyBalances;
         notifyDataSetChanged();
     }

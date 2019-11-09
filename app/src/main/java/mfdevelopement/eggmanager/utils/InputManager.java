@@ -1,4 +1,4 @@
-package mfdevelopement.eggmanager;
+package mfdevelopement.eggmanager.utils;
 
 import android.app.Activity;
 import android.view.View;

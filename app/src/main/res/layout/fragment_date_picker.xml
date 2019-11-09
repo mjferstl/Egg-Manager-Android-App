@@ -18,26 +18,10 @@
 
     </DatePicker>
 
-    <LinearLayout
+    <include layout="@layout/fragment_cancel_ok_button"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:gravity="end">
-
-        <Button
-            android:id="@+id/btn_datepicker_cancel"
-            style="@style/button_minmal"
-            android:text="Abbrechen"
-            android:textAllCaps="false">
-        </Button>
-
-        <Button
-            android:id="@+id/btn_datepicker_ok"
-            style="@style/button_minmal"
-            android:text="OK"
-            android:textAllCaps="true">
-        </Button>
-
-    </LinearLayout>
+        android:layout_marginStart="@dimen/small_padding"
+        android:layout_marginEnd="@dimen/small_padding"/>
 
 </LinearLayout>

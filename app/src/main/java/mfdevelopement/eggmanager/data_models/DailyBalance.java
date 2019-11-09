@@ -1,4 +1,4 @@
-package mfdevelopement.eggmanager;
+package mfdevelopement.eggmanager.data_models;
 
 import androidx.annotation.NonNull;
 import androidx.room.ColumnInfo;

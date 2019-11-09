@@ -1,4 +1,4 @@
-package mfdevelopement.eggmanager;
+package mfdevelopement.eggmanager.data_models;
 
 import androidx.lifecycle.LiveData;
 import androidx.room.Dao;
@@ -9,10 +9,10 @@ import androidx.room.Query;
 
 import java.util.List;
 
-import static mfdevelopement.eggmanager.DailyBalance.COL_DATE_PRIMARY_KEY;
-import static mfdevelopement.eggmanager.DailyBalance.COL_EGGS_COLLECTED_NAME;
-import static mfdevelopement.eggmanager.DailyBalance.COL_EGGS_SOLD_NAME;
-import static mfdevelopement.eggmanager.DailyBalance.COL_MONEY_EARNED;
+import static mfdevelopement.eggmanager.data_models.DailyBalance.COL_DATE_PRIMARY_KEY;
+import static mfdevelopement.eggmanager.data_models.DailyBalance.COL_EGGS_COLLECTED_NAME;
+import static mfdevelopement.eggmanager.data_models.DailyBalance.COL_EGGS_SOLD_NAME;
+import static mfdevelopement.eggmanager.data_models.DailyBalance.COL_MONEY_EARNED;
 
 @Dao
 public interface DailyBalanceDao {
@@ -48,6 +48,9 @@ public interface DailyBalanceDao {
     @Query("SELECT " + COL_DATE_PRIMARY_KEY + " FROM " + tableName)
     LiveData<List<String>> getDateKeys();
 
-    @Query("SELECT * FROM " + tableName + " WHERE " + COL_DATE_PRIMARY_KEY + " LIKE :dateKey || '%'")
+    @Query("SELECT * FROM " + tableName + " WHERE " + COL_DATE_PRIMARY_KEY + " LIKE :dateKey || '%' ORDER BY " + COL_DATE_PRIMARY_KEY + " ASC")
     List<DailyBalance> getDailyBalancesByDateKey(String dateKey);
+
+    @Query("SELECT * FROM " + tableName + " WHERE " + COL_DATE_PRIMARY_KEY + " LIKE (:dateKey || '%') ORDER BY " + COL_DATE_PRIMARY_KEY + " ASC")
+    LiveData<List<DailyBalance>> getLiveDailyBalancesByDateKey(String dateKey);
 }

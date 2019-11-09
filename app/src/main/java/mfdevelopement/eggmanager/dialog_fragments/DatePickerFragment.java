@@ -1,4 +1,4 @@
-package mfdevelopement.eggmanager;
+package mfdevelopement.eggmanager.dialog_fragments;
 
 import android.content.Context;
 import android.os.Bundle;
@@ -14,6 +14,8 @@ import androidx.fragment.app.DialogFragment;
 
 import java.util.Calendar;
 import java.util.Date;
+
+import mfdevelopement.eggmanager.R;
 
 public class DatePickerFragment extends DialogFragment {
 
@@ -66,7 +68,7 @@ public class DatePickerFragment extends DialogFragment {
             datePicker.updateDate(cal.get(Calendar.YEAR),cal.get(Calendar.MONTH),cal.get(Calendar.DAY_OF_MONTH));
         }
 
-        Button btn_cancel = v.findViewById(R.id.btn_datepicker_cancel);
+        Button btn_cancel = v.findViewById(R.id.btn_cancel);
         btn_cancel.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -75,7 +77,7 @@ public class DatePickerFragment extends DialogFragment {
             }
         });
 
-        Button btn_ok = v.findViewById(R.id.btn_datepicker_ok);
+        Button btn_ok = v.findViewById(R.id.btn_ok);
         btn_ok.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {

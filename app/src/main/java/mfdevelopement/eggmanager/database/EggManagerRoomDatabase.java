@@ -1,4 +1,4 @@
-package mfdevelopement.eggmanager;
+package mfdevelopement.eggmanager.database;
 
 import android.content.Context;
 import android.os.AsyncTask;
@@ -9,6 +9,9 @@ import androidx.room.Room;
 import androidx.room.RoomDatabase;
 import androidx.sqlite.db.SupportSQLiteDatabase;
 
+import mfdevelopement.eggmanager.data_models.DailyBalance;
+import mfdevelopement.eggmanager.data_models.DailyBalanceDao;
+
 @Database(entities = {DailyBalance.class}, version = 1, exportSchema = false)
 public abstract class EggManagerRoomDatabase extends RoomDatabase {
 
@@ -17,7 +20,7 @@ public abstract class EggManagerRoomDatabase extends RoomDatabase {
     private static volatile EggManagerRoomDatabase INSTANCE;
     private static final String dataBaseName = "eggManagerDatabase";
 
-    static EggManagerRoomDatabase getDatabase(final Context context) {
+    public static EggManagerRoomDatabase getDatabase(final Context context) {
         if (INSTANCE == null) {
             synchronized (EggManagerRoomDatabase.class) {
                 if (INSTANCE == null) {

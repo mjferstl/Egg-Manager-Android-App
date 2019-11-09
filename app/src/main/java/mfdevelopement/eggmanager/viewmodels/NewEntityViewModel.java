@@ -1,4 +1,4 @@
-package mfdevelopement.eggmanager;
+package mfdevelopement.eggmanager.viewmodels;
 
 import android.app.Application;
 
@@ -6,6 +6,9 @@ import androidx.lifecycle.AndroidViewModel;
 import androidx.lifecycle.LiveData;
 
 import java.util.List;
+
+import mfdevelopement.eggmanager.data_models.DailyBalance;
+import mfdevelopement.eggmanager.database.EggManagerRepository;
 
 public class NewEntityViewModel extends AndroidViewModel {
 

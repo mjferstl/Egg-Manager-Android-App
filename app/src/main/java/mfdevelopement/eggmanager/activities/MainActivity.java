@@ -1,4 +1,4 @@
-package mfdevelopement.eggmanager;
+package mfdevelopement.eggmanager.activities;
 
 import android.content.Intent;
 import android.os.Bundle;
@@ -12,7 +12,6 @@ import android.widget.TextView;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
-import androidx.fragment.app.DialogFragment;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentTransaction;
 import androidx.lifecycle.Observer;
@@ -26,9 +25,19 @@ import com.google.android.material.snackbar.Snackbar;
 import java.util.List;
 import java.util.Locale;
 
-public class MainActivity extends AppCompatActivity implements FilterDialogFragment.OnAddFilterListener{
+import mfdevelopement.eggmanager.R;
+import mfdevelopement.eggmanager.data_models.DailyBalance;
+import mfdevelopement.eggmanager.dialog_fragments.FilterDialogFragment;
+import mfdevelopement.eggmanager.list_adapters.DailyBalanceListAdapter;
+import mfdevelopement.eggmanager.list_adapters.FilterDialogListAdapter;
+import mfdevelopement.eggmanager.viewmodels.DailyBalanceViewModel;
+
+public class MainActivity extends AppCompatActivity implements FilterDialogListAdapter.OnFilterSelectListener, FilterDialogFragment.OnClickListener{
 
     private DailyBalanceViewModel dailyBalanceViewModel;
+    private DailyBalanceListAdapter adapter;
+    private FilterDialogFragment filterDialogFragment;
+
     public static final int NEW_ENTITY_REQUEST_CODE = 2;
     public static final int EDIT_ENTITY_REQUEST_CODE = 3;
 
@@ -38,7 +47,6 @@ public class MainActivity extends AppCompatActivity implements FilterDialogFragm
     private List<String> allDateKeys;
 
     public static final String EXTRA_REQUEST_CODE_NAME = "requestCode";
-    public static final String EXTRA_PRIMATRY_KEY_NAME = "dateKeyPrimary";
     public static final String EXTRA_DAILY_BALANCE = "extraDailyBalance";
     private final String LOG_TAG = "MainActivity";
     private int totalEggsSold, totalEggsCollected;
@@ -48,8 +56,6 @@ public class MainActivity extends AppCompatActivity implements FilterDialogFragm
     private TextView txtv_summary_extra_info;
     private LinearLayout linLay_summary;
 
-    private boolean filtered = false;
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -58,7 +64,7 @@ public class MainActivity extends AppCompatActivity implements FilterDialogFragm
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
-        linLay_summary = findViewById(R.id.linLay_summary);
+        linLay_summary = findViewById(R.id.fragment_summary);
         hideSummary();
         txtv_summary_eggs_collected = findViewById(R.id.txtv_summary_eggsCollected);
         txtv_summary_eggs_sold = findViewById(R.id.txtv_summary_eggsSold);
@@ -68,8 +74,6 @@ public class MainActivity extends AppCompatActivity implements FilterDialogFragm
         initFab();
 
         dailyBalanceViewModel = new ViewModelProvider(this).get(DailyBalanceViewModel.class);
-
-        Log.d(LOG_TAG,"get number of entries for october 2019: number = " + dailyBalanceViewModel.getFilteredDailyBalanceList("201910").size());
 
         setObservers();
     }
@@ -90,14 +94,29 @@ public class MainActivity extends AppCompatActivity implements FilterDialogFragm
         txtv_summary_eggs_collected.setText(String.valueOf(totalEggsCollected));
         txtv_summary_eggs_sold.setText(String.valueOf(totalEggsSold));
         txtv_summary_money_earned.setText(String.format(Locale.getDefault(),"%.2f",totalMoneyEarned));
+
+        // show summary if the recycler view contains 2 or more items
+        if (adapter != null) {
+            int numItems = adapter.getItemCount();
+            String extraInfo = +numItems + " Einträge";
+            if (numItems >= 2) {
+                showSummary();
+            } else {
+                hideSummary();
+                txtv_summary_extra_info.setText("");
+            }
+            txtv_summary_extra_info.setText(extraInfo);
+        }
     }
 
     private void hideSummary() {
+        Log.d(LOG_TAG,"hideSummary");
         if (linLay_summary != null)
             linLay_summary.setVisibility(View.GONE);
     }
 
-    private void displaySummary() {
+    private void showSummary() {
+        Log.d(LOG_TAG,"showSummary");
         if (linLay_summary != null)
             linLay_summary.setVisibility(View.VISIBLE);
     }
@@ -137,11 +156,11 @@ public class MainActivity extends AppCompatActivity implements FilterDialogFragm
             ft.commit();
 
             // Create and show the dialog.
-            DialogFragment newFragment = FilterDialogFragment.newInstance(allDateKeys, dailyBalanceViewModel);
+            filterDialogFragment = FilterDialogFragment.newInstance(allDateKeys);
 
             //newFragment.setTargetFragment(this, 1);
-            newFragment.show(getSupportFragmentManager(), "filterDialog");
-            return false;
+            filterDialogFragment.show(getSupportFragmentManager(), "filterDialog");
+            return true;
         }
 
         return super.onOptionsItemSelected(item);
@@ -186,7 +205,7 @@ public class MainActivity extends AppCompatActivity implements FilterDialogFragm
     private void setObservers() {
 
         RecyclerView recyclerView = findViewById(R.id.recyclerview);
-        final DailyBalanceListAdapter adapter = new DailyBalanceListAdapter(this, dailyBalanceViewModel);
+        adapter = new DailyBalanceListAdapter(this, dailyBalanceViewModel);
         recyclerView.setAdapter(adapter);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
 
@@ -194,18 +213,9 @@ public class MainActivity extends AppCompatActivity implements FilterDialogFragm
             @Override
             public void onChanged(@Nullable final List<DailyBalance> dailyBalanceList) {
                 // Update the cached copy of the items in the adapter, if the list is not in filtered mode
-                if (!filtered) { adapter.setDailyBalances(dailyBalanceList);}
-
-                // show summary if the recycler view contains 2 or more items
-                int numItems = adapter.getItemCount();
-                if (numItems >= 2) {
-                    displaySummary();
-                    String extraInfo = "(" + numItems + " Einträge)";
-                    txtv_summary_extra_info.setText(extraInfo);
-                } else {
-                    hideSummary();
-                    txtv_summary_extra_info.setText("");
-                }
+                Log.d(LOG_TAG,"updating recycler view");
+                adapter.setDailyBalances(dailyBalanceList);
+                updateSummary();
             }
         });
 
@@ -242,7 +252,42 @@ public class MainActivity extends AppCompatActivity implements FilterDialogFragm
     }
 
     @Override
-    public void onAddFilterListenerSubmit(String filterString) {
+    public void onFilterSelected(String filterString, int buttonPosition, boolean isSelected) {
+        // update dialog fragment
+        filterDialogFragment.setButtonSelected(filterString, buttonPosition, isSelected);
+    }
 
+    @Override
+    public void onOkClicked(String selectedFilterString) {
+
+        if (!selectedFilterString.equals(FilterDialogFragment.NOT_SET_FILTER_STRING))
+            dailyBalanceViewModel.setFilterString(selectedFilterString);
+
+        // dismiss dialog
+        filterDialogFragment.dismiss();
+
+        // update recycler view
+        List<DailyBalance> filteredDailyBalances = dailyBalanceViewModel.getFilteredDailyBalances();
+        adapter.setDailyBalances(filteredDailyBalances);
+
+        // update summary
+        int countEggsCollected = 0, countEggsSold = 0;
+        double countMoneyEarned = 0;
+        for(int i=0; i<filteredDailyBalances.size(); i++) {
+            countEggsCollected = countEggsCollected + filteredDailyBalances.get(i).getEggsCollected();
+            countEggsSold = countEggsSold + filteredDailyBalances.get(i).getEggsSold();
+            countMoneyEarned = countMoneyEarned + filteredDailyBalances.get(i).getMoneyEarned();
+        }
+        setTotalEggsCollected(countEggsCollected);
+        setTotalEggsSold(countEggsSold);
+        setTotalMoneyEarned(countMoneyEarned);
+        updateSummary();
+    }
+
+    @Override
+    public void onCancelClicked() {
+        // dismiss dialog
+        dailyBalanceViewModel.setFilterString("");
+        filterDialogFragment.dismiss();
     }
 }

@@ -1,11 +1,15 @@
-package mfdevelopement.eggmanager;
+package mfdevelopement.eggmanager.viewmodels;
 
 import android.app.Application;
+import android.util.Log;
 
 import androidx.lifecycle.AndroidViewModel;
 import androidx.lifecycle.LiveData;
 
 import java.util.List;
+
+import mfdevelopement.eggmanager.data_models.DailyBalance;
+import mfdevelopement.eggmanager.database.EggManagerRepository;
 
 public class DailyBalanceViewModel extends AndroidViewModel {
 
@@ -17,32 +21,43 @@ public class DailyBalanceViewModel extends AndroidViewModel {
     private LiveData<Double> mMoneyEarned;
     private List<DailyBalance> filteredDailyBalanceList;
     private LiveData<List<String>> ldDateKeys;
+    private String filterString = "";
 
     public DailyBalanceViewModel (Application application) {
         super(application);
         mRepository = new EggManagerRepository(application);
-        mAllDailyBalances = mRepository.getAllData();
+        mAllDailyBalances = mRepository.getFilteredDailyBalance(filterString);
         mNumberEggsSold = mRepository.getTotalEggsSold();
         mMoneyEarned = mRepository.getTotalMoneyEarned();
         mTotalEggsCollected = mRepository.getTotalEggsCollected();
         ldDateKeys = mRepository.getDateKeys();
     }
 
-    LiveData<List<DailyBalance>> getAllDailyBalances() { return mAllDailyBalances; }
+    public LiveData<List<DailyBalance>> getAllDailyBalances() { return mAllDailyBalances; }
 
     public void insert(DailyBalance dailyBalance) { mRepository.insert(dailyBalance); }
     public void delete(DailyBalance dailyBalance) { mRepository.delete(dailyBalance);}
 
-    LiveData<Integer> getTotalEggsSold() { return  mNumberEggsSold; }
+    public LiveData<Integer> getTotalEggsSold() { return  mNumberEggsSold; }
 
-    LiveData<Double> getTotalMoneyEarned() { return mMoneyEarned; }
+    public LiveData<Double> getTotalMoneyEarned() { return mMoneyEarned; }
 
-    LiveData<Integer> getTotalEggsCollected() { return mTotalEggsCollected; }
+    public LiveData<Integer> getTotalEggsCollected() { return mTotalEggsCollected; }
 
-    public List<DailyBalance> getFilteredDailyBalanceList(String dateKeyPattern) {
+    public List<DailyBalance> getDailyBalanceByDateKey(String dateKeyPattern) {
         filteredDailyBalanceList = mRepository.getDailyBalancesByDateKey(dateKeyPattern);
         return  filteredDailyBalanceList;
     }
 
+    public List<DailyBalance> getFilteredDailyBalances() {return getDailyBalanceByDateKey(filterString); }
+
     public LiveData<List<String>> getDateKeys() { return ldDateKeys;}
+
+    public void setFilterString(String string) {
+        filterString = string;
+        Log.d(LOG_TAG,"setFilterString::filterString = " + string);
+        mAllDailyBalances = mRepository.getFilteredDailyBalance(filterString);
+    }
+
+    public void resetFilterString() { filterString = ""; }
 }

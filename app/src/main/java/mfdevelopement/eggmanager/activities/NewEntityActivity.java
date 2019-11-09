@@ -1,4 +1,4 @@
-package mfdevelopement.eggmanager;
+package mfdevelopement.eggmanager.activities;
 
 import android.app.AlertDialog;
 import android.content.DialogInterface;
@@ -30,6 +30,12 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
+
+import mfdevelopement.eggmanager.data_models.DailyBalance;
+import mfdevelopement.eggmanager.dialog_fragments.DatePickerFragment;
+import mfdevelopement.eggmanager.utils.InputManager;
+import mfdevelopement.eggmanager.R;
+import mfdevelopement.eggmanager.viewmodels.NewEntityViewModel;
 
 public class NewEntityActivity extends AppCompatActivity implements DatePickerFragment.OnAddDateListener {
 
