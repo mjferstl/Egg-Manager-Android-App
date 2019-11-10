@@ -10,6 +10,7 @@ import java.util.List;
 
 import mfdevelopement.eggmanager.data_models.DailyBalance;
 import mfdevelopement.eggmanager.database.EggManagerRepository;
+import mfdevelopement.eggmanager.dialog_fragments.FilterDialogFragment;
 
 public class DailyBalanceViewModel extends AndroidViewModel {
 
@@ -21,7 +22,7 @@ public class DailyBalanceViewModel extends AndroidViewModel {
     private LiveData<Double> mMoneyEarned;
     private List<DailyBalance> filteredDailyBalanceList;
     private LiveData<List<String>> ldDateKeys;
-    private String filterString = "";
+    private String filterString = FilterDialogFragment.NOT_SET_FILTER_STRING;
 
     public DailyBalanceViewModel (Application application) {
         super(application);
@@ -60,4 +61,8 @@ public class DailyBalanceViewModel extends AndroidViewModel {
     }
 
     public void resetFilterString() { filterString = ""; }
+
+    public String getFilterString() {
+        return filterString;
+    }
 }

@@ -1,24 +1,38 @@
 <resources>
     <string name="app_name">EggManager</string>
+
+    <!-- activity names -->
+    <string name="title_activity_settings">Settings</string>
+    <string name="title_activity_about">\u00DCber EggManager</string> <!-- \u00DC = Ü -->
+
+    <!-- action bars -->
     <string name="action_settings">Einstellungen</string>
     <string name="action_about">App-Info</string>
     <string name="action_filter">Filtern</string>
     <string name="action_save">Speichern</string>
 
+    <!-- main activity -->
     <string name="button_save">@string/action_save</string>
     <string name="entry_not_added">Kein Eintrag erstellt</string>
     <string name="new_entity_saved">Neuer Eintrag gespeichert</string>
     <string name="changes_saved">Änderungen gespeichert</string>
     <string name="changes_not_saved">Änderungen nicht übernommen</string>
     <string name="summary">Zusammenfassung</string>
+    <string name="numer_eggs_collected_empty">Anzahl abgenommener Eier fehlt</string>
+    <string name="selected_filter_part1">Daten nach\u0020</string>
+    <string name="selected_filter_part2">\u0020gefiltert</string>
+    <string name="filter_removed">Filter entfernt</string>
+    <string name="data_not_filtered">Daten nicht gefiltert</string>
 
+    <!-- hints -->
     <string name="hint_eggs_collected">abgenommen</string>
     <string name="hint_eggs_sold">verkauft</string>
-
-    <string name="numer_eggs_collected_empty">Anzahl abgenommener Eier fehlt</string>
+    <string name="hint_price_per_egg">Preis pro Ei</string>
 
     <!-- dialogs -->
     <string name="entry_delete_request">Eintrag löschen?</string>
+    <string name="choose_a_year">Wählen Sie ein Jahr aus</string>
+    <string name="choose_a_month_of_this_year">Wählen Sie einen Monat des Jahres aus</string>
 
     <!-- symbols -->
     <string name="euro_symbol" translatable="false">&#8364;</string>
@@ -29,20 +43,12 @@
     <string name="transition_txtv_eggs_sold" translatable="false">textEggsSold</string>
     <string name="transition_imgv_eggs_collected" translatable="false">imageEggsCollected</string>
     <string name="transition_imgv_eggs_sold" translatable="false">imageEggsSold</string>
-    <string name="title_activity_settings">Settings</string>
 
-    <!-- Preference Titles -->
-    <string name="messages_header">Messages</string>
-    <string name="sync_header">Sync</string>
+    <!-- About activity -->
+    <string name="icon_credits_header">Credits:</string>
+    <string name="icon_creadits_flaticon">Icons made by Freepik from www.flaticon.com</string>
+    <string name="app_developer">Entwickler: Mathias Ferstl</string>
 
-    <!-- Messages Preferences -->
-    <string name="signature_title">Your signature</string>
-    <string name="reply_title">Default reply action</string>
-
-    <!-- Sync Preferences -->
-    <string name="sync_title">Sync email periodically</string>
-    <string name="attachment_title">Download incoming attachments</string>
-    <string name="attachment_summary_on">Automatically download attachments for incoming emails
-    </string>
-    <string name="attachment_summary_off">Only download attachments when manually requested</string>
+    <!-- whitespace -->
+    <string name="whitespace">\u0020</string>
 </resources>

@@ -4,7 +4,10 @@
 
     <dimen name="tiny_padding">3dp</dimen>
     <dimen name="small_padding">6dp</dimen>
-    <dimen name="big_padding">16dp</dimen>
+    <dimen name="large_padding">16dp</dimen>
+    <dimen name="LARGE_padding">24dp</dimen>
+    <dimen name="huge_padding">32dp</dimen>
+    <dimen name="HUGE_padding">48dp</dimen>
 
     <dimen name="main_text_size">18sp</dimen>
 

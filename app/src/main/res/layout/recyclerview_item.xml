@@ -87,7 +87,7 @@
             android:layout_height="wrap_content"
             style="@style/recycler_item_text"
             android:layout_gravity="center_vertical"
-            android:layout_marginStart="@dimen/big_padding"
+            android:layout_marginStart="@dimen/large_padding"
             android:layout_marginEnd="@dimen/small_padding"
             android:gravity="end">
         </TextView>

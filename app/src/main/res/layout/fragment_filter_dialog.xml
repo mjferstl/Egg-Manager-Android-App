@@ -4,13 +4,13 @@
     android:orientation="vertical"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:layout_marginTop="@dimen/big_padding"
-    android:layout_marginBottom="@dimen/big_padding"
-    android:layout_marginStart="@dimen/big_padding"
-    android:layout_marginEnd="@dimen/big_padding"
-    android:paddingStart="@dimen/big_padding"
-    android:paddingEnd="@dimen/big_padding"
-    android:paddingTop="@dimen/big_padding"
+    android:layout_marginTop="@dimen/large_padding"
+    android:layout_marginBottom="@dimen/large_padding"
+    android:layout_marginStart="@dimen/large_padding"
+    android:layout_marginEnd="@dimen/large_padding"
+    android:paddingStart="@dimen/large_padding"
+    android:paddingEnd="@dimen/large_padding"
+    android:paddingTop="@dimen/large_padding"
     android:paddingBottom="@dimen/small_padding">
 
     <LinearLayout
@@ -48,14 +48,14 @@
         android:id="@+id/txtv_filter_dialog_caption_years"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Wählen Sie ein Jahr aus"
+        android:text="@string/choose_a_year"
         android:textColor="@color/main_text_color"
         android:textSize="@dimen/textAppearanceCaption"
         android:textStyle="bold"
         android:paddingStart="@dimen/small_padding"
         android:paddingEnd="@dimen/small_padding"
         android:paddingTop="@dimen/small_padding"
-        android:paddingBottom="@dimen/big_padding">
+        android:paddingBottom="@dimen/large_padding">
     </TextView>
 
     <androidx.recyclerview.widget.RecyclerView
@@ -63,21 +63,21 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         tools:listitem="@layout/recyclerview_filter_dialog_item"
-        android:paddingBottom="@dimen/big_padding">
+        android:paddingBottom="@dimen/large_padding">
     </androidx.recyclerview.widget.RecyclerView>
 
     <TextView
         android:id="@+id/txtv_filter_dialog_caption_months"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Wählen Sie einen Monat des Jahres aus"
+        android:text="@string/choose_a_month_of_this_year"
         android:textColor="@color/main_text_color"
         android:textSize="@dimen/textAppearanceCaption"
         android:textStyle="bold"
         android:paddingStart="@dimen/small_padding"
         android:paddingEnd="@dimen/small_padding"
         android:paddingTop="@dimen/small_padding"
-        android:paddingBottom="@dimen/big_padding">
+        android:paddingBottom="@dimen/large_padding">
     </TextView>
 
     <androidx.recyclerview.widget.RecyclerView
@@ -85,7 +85,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         tools:listitem="@layout/recyclerview_filter_dialog_item"
-        android:paddingBottom="@dimen/big_padding">
+        android:paddingBottom="@dimen/large_padding">
     </androidx.recyclerview.widget.RecyclerView>
 
     <include layout="@layout/fragment_cancel_ok_button"/>

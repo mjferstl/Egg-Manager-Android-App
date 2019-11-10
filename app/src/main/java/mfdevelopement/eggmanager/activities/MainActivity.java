@@ -22,6 +22,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.snackbar.Snackbar;
 
+import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
 
@@ -132,6 +133,11 @@ public class MainActivity extends AppCompatActivity implements FilterDialogListA
         return true;
     }
 
+    /**
+     * action when the user clicks a item on the action bar
+     * @param item MenuItem of the ation bar
+     * @return
+     */
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         // Handle action bar item clicks here. The action bar will
@@ -140,30 +146,39 @@ public class MainActivity extends AppCompatActivity implements FilterDialogListA
         int id = item.getItemId();
 
         //noinspection SimplifiableIfStatement
-        if (id == R.id.action_settings) {
-//            Intent intent = new Intent(this, SettingsActivity.class);
-//            startActivity(intent);
-            return false;
+        switch (id) {
+            case R.id.action_main_filter:
+                showFilterDialog();
+                break;
+            case R.id.action_settings:
+                Snackbar.make(findViewById(R.id.main_container),"Noch keine Einstellungen vorhanden",Snackbar.LENGTH_SHORT).show();
+                break;
+            case R.id.action_main_about:
+                Intent intent = new Intent(this, AboutActivity.class);
+                intent.addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
+                startActivity(intent);
+                break;
         }
-        else if (id == R.id.action_main_filter) {
-
-            FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
-            Fragment prev = getSupportFragmentManager().findFragmentByTag("dialog");
-            if (prev != null) {
-                ft.remove(prev);
-            }
-            ft.addToBackStack(null);
-            ft.commit();
-
-            // Create and show the dialog.
-            filterDialogFragment = FilterDialogFragment.newInstance(allDateKeys);
-
-            //newFragment.setTargetFragment(this, 1);
-            filterDialogFragment.show(getSupportFragmentManager(), "filterDialog");
-            return true;
-        }
-
         return super.onOptionsItemSelected(item);
+    }
+
+    /**
+     * show dialog to filter the displayed data
+     */
+    private void showFilterDialog() {
+        FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
+        Fragment prev = getSupportFragmentManager().findFragmentByTag("dialog");
+        if (prev != null) {
+            ft.remove(prev);
+        }
+        ft.addToBackStack(null);
+        ft.commit();
+
+        // Create and show the dialog.
+        filterDialogFragment = FilterDialogFragment.newInstance(allDateKeys, dailyBalanceViewModel.getFilterString());
+
+        //newFragment.setTargetFragment(this, 1);
+        filterDialogFragment.show(getSupportFragmentManager(), "filterDialog");
     }
 
     @Override
@@ -202,6 +217,9 @@ public class MainActivity extends AppCompatActivity implements FilterDialogListA
         });
     }
 
+    /**
+     * set observers for LiveData using the Room Database
+     */
     private void setObservers() {
 
         RecyclerView recyclerView = findViewById(R.id.recyclerview);
@@ -257,11 +275,39 @@ public class MainActivity extends AppCompatActivity implements FilterDialogListA
         filterDialogFragment.setButtonSelected(filterString, buttonPosition, isSelected);
     }
 
+    /**
+     * action when the user clicks OK on the filter dialog
+     * show a Snackbar to inform the user about the selected filter
+     * @param selectedFilterString String containing the filter for the primary key of the database
+     */
     @Override
     public void onOkClicked(String selectedFilterString) {
 
-        if (!selectedFilterString.equals(FilterDialogFragment.NOT_SET_FILTER_STRING))
+        if (selectedFilterString.equals(FilterDialogFragment.NOT_SET_FILTER_STRING)) {
+            dailyBalanceViewModel.setFilterString("");
+            Snackbar.make(findViewById(R.id.main_container),getString(R.string.data_not_filtered),Snackbar.LENGTH_SHORT).show();
+        } else {
             dailyBalanceViewModel.setFilterString(selectedFilterString);
+
+            // create a snackbar
+            String snackbarText = getString(R.string.selected_filter_part1);
+            if (selectedFilterString.length() == 4) {
+                snackbarText = snackbarText + selectedFilterString;
+            } else if (selectedFilterString.length() == 6) {
+                int monthIndex = Integer.valueOf(selectedFilterString.substring(4,6))-1;
+                List<String> monthNames = Arrays.asList(this.getResources().getStringArray(R.array.month_names));
+                String monthName = monthNames.get(monthIndex);
+                String year = selectedFilterString.substring(0,4);
+                snackbarText = snackbarText + monthName + " " + year;
+            } else {
+                return;
+            }
+
+            snackbarText = snackbarText + getString(R.string.selected_filter_part2);
+
+            // show Snackbar to inform the user about the selected filter
+            Snackbar.make(findViewById(R.id.main_container),snackbarText,Snackbar.LENGTH_SHORT).show();
+        }
 
         // dismiss dialog
         filterDialogFragment.dismiss();
@@ -284,10 +330,11 @@ public class MainActivity extends AppCompatActivity implements FilterDialogListA
         updateSummary();
     }
 
+    /**
+     * dismiss dialog when the user cancels the filter dialog
+     */
     @Override
     public void onCancelClicked() {
-        // dismiss dialog
-        dailyBalanceViewModel.setFilterString("");
         filterDialogFragment.dismiss();
     }
 }

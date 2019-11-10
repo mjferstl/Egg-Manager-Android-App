@@ -15,16 +15,24 @@ import java.util.Arrays;
 import java.util.List;
 
 import mfdevelopement.eggmanager.R;
+import mfdevelopement.eggmanager.dialog_fragments.FilterDialogFragment;
 
 public class FilterDialogListAdapter extends RecyclerView.Adapter<FilterDialogListAdapter.FilterDialogViewHolder> {
 
     private final String LOG_TAG = "FilterDialogListAdaptYe";
-    private List<String> filterList;
+    private String initialFilterString = FilterDialogFragment.NOT_SET_FILTER_STRING;
+    private final String notSetFilterString = initialFilterString + initialFilterString;
+
+    private List<String> filterList, monthNames;
+
     private final LayoutInflater mInflater;
-    private List<String> monthNames;
-    private static OnFilterSelectListener listener;
+
+    private OnFilterSelectListener listener;
+
     private Context parentContext;
+
     private SparseBooleanArray sSelectedItems;
+
 
     // interface for updating parent activity
     public interface OnFilterSelectListener {
@@ -37,23 +45,7 @@ public class FilterDialogListAdapter extends RecyclerView.Adapter<FilterDialogLi
         FilterDialogViewHolder(View itemView) {
             super(itemView);
             btn = itemView.findViewById(R.id.txtv_recycler_item_filter_dialog_year);
-//            itemView.setOnClickListener(this);
         }
-
-/*        @Override
-        public void onClick(View v) {
-*//*            Log.d(LOG_TAG,"on recycler view clicked");
-            if (sSelectedItems.get(getAdapterPosition(), false)) {
-                sSelectedItems.delete(getAdapterPosition());
-                Log.d(LOG_TAG,"button unselected");
-                setButtonPressed(btn);
-            } else {
-                sSelectedItems.put(getAdapterPosition(), true);
-                Log.d(LOG_TAG,"button selected");
-                setButtonNotPressed(btn);
-            }
-            listener.onFilterSelected(btn.getContentDescription().toString(),getAdapterPosition());*//*
-        }*/
     }
 
     public void setOnItemClickListener(OnFilterSelectListener clickListener) {
@@ -61,6 +53,24 @@ public class FilterDialogListAdapter extends RecyclerView.Adapter<FilterDialogLi
     }
 
     public FilterDialogListAdapter(Context context) {
+        mInflater = LayoutInflater.from(context);
+        monthNames = Arrays.asList(context.getResources().getStringArray(R.array.month_names));
+        parentContext = context;
+
+        if (context instanceof OnFilterSelectListener) {
+            listener = (OnFilterSelectListener) context;
+        } else {
+            throw new ClassCastException(context.toString()
+                    + " must implement FilterDialogListAdapter.OnFilterSelectListener");
+        }
+
+        sSelectedItems = new SparseBooleanArray();
+    }
+
+    public FilterDialogListAdapter(Context context, String currentFilterString) {
+        // set inital filter string
+        initialFilterString = currentFilterString;
+
         mInflater = LayoutInflater.from(context);
         monthNames = Arrays.asList(context.getResources().getStringArray(R.array.month_names));
         parentContext = context;
@@ -93,21 +103,29 @@ public class FilterDialogListAdapter extends RecyclerView.Adapter<FilterDialogLi
             if (current.length() == 4) {
                 holder.btn.setText(current);
                 holder.btn.setContentDescription(current);
+
+                // if the initalFilterString is targeting the current year-button or a month of this year, the button state is changed to "pressed"
+                if (current.equals(initialFilterString) || (initialFilterString.length() == 6 && current.equals(initialFilterString.substring(0,4)))) {
+                    sSelectedItems.put(position,true);
+                }
             }
             // item is a month name
             else if (current.length() == 6) {
                 int monthIndex = Integer.valueOf(current.substring(4,6))-1;
                 holder.btn.setText(monthNames.get(monthIndex));
                 holder.btn.setContentDescription(current);
+
+                // if the initalFilterString is targeting the current button, then the button state is changed to "pressed"
+                if (current.equals(initialFilterString)) {
+                    sSelectedItems.put(position,true);
+                }
             } else {
                 Log.e(LOG_TAG, "onBindViewHolder::String has not 4 or 6 characters; current = " + current);
             }
 
             if (sSelectedItems.get(position,false)) {
-                holder.btn.setSelected(true);
                 setButtonPressed(holder.btn);
             } else {
-                holder.btn.setSelected(false);
                 setButtonNotPressed(holder.btn);
             }
 
@@ -115,6 +133,10 @@ public class FilterDialogListAdapter extends RecyclerView.Adapter<FilterDialogLi
                 @Override
                 public void onClick(View v) {
                     listener.onFilterSelected(current,position,!holder.btn.isSelected());
+
+                    // set initialFilterString to NOT_SET to prevent a button being selected although the user has manually chosen a different one
+                    // the initialFilterString is only used to display the first selection
+                    initialFilterString = FilterDialogFragment.NOT_SET_FILTER_STRING;
                 }
             });
         } else {
@@ -143,6 +165,7 @@ public class FilterDialogListAdapter extends RecyclerView.Adapter<FilterDialogLi
     public void setNoButtonSelected() {
         sSelectedItems.clear();
         notifyDataSetChanged();
+        initialFilterString = notSetFilterString;
     }
 
     public void updateButtons(int posSelectedButton) {

@@ -37,6 +37,7 @@ public class FilterDialogFragment extends DialogFragment {
     private OnClickListener clickListener;
     private FilterDialogListAdapter monthsAdapter, yearsAdapter;
     private ImageButton imgbtn_filter_remove;
+    private static String initialFilterString = NOT_SET_FILTER_STRING;
 
     public interface OnClickListener {
         void onOkClicked(String filterString);
@@ -50,7 +51,7 @@ public class FilterDialogFragment extends DialogFragment {
     public void onAttach(@NonNull Context context) {
         super.onAttach(context);
         parentContext = context;
-        monthsAdapter = new FilterDialogListAdapter(parentContext);
+        monthsAdapter = new FilterDialogListAdapter(parentContext, initialFilterString);
         Log.d(LOG_TAG,"context of FilterDialogFragment: " + parentContext);
         monthNames = Arrays.asList(context.getResources().getStringArray(R.array.month_names));
 
@@ -62,8 +63,9 @@ public class FilterDialogFragment extends DialogFragment {
         }
     }
 
-    public static FilterDialogFragment newInstance(List<String> dateKeysList) {
+    public static FilterDialogFragment newInstance(List<String> dateKeysList, String currentFilterString) {
         dateKeys = getUniqueYearMonthKeys(dateKeysList);
+        initialFilterString = currentFilterString;
         return new FilterDialogFragment();
     }
 
@@ -72,6 +74,7 @@ public class FilterDialogFragment extends DialogFragment {
                              Bundle savedInstanceState) {
         View v = inflater.inflate(R.layout.fragment_filter_dialog, container);
 
+        // initialize image button to remove the current filter
         imgbtn_filter_remove = v.findViewById(R.id.imgbtn_filter_remove);
         imgbtn_filter_remove.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -83,6 +86,7 @@ public class FilterDialogFragment extends DialogFragment {
             }
         });
 
+        // initialize OK-button
         Button btn_ok = v.findViewById(R.id.btn_ok);
         btn_ok.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -91,6 +95,7 @@ public class FilterDialogFragment extends DialogFragment {
             }
         });
 
+        // initialize cancel button
         Button btn_cancel = v.findViewById(R.id.btn_cancel);
         btn_cancel.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -100,16 +105,33 @@ public class FilterDialogFragment extends DialogFragment {
         });
 
         txtv_caption_months = v.findViewById(R.id.txtv_filter_dialog_caption_months);
-        txtv_caption_months.setVisibility(View.GONE);
 
+        // recycler view for annually buttons
         RecyclerView recyclerViewYears = v.findViewById(R.id.filter_dialog_recycler_view_years);
-        yearsAdapter = new FilterDialogListAdapter(parentContext);
+        yearsAdapter = new FilterDialogListAdapter(parentContext,initialFilterString);
         yearsAdapter.setOnItemClickListener((FilterDialogListAdapter.OnFilterSelectListener) parentContext);
         recyclerViewYears.setAdapter(yearsAdapter);
         recyclerViewYears.setLayoutManager(new GridLayoutManager(v.getContext(),2));
 
+        // recycler view for monthly buttons
         recyclerViewMonths = v.findViewById(R.id.filter_dialog_recycler_view_months);
         recyclerViewMonths.setLayoutManager(new GridLayoutManager(v.getContext(),2));
+
+        // adapter for months selection
+        monthsAdapter.setOnItemClickListener((FilterDialogListAdapter.OnFilterSelectListener) parentContext);
+        recyclerViewMonths.setAdapter(monthsAdapter);
+
+        if (!initialFilterString.equals(NOT_SET_FILTER_STRING) &&
+                (initialFilterString.length() == 6 || initialFilterString.length() == 4)) {
+            txtv_caption_months.setVisibility(View.VISIBLE);
+            monthsAdapter.setFilterStrings(getDateKeysByYear(dateKeys, initialFilterString.substring(0,4)));
+            recyclerViewMonths.setVisibility(View.VISIBLE);
+        } else {
+            txtv_caption_months.setVisibility(View.GONE);
+            recyclerViewMonths.setVisibility(View.GONE);
+            if (!initialFilterString.equals(NOT_SET_FILTER_STRING) && initialFilterString.length() == 4)
+                monthsAdapter.setNoButtonSelected();
+        }
 
         List<String> uniqueYearKeys = getUniqueYearKeys(dateKeys);
         List<String> yearFilterList = new ArrayList<>();
@@ -138,18 +160,17 @@ public class FilterDialogFragment extends DialogFragment {
     private static List<String> getUniqueYearMonthKeys(List<String> dateKeysList) {
 
         List<String> yearMonthKeys = new ArrayList<>();
-        for (int i=0; i<dateKeysList.size(); i++) {
+        for (int i=0; i<dateKeysList.size(); i++)
             yearMonthKeys.add(dateKeysList.get(i).substring(0,6));
-        }
-        return new ArrayList<>(new HashSet<>(sortReverse(yearMonthKeys)));
+
+        return new ArrayList<>(new HashSet<>(sortDescending(yearMonthKeys)));
     }
 
     private List<String> getDateKeysByYear(List<String> dateKeyList, String year) {
         List<String> itemsCurrentYear = new ArrayList<>();
         for (int i=0; i<dateKeyList.size(); i++) {
-            if (dateKeyList.get(i).substring(0,4).equals(year)) {
+            if (dateKeyList.get(i).substring(0,4).equals(year))
                 itemsCurrentYear.add(dateKeyList.get(i));
-            }
         }
         return itemsCurrentYear;
     }
@@ -168,11 +189,15 @@ public class FilterDialogFragment extends DialogFragment {
         for (int i=0; i<stringList.size(); i++) {
             yearKeys.add(stringList.get(i).substring(0,4));
         }
-        return new ArrayList<>(new HashSet<>(sortReverse(yearKeys)));
+        return new ArrayList<>(new HashSet<>(sortDescending(yearKeys)));
     }
 
-    private static List<String> sortReverse(List<String> stringList) {
-        // sort list in descending order
+    /**
+     * sort a list containing strings in descending order
+     * @param stringList List<String>
+     * @return list with items in descending order
+     */
+    private static List<String> sortDescending(List<String> stringList) {
         Collections.sort(stringList);
         Collections.reverse(stringList);
         return stringList;
@@ -180,41 +205,42 @@ public class FilterDialogFragment extends DialogFragment {
 
     public void setButtonSelected(String selectedString, int buttonPosition, boolean isSelected) {
 
-        Log.d(LOG_TAG, "setButtonSelected::selectedString = " + selectedString);
+        Log.d(LOG_TAG,"setButtonSelected::selectedString = " + selectedString);
         Log.d(LOG_TAG,"before execution: setButtonSelected::selectedFilterString = " + selectedFilterString);
 
+        // a button containing a year is clicked
         if (selectedString.length() == 4) {
+
+            yearsAdapter.updateButtons(buttonPosition);
+            monthsAdapter.setNoButtonSelected();
+
             if (!isSelected) {
                 txtv_caption_months.setVisibility(View.GONE);
                 recyclerViewMonths.setVisibility(View.GONE);
-                yearsAdapter.updateButtons(buttonPosition);
                 selectedFilterString = NOT_SET_FILTER_STRING;
             } else {
                 //updateYears
-                yearsAdapter.updateButtons(buttonPosition);
                 txtv_caption_months.setVisibility(View.VISIBLE);
                 recyclerViewMonths.setVisibility(View.VISIBLE);
-                monthsAdapter.setOnItemClickListener((FilterDialogListAdapter.OnFilterSelectListener) parentContext);
-                recyclerViewMonths.setAdapter(monthsAdapter);
                 monthsAdapter.setFilterStrings(getDateKeysByYear(dateKeys, selectedString));
                 selectedFilterString = selectedString;
             }
         }
-
-        // month
+        // a button containing a month is clicked
         if (selectedString.length() == 6) {
-            if (!isSelected) {
-                monthsAdapter.updateButtons(buttonPosition);
+            if (!isSelected)
                 selectedFilterString = selectedString.substring(0,4);
-            } else {
-                monthsAdapter.updateButtons(buttonPosition);
+            else
                 selectedFilterString = selectedString;
-            }
+            monthsAdapter.updateButtons(buttonPosition);
         }
 
         Log.d(LOG_TAG,"after execution: setButtonSelected::selectedFilterString = " + selectedFilterString);
     }
 
+    /**
+     * set all items (buttons) in the recycler views to be not pressed
+     */
     private void setNoButtonSelected() {
         yearsAdapter.setNoButtonSelected();
         monthsAdapter.setNoButtonSelected();

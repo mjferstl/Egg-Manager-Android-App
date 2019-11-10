@@ -9,7 +9,17 @@
         android:label="@string/app_name"
         android:supportsRtl="true"
         android:theme="@style/AppTheme"
-        tools:ignore="GoogleAppIndexingWarning" > <!-- ignore warnings -->
+        tools:ignore="GoogleAppIndexingWarning">
+        <activity
+            android:name=".activities.AboutActivity"
+            android:label="@string/title_activity_about"
+            android:parentActivityName=".activities.MainActivity"
+            android:theme="@style/AppTheme.NoActionBar">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="mfdevelopement.eggmanager.activities.MainActivity" />
+        </activity>
+        <!-- ignore warnings -->
         <activity android:name=".activities.NewEntityActivity" />
         <activity
             android:name=".activities.MainActivity"
