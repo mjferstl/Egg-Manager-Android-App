@@ -148,7 +148,11 @@ public class MainActivity extends AppCompatActivity implements FilterDialogListA
         //noinspection SimplifiableIfStatement
         switch (id) {
             case R.id.action_main_filter:
-                showFilterDialog();
+                List<DailyBalance> allData = dailyBalanceViewModel.getDailyBalanceByDateKey("");
+                if (allData.size() > 0)
+                    showFilterDialog();
+                else
+                    Snackbar.make(findViewById(R.id.main_container),"Keine Daten zum Filtern vorhanden. Erstellen Sie einen neuen Eintrag.",Snackbar.LENGTH_LONG).show();
                 break;
             case R.id.action_settings:
                 Snackbar.make(findViewById(R.id.main_container),"Noch keine Einstellungen vorhanden",Snackbar.LENGTH_SHORT).show();
@@ -232,32 +236,43 @@ public class MainActivity extends AppCompatActivity implements FilterDialogListA
             public void onChanged(@Nullable final List<DailyBalance> dailyBalanceList) {
                 // Update the cached copy of the items in the adapter, if the list is not in filtered mode
                 Log.d(LOG_TAG,"updating recycler view");
-                adapter.setDailyBalances(dailyBalanceList);
-                updateSummary();
+                if (dailyBalanceList != null) {
+                    adapter.setDailyBalances(dailyBalanceList);
+                    updateSummary();
+                }
             }
         });
 
         dailyBalanceViewModel.getTotalEggsSold().observe(this, new Observer<Integer>() {
             @Override
             public void onChanged(Integer totalEggsSold) {
-                setTotalEggsSold(totalEggsSold);
-                updateSummary();
+                Log.d(LOG_TAG,"amount of total eggs sold changed. New value: " + String.format("%.4f",totalMoneyEarned));
+                if (totalEggsSold != null) {
+                    setTotalEggsSold(totalEggsSold);
+                    updateSummary();
+                }
             }
         });
 
         dailyBalanceViewModel.getTotalMoneyEarned().observe(this, new Observer<Double>() {
             @Override
             public void onChanged(Double totalMoneyEarned) {
-                setTotalMoneyEarned(totalMoneyEarned);
-                updateSummary();
+                Log.d(LOG_TAG,"amount of total money earned changed. New value: " + String.format("%.4f",totalMoneyEarned));
+                if (totalMoneyEarned != null) {
+                    setTotalMoneyEarned(totalMoneyEarned);
+                    updateSummary();
+                }
             }
         });
 
         dailyBalanceViewModel.getTotalEggsCollected().observe(this, new Observer<Integer>() {
             @Override
             public void onChanged(Integer totalEggsCollected) {
-                setTotalEggsCollected(totalEggsCollected);
-                updateSummary();
+                Log.d(LOG_TAG,"amount of total eggs collected changed. New value: " + String.format("%.4f",totalMoneyEarned));
+                if (totalEggsCollected != null) {
+                    setTotalEggsCollected(totalEggsCollected);
+                    updateSummary();
+                }
             }
         });
 
