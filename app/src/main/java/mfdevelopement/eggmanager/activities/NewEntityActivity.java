@@ -15,6 +15,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.DialogFragment;
 import androidx.fragment.app.Fragment;
@@ -58,6 +59,12 @@ public class NewEntityActivity extends AppCompatActivity implements DatePickerFr
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_new_entity);
+
+        Toolbar toolbar = findViewById(R.id.toolbar_new_entity);
+        setSupportActionBar(toolbar);
+
+        if (getSupportActionBar() != null)
+            getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
         dateTextView = findViewById(R.id.txtv_new_entity_date);
         eggsCollectedEditText = findViewById(R.id.etxt_fetched_eggs);
