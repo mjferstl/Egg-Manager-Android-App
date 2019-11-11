@@ -152,10 +152,10 @@ public class MainActivity extends AppCompatActivity implements FilterDialogListA
                 if (allData.size() > 0)
                     showFilterDialog();
                 else
-                    Snackbar.make(findViewById(R.id.main_container),"Keine Daten zum Filtern vorhanden. Erstellen Sie einen neuen Eintrag.",Snackbar.LENGTH_LONG).show();
+                    Snackbar.make(findViewById(R.id.main_container),getString(R.string.snackbar_no_data),Snackbar.LENGTH_LONG).show();
                 break;
             case R.id.action_settings:
-                Snackbar.make(findViewById(R.id.main_container),"Noch keine Einstellungen vorhanden",Snackbar.LENGTH_SHORT).show();
+                Snackbar.make(findViewById(R.id.main_container),getString(R.string.snackbar_no_settings),Snackbar.LENGTH_SHORT).show();
                 break;
             case R.id.action_main_about:
                 Intent intent = new Intent(this, AboutActivity.class);

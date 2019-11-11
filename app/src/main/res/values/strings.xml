@@ -4,12 +4,17 @@
     <!-- activity names -->
     <string name="title_activity_settings">Settings</string>
     <string name="title_activity_about">\u00DCber EggManager</string> <!-- \u00DC = Ü -->
+    <string name="title_activity_new_entity">Tagesbilanz</string>
 
     <!-- action bars -->
     <string name="action_settings">Einstellungen</string>
     <string name="action_about">App-Info</string>
     <string name="action_filter">Filtern</string>
     <string name="action_save">Speichern</string>
+
+    <!-- Snackbars -->
+    <string name="snackbar_no_data">Keine Daten zum Filtern vorhanden. Erstellen Sie einen neuen Eintrag.</string>
+    <string name="snackbar_no_settings">Noch keine App-Einstellungen verfügbar</string>
 
     <!-- main activity -->
     <string name="button_save">@string/action_save</string>
@@ -25,7 +30,7 @@
     <string name="data_not_filtered">Daten nicht gefiltert</string>
 
     <!-- hints -->
-    <string name="hint_eggs_collected">abgenommen</string>
+    <string name="hint_eggs_collected">gelegt</string>
     <string name="hint_eggs_sold">verkauft</string>
     <string name="hint_price_per_egg">Preis pro Ei</string>
 
