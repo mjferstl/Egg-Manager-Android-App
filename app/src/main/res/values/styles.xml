@@ -59,7 +59,7 @@
         <item name="android:layout_height">wrap_content</item>
         <item name="android:layout_gravity">center_horizontal</item>
         <item name="android:inputType">number</item>
-        <item name="android:textSize">@dimen/textAppearanceBody2</item>
+        <item name="android:textSize">@dimen/main_text_size</item>
         <item name="android:gravity">center</item>
     </style>
 
