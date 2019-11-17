@@ -3,6 +3,7 @@ package mfdevelopement.eggmanager.data_models;
 import androidx.annotation.NonNull;
 import androidx.room.ColumnInfo;
 import androidx.room.Entity;
+import androidx.room.Ignore;
 import androidx.room.PrimaryKey;
 
 import java.io.Serializable;
@@ -17,8 +18,8 @@ public class DailyBalance implements Serializable {
     public static final String COL_DATE_PRIMARY_KEY = "dateKey";
     public static final String COL_EGGS_COLLECTED_NAME = "eggsFetched";
     public static final String COL_EGGS_SOLD_NAME = "eggsSold";
-    private static final String COL_PRICE_PER_EGG = "pricePerEgg";
-    private static final String COL_NUMBER_HENS = "numberOfHens";
+    public static final String COL_PRICE_PER_EGG = "pricePerEgg";
+    public static final String COL_NUMBER_HENS = "numberOfHens";
     public static final String COL_MONEY_EARNED = "moneyEarned";
     public static final String dateKeyFormat = "yyyyMMdd";
     public static final int NOT_SET = 0;
@@ -49,6 +50,16 @@ public class DailyBalance implements Serializable {
         this.eggsSold = eggsSold;
         this.pricePerEgg = pricePerEgg;
         this.numHens = 0;
+        this.moneyEarned = calcMoneyEarned(eggsSold,pricePerEgg);
+    }
+
+    @Ignore
+    public DailyBalance(@NonNull String dateKey, int eggsCollected, int eggsSold, double pricePerEgg, int numHens) {
+        this.dateKey = dateKey;
+        this.eggsCollected = eggsCollected;
+        this.eggsSold = eggsSold;
+        this.pricePerEgg = pricePerEgg;
+        this.numHens = numHens;
         this.moneyEarned = calcMoneyEarned(eggsSold,pricePerEgg);
     }
 

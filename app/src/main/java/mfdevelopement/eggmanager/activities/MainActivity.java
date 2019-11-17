@@ -145,7 +145,6 @@ public class MainActivity extends AppCompatActivity implements FilterDialogListA
         // as you specify a parent activity in AndroidManifest.xml.
         int id = item.getItemId();
 
-        //noinspection SimplifiableIfStatement
         switch (id) {
             case R.id.action_main_filter:
                 List<DailyBalance> allData = dailyBalanceViewModel.getDailyBalanceByDateKey("");
@@ -156,6 +155,9 @@ public class MainActivity extends AppCompatActivity implements FilterDialogListA
                 break;
             case R.id.action_settings:
                 Snackbar.make(findViewById(R.id.main_container),getString(R.string.snackbar_no_settings),Snackbar.LENGTH_SHORT).show();
+                break;
+            case R.id.action_main_backup:
+                startActivity(new Intent(this, DatabaseImportExportActivity.class));
                 break;
             case R.id.action_main_about:
                 Intent intent = new Intent(this, AboutActivity.class);

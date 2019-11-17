@@ -5,16 +5,24 @@
     <string name="title_activity_settings">Settings</string>
     <string name="title_activity_about">\u00DCber EggManager</string> <!-- \u00DC = Ü -->
     <string name="title_activity_new_entity">Tagesbilanz</string>
+    <string name="title_activity_database_import_export">Datensicherung</string>
 
     <!-- action bars -->
     <string name="action_settings">Einstellungen</string>
     <string name="action_about">App-Info</string>
     <string name="action_filter">Filtern</string>
     <string name="action_save">Speichern</string>
+    <string name="action_backup">Datensicherung</string>
 
     <!-- Snackbars -->
     <string name="snackbar_no_data">Keine Daten zum Filtern vorhanden. Erstellen Sie einen neuen Eintrag.</string>
     <string name="snackbar_no_settings">Noch keine App-Einstellungen verfügbar</string>
+    <string name="snackbar_error_loading_data_from_database">Fehler beim Lesen der Daten aus der Datenbank. Bitte den Fehler an den Entwickler melden.</string>
+    <string name="snackbar_no_external_storage">Kein externer Speicher im Gerät verfügbar. Bitte legen Sie einen externen Speicher in das Gerät ein.</string>
+    <string name="snackbar_permission_ext_storage_granted">Zugriff auf externen Speicher gewährt. Sie können die Daten jetzt auf dem Gerät sichern.</string>
+    <string name="snackbar_permission_ext_storage_denied">Zugriff auf externen Speicher verweigert. Backup kann nicht durchgeführt werden.</string>
+    <string name="snackbar_data_exported_successfully">Daten erfolgreich exportiert</string>
+    <string name="snackbar_data_imported_successfully">Daten für %d Tage erfolgreich importiert.</string>
 
     <!-- main activity -->
     <string name="button_save">@string/action_save</string>
@@ -28,6 +36,12 @@
     <string name="selected_filter_part2">\u0020gefiltert</string>
     <string name="filter_removed">Filter entfernt</string>
     <string name="data_not_filtered">Daten nicht gefiltert</string>
+
+    <!-- databse import export activity -->
+    <string name="txt_save_database">Sichern der Daten in einer Datei auf dem Gerät.</string>
+    <string name="btn_txt_export_data">Daten exportieren</string>
+    <string name="txt_import_data">Einlesen der Daten aus einer Sicherungsdatei. Durch den Import werden alle vorhandenen Daten überschrieben. Wählen Sie das Datum der Sicherung aus</string>
+    <string name="btn_txt_import_data">Daten importieren</string>
 
     <!-- hints -->
     <string name="hint_eggs_collected">gelegt</string>

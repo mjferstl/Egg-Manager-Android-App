@@ -4,6 +4,7 @@ import android.app.Application;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.os.AsyncTask;
+import android.util.Log;
 
 import androidx.lifecycle.LiveData;
 
@@ -21,6 +22,7 @@ public class EggManagerRepository {
     private final String PRICE_PER_EGG = "pricePerEgg";
     private double pricePerEgg;
     private String filterString = "";
+    private final String LOG_TAG = "EggManagerRepository";
 
     private Application application;
 
@@ -47,6 +49,24 @@ public class EggManagerRepository {
 
     public LiveData<List<DailyBalance>> getAllData() {
         return mAllData;
+    }
+
+    public List<DailyBalance> getAllDataList() {
+        List<DailyBalance> dailyBalances;
+
+        try {
+            dailyBalances = new getAllData(dailyBalanceDao).execute().get();
+        } catch (ExecutionException e) {
+            e.printStackTrace();
+            Log.e(LOG_TAG,"getAllDataList::ExecutionException");
+            return null;
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+            Log.e(LOG_TAG,"getAllDataList::InterruptedException");
+            return null;
+        }
+
+        return dailyBalances;
     }
 
     public void insert(DailyBalance dailyBalance) {
@@ -132,6 +152,20 @@ public class EggManagerRepository {
         @Override
         protected List<DailyBalance> doInBackground(final String... params) {
             return mAsyncTaskDao.getDailyBalancesByDateKey(params[0]);
+        }
+    }
+
+    private static class getAllData extends AsyncTask<Void, Void, List<DailyBalance>> {
+
+        private DailyBalanceDao mAsyncTaskDao;
+
+        getAllData(DailyBalanceDao dao) {
+            mAsyncTaskDao = dao;
+        }
+
+        @Override
+        protected List<DailyBalance> doInBackground(Void... voids) {
+            return mAsyncTaskDao.getAscendingItemsList();
         }
     }
 

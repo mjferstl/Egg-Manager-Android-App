@@ -33,8 +33,11 @@ public interface DailyBalanceDao {
     @Query("SELECT * from " + tableName + " ORDER BY " + COL_DATE_PRIMARY_KEY + " ASC")
     LiveData<List<DailyBalance>> getAscendingItems();
 
+    @Query("SELECT * from " + tableName + " ORDER BY " + COL_DATE_PRIMARY_KEY + " ASC")
+    List<DailyBalance> getAscendingItemsList();
+
     @Query("SELECT * FROM " + tableName + " WHERE " + COL_DATE_PRIMARY_KEY + " = :dateKey")
-    DailyBalance getDailyBalance(String dateKey);
+    DailyBalance getDailyBalanceByDateKey(String dateKey);
 
     @Query("SELECT SUM(" + COL_EGGS_SOLD_NAME + ") FROM " + tableName)
     LiveData<Integer> getTotalEggsSold();
