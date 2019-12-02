@@ -1,12 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-<!--    <color name="colorPrimary">#0089ff</color>
-    <color name="colorPrimaryDark">#1464d8</color>
-    <color name="colorAccent">#ffa709</color>
-    <color name="main_background">#E8EAF6</color>
-    <color name="main_background_dark">#C5CAE9</color>-->
-
-    <!-- Color Sheme green - orange-->
+    <!-- Color Sheme: green - orange-->
     <color name="colorPrimary">#43a047</color>
     <color name="colorPrimaryDark">#00701a</color>
     <color name="colorPrimaryLight">#76d275</color>
@@ -16,6 +10,7 @@
 
     <color name="main_background">#e8f5e9</color>
     <color name="main_background_dark">#c8e6c9</color>
+    <color name="light_gray">#D8D8D8</color>
 
     <color name="colorAccent">@color/colorSecondary</color>
 

@@ -22,15 +22,15 @@ import java.text.SimpleDateFormat;
 import java.util.List;
 import java.util.Locale;
 
+import mfdevelopement.eggmanager.activities.DatabaseFragment;
 import mfdevelopement.eggmanager.data_models.DailyBalance;
-import mfdevelopement.eggmanager.activities.MainActivity;
 import mfdevelopement.eggmanager.R;
 import mfdevelopement.eggmanager.activities.NewEntityActivity;
-import mfdevelopement.eggmanager.viewmodels.DailyBalanceViewModel;
+import mfdevelopement.eggmanager.viewmodels.DatabaseActivityViewModel;
 
 public class DailyBalanceListAdapter extends RecyclerView.Adapter<DailyBalanceListAdapter.DailyBalanceViewHolder> {
 
-    private DailyBalanceViewModel viewModel;
+    private DatabaseActivityViewModel viewModel;
     private final String LOG_TAG = "DailyBalanceListAdapter";
     private final SimpleDateFormat sdf = new SimpleDateFormat("EE, dd.MM.yyyy", Locale.getDefault());
     private final LayoutInflater mInflater;
@@ -55,7 +55,7 @@ public class DailyBalanceListAdapter extends RecyclerView.Adapter<DailyBalanceLi
         }
     }
 
-    public DailyBalanceListAdapter(Context context, DailyBalanceViewModel viewModel) {
+    public DailyBalanceListAdapter(Context context, DatabaseActivityViewModel viewModel) {
         this.viewModel = viewModel;
         mInflater = LayoutInflater.from(context);
     }
@@ -133,8 +133,8 @@ public class DailyBalanceListAdapter extends RecyclerView.Adapter<DailyBalanceLi
                     Context context = v.getContext();
 
                     Intent intent = new Intent(v.getContext(), NewEntityActivity.class);
-                    intent.putExtra(MainActivity.EXTRA_REQUEST_CODE_NAME,MainActivity.EDIT_ENTITY_REQUEST_CODE);
-                    intent.putExtra(MainActivity.EXTRA_DAILY_BALANCE,current);
+                    intent.putExtra(DatabaseFragment.EXTRA_REQUEST_CODE_NAME, DatabaseFragment.EDIT_ENTITY_REQUEST_CODE);
+                    intent.putExtra(DatabaseFragment.EXTRA_DAILY_BALANCE,current);
 
                     int numPairs = 1;
                     if (current.getEggsSold() != DailyBalance.NOT_SET) {numPairs = 2;}
@@ -149,7 +149,7 @@ public class DailyBalanceListAdapter extends RecyclerView.Adapter<DailyBalanceLi
                     }
 
                     ActivityOptions options = ActivityOptions.makeSceneTransitionAnimation((Activity) context,pairs);
-                    ((Activity) context).startActivityForResult(intent, MainActivity.EDIT_ENTITY_REQUEST_CODE ,options.toBundle());
+                    ((Activity) context).startActivityForResult(intent, DatabaseFragment.EDIT_ENTITY_REQUEST_CODE ,options.toBundle());
                 }
             });
         } else {

@@ -34,14 +34,13 @@ public class FilterDialogFragment extends DialogFragment {
     public static final String NOT_SET_FILTER_STRING = "0000";
     private String selectedFilterString = NOT_SET_FILTER_STRING;
     private RecyclerView recyclerViewMonths;
-    private OnClickListener clickListener;
+    private OnFilterDialogClickListener filterDialogClickListener;
     private FilterDialogListAdapter monthsAdapter, yearsAdapter;
-    private ImageButton imgbtn_filter_remove;
     private static String initialFilterString = NOT_SET_FILTER_STRING;
 
-    public interface OnClickListener {
-        void onOkClicked(String filterString);
-        void onCancelClicked();
+    public interface OnFilterDialogClickListener {
+        void onFilterDialogOkClicked(String filterString);
+        void onFilterDialogCancelClicked();
     }
 
     public FilterDialogFragment() {
@@ -55,11 +54,11 @@ public class FilterDialogFragment extends DialogFragment {
         Log.d(LOG_TAG,"context of FilterDialogFragment: " + parentContext);
         monthNames = Arrays.asList(context.getResources().getStringArray(R.array.month_names));
 
-        if (context instanceof OnClickListener) {
-            clickListener = (OnClickListener) context;
+        if (context instanceof OnFilterDialogClickListener) {
+            filterDialogClickListener = (OnFilterDialogClickListener) context;
         } else {
             throw new ClassCastException(context.toString()
-                    + " must implement FilterDialogFragment.OnClickListener");
+                    + " must implement FilterDialogFragment.OnFilterDialogClickListener");
         }
     }
 
@@ -74,8 +73,10 @@ public class FilterDialogFragment extends DialogFragment {
                              Bundle savedInstanceState) {
         View v = inflater.inflate(R.layout.fragment_filter_dialog, container);
 
+        selectedFilterString = initialFilterString;
+
         // initialize image button to remove the current filter
-        imgbtn_filter_remove = v.findViewById(R.id.imgbtn_filter_remove);
+        ImageButton imgbtn_filter_remove = v.findViewById(R.id.imgbtn_filter_remove);
         imgbtn_filter_remove.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -83,6 +84,7 @@ public class FilterDialogFragment extends DialogFragment {
                 selectedFilterString = NOT_SET_FILTER_STRING;
                 Log.d(LOG_TAG,"selectedFilterString = " + selectedFilterString);
                 setNoButtonSelected();
+                filterDialogClickListener.onFilterDialogOkClicked(selectedFilterString);
             }
         });
 
@@ -91,7 +93,7 @@ public class FilterDialogFragment extends DialogFragment {
         btn_ok.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                clickListener.onOkClicked(selectedFilterString);
+                filterDialogClickListener.onFilterDialogOkClicked(selectedFilterString);
             }
         });
 
@@ -100,7 +102,7 @@ public class FilterDialogFragment extends DialogFragment {
         btn_cancel.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                clickListener.onCancelClicked();
+                filterDialogClickListener.onFilterDialogCancelClicked();
             }
         });
 

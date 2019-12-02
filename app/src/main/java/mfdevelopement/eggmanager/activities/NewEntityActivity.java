@@ -19,6 +19,7 @@ import androidx.appcompat.widget.Toolbar;
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.DialogFragment;
 import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentActivity;
 import androidx.fragment.app.FragmentTransaction;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
@@ -32,10 +33,10 @@ import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 
+import mfdevelopement.eggmanager.R;
 import mfdevelopement.eggmanager.data_models.DailyBalance;
 import mfdevelopement.eggmanager.dialog_fragments.DatePickerFragment;
 import mfdevelopement.eggmanager.utils.InputManager;
-import mfdevelopement.eggmanager.R;
 import mfdevelopement.eggmanager.viewmodels.NewEntityViewModel;
 
 public class NewEntityActivity extends AppCompatActivity implements DatePickerFragment.OnAddDateListener {
@@ -55,10 +56,14 @@ public class NewEntityActivity extends AppCompatActivity implements DatePickerFr
     private List<String> listDateKeys;
     private Snackbar snackbarEggsCollectedEmpty;
 
+    private FragmentActivity fragmentActivity;
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_new_entity);
+
+        fragmentActivity = this;
 
         Toolbar toolbar = findViewById(R.id.toolbar_new_entity);
         setSupportActionBar(toolbar);
@@ -72,7 +77,7 @@ public class NewEntityActivity extends AppCompatActivity implements DatePickerFr
         pricePerEggEditText = findViewById(R.id.etxt_egg_price);
 
         // create snackbar
-        snackbarEggsCollectedEmpty = Snackbar.make(findViewById(R.id.new_entity_main_container),getString(R.string.numer_eggs_collected_empty),Snackbar.LENGTH_INDEFINITE);
+        snackbarEggsCollectedEmpty = Snackbar.make(findViewById(R.id.new_entity_container),getString(R.string.number_eggs_collected_empty),Snackbar.LENGTH_INDEFINITE);
 
         // set the current date as default user selection
         updateDate(Calendar.getInstance().getTime());
@@ -95,10 +100,10 @@ public class NewEntityActivity extends AppCompatActivity implements DatePickerFr
         pricePerEggEditText.setText(String.format(Locale.getDefault(), PRICE_FORMAT, pricePerEgg));
 
         // fill in fields, if a item is edited
-        requestCode = getIntent().getIntExtra(MainActivity.EXTRA_REQUEST_CODE_NAME,MainActivity.NEW_ENTITY_REQUEST_CODE);
+        requestCode = getIntent().getIntExtra(DatabaseFragment.EXTRA_REQUEST_CODE_NAME, DatabaseFragment.NEW_ENTITY_REQUEST_CODE);
         Log.d(LOG_TAG,"activity startet with request code " + requestCode);
-        if (requestCode == MainActivity.EDIT_ENTITY_REQUEST_CODE) {
-            loadedDailyBalance = (DailyBalance)getIntent().getSerializableExtra(MainActivity.EXTRA_DAILY_BALANCE);
+        if (requestCode == DatabaseFragment.EDIT_ENTITY_REQUEST_CODE) {
+            loadedDailyBalance = (DailyBalance)getIntent().getSerializableExtra(DatabaseFragment.EXTRA_DAILY_BALANCE);
             String dateKey = loadedDailyBalance.getDateKey();
 
             eggsCollectedEditText.setText(String.valueOf(loadedDailyBalance.getEggsCollected()));
@@ -138,6 +143,9 @@ public class NewEntityActivity extends AppCompatActivity implements DatePickerFr
             // action with ID action_save was selected
             case R.id.action_save:
                 saveEntryAndExit();
+                break;
+            case android.R.id.home:
+                onBackPressed();
                 break;
             default:
                 break;
@@ -235,7 +243,7 @@ public class NewEntityActivity extends AppCompatActivity implements DatePickerFr
      */
     private void saveEntryAndExit() {
         // hide keyboard
-        InputManager.hideKeyboard(this);
+        InputManager.hideKeyboard(fragmentActivity);
 
         if (eggsCollectedEditText.getText().toString().isEmpty()) {
             snackbarEggsCollectedEmpty.show();
@@ -245,7 +253,7 @@ public class NewEntityActivity extends AppCompatActivity implements DatePickerFr
         // check if price per egg is a valid number
         String priceString = pricePerEggEditText.getText().toString();
         if (!isValidPrice(priceString)) {
-            Toast.makeText(this, "Der eingegebene Preis pro Ei ist ungültig", Toast.LENGTH_SHORT).show();
+            Toast.makeText(fragmentActivity, "Der eingegebene Preis pro Ei ist ungültig", Toast.LENGTH_SHORT).show();
             return;
         }
 
@@ -254,7 +262,7 @@ public class NewEntityActivity extends AppCompatActivity implements DatePickerFr
 
         // if the date key exists, the user needs to decide, if the existing entry should be overwritten
         if (dateKeyExists(dailyBalance.getDateKey())) {
-            new AlertDialog.Builder(this)
+            new AlertDialog.Builder(fragmentActivity)
                     .setTitle("Eintrag überschreiben")
                     .setMessage("Für den ausgewählten Tag ist bereits ein Eintrag vorhanden. Soll dieser Eintrag überschrieben werden?")
 
@@ -265,9 +273,9 @@ public class NewEntityActivity extends AppCompatActivity implements DatePickerFr
                             // Continue with delete operation
                             newEntityViewModel.deleteDailyBalance(loadedDailyBalance);
                             newEntityViewModel.addDailyBalance(dailyBalance);
-                            setResult(MainActivity.EDITED_ENTITY_RESULT_CODE);
+                            fragmentActivity.setResult(DatabaseFragment.EDITED_ENTITY_RESULT_CODE);
 
-                            finish();
+                            fragmentActivity.finish();
                         }
                     })
 
@@ -280,17 +288,17 @@ public class NewEntityActivity extends AppCompatActivity implements DatePickerFr
         else {
 
             // if the user edited an entry and selected a new date which has no data yet, then delete the selected entry and save the entry with the selected date
-            if (requestCode == MainActivity.EDIT_ENTITY_REQUEST_CODE) {
+            if (requestCode == DatabaseFragment.EDIT_ENTITY_REQUEST_CODE) {
                 newEntityViewModel.deleteDailyBalance(loadedDailyBalance);
-                setResult(MainActivity.EDITED_ENTITY_RESULT_CODE);
+                fragmentActivity.setResult(DatabaseFragment.EDITED_ENTITY_RESULT_CODE);
             } else {
-                setResult(MainActivity.NEW_ENTITY_RESULT_CODE);
+                fragmentActivity.setResult(DatabaseFragment.NEW_ENTITY_RESULT_CODE);
             }
 
             // save created item
             newEntityViewModel.addDailyBalance(dailyBalance);
 
-            finish();
+            fragmentActivity.finish();
         }
     }
 
@@ -317,8 +325,8 @@ public class NewEntityActivity extends AppCompatActivity implements DatePickerFr
         dateTextView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
-                Fragment prev = getSupportFragmentManager().findFragmentByTag("dialog");
+                FragmentTransaction ft = fragmentActivity.getSupportFragmentManager().beginTransaction();
+                Fragment prev = fragmentActivity.getSupportFragmentManager().findFragmentByTag("dialog");
                 if (prev != null) {
                     ft.remove(prev);
                 }
@@ -335,7 +343,7 @@ public class NewEntityActivity extends AppCompatActivity implements DatePickerFr
                     }
                 }
                 //newFragment.setTargetFragment(this, 1);
-                newFragment.show(getSupportFragmentManager(), "datePicker");
+                newFragment.show(fragmentActivity.getSupportFragmentManager(), "datePicker");
             }
         });
     }

@@ -31,7 +31,7 @@
     <string name="changes_saved">Änderungen gespeichert</string>
     <string name="changes_not_saved">Änderungen nicht übernommen</string>
     <string name="summary">Zusammenfassung</string>
-    <string name="numer_eggs_collected_empty">Anzahl abgenommener Eier fehlt</string>
+    <string name="number_eggs_collected_empty">Anzahl abgenommener Eier fehlt</string>
     <string name="selected_filter_part1">Daten nach\u0020</string>
     <string name="selected_filter_part2">\u0020gefiltert</string>
     <string name="filter_removed">Filter entfernt</string>
@@ -70,4 +70,19 @@
 
     <!-- whitespace -->
     <string name="whitespace">\u0020</string>
+
+
+
+    <string name="title_activity_main2" translatable="false">Main2Activity</string>
+    <string name="navigation_drawer_open" translatable="false">Open navigation drawer</string>
+    <string name="navigation_drawer_close" translatable="false">Close navigation drawer</string>
+    <string name="nav_header_title" translatable="false">EggManager</string>
+    <string name="nav_header_subtitle" translatable="false">https://mjferstl.github.io/</string>
+    <string name="nav_header_desc" translatable="false">Navigation header</string>
+
+    <string name="menu_main_database" translatable="false">Daten</string>
+    <string name="menu_diagrams" translatable="false">Statistiken</string>
+    <string name="menu_about" translatable="false">Über EggManager</string>
+    <string name="menu_backup_data" translatable="false">Datensicherung</string>
+    <string name="menu_settings" translatable="false">Einstellungen</string>
 </resources>

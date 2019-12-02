@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/mobile_navigation"
+    app:startDestination="@+id/nav_main_database">
+
+    <fragment
+        android:id="@+id/nav_main_database"
+        android:name="mfdevelopement.eggmanager.activities.DatabaseFragment"
+        android:label="@string/menu_main_database"
+        tools:layout="@layout/fragment_main_database" />
+
+    <fragment
+        android:id="@+id/nav_diagrams"
+        android:name="mfdevelopement.eggmanager.activities.LineChartActivity"
+        android:label="@string/menu_diagrams"
+        tools:layout="@layout/fragment_diagrams" />
+
+    <fragment
+        android:id="@+id/nav_about"
+        android:name="mfdevelopement.eggmanager.activities.AboutActivity"
+        android:label="@string/menu_about"
+        tools:layout="@layout/fragment_about" />
+
+    <fragment
+        android:id="@+id/nav_backup"
+        android:name="mfdevelopement.eggmanager.activities.DatabaseImportExportActivity"
+        android:label="@string/menu_backup_data"
+        tools:layout="@layout/fragment_backup" />
+
+</navigation>

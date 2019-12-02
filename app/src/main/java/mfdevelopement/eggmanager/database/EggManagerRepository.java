@@ -19,7 +19,8 @@ public class EggManagerRepository {
 
     private SharedPreferences sharedPreferences;
     private final String PREFERENCE_FILE_KEY = "mfdevelopment.eggmanager.PREFERENCE_FILE_KEY";
-    private final String PRICE_PER_EGG = "pricePerEgg";
+    private final String KEY_PRICE_PER_EGG = "pricePerEgg";
+    private final String KEY_FILTER_STRING = "filterString";
     private double pricePerEgg;
     private String filterString = "";
     private final String LOG_TAG = "EggManagerRepository";
@@ -31,7 +32,6 @@ public class EggManagerRepository {
     private LiveData<Integer> ldTotalEggsSold, ldTotalEggsCollected;
     private LiveData<Double> ldTotalMoneyEarned;
     private LiveData<List<String>> ldDateKeys;
-    private List<DailyBalance> listFilteredDailyBalances;
 
     public EggManagerRepository(Application application){
         this.application = application;
@@ -171,12 +171,25 @@ public class EggManagerRepository {
 
     public double getPricePerEgg() {
         sharedPreferences = application.getSharedPreferences(PREFERENCE_FILE_KEY, Context.MODE_PRIVATE);
-        return sharedPreferences.getFloat(PRICE_PER_EGG, 0);
+        return sharedPreferences.getFloat(KEY_PRICE_PER_EGG, 0);
     }
 
     public void setPricePerEgg(double pricePerEgg) {
+        sharedPreferences = application.getSharedPreferences(PREFERENCE_FILE_KEY, Context.MODE_PRIVATE);
         SharedPreferences.Editor editor = sharedPreferences.edit();
-        editor.putFloat(PRICE_PER_EGG, (float) pricePerEgg);
+        editor.putFloat(KEY_PRICE_PER_EGG, (float) pricePerEgg);
         editor.apply();
+    }
+
+    public void setDataFilter(String filterString) {
+        sharedPreferences = application.getSharedPreferences(PREFERENCE_FILE_KEY, Context.MODE_PRIVATE);
+        SharedPreferences.Editor editor = sharedPreferences.edit();
+        editor.putString(KEY_FILTER_STRING, filterString);
+        editor.apply();
+    }
+
+    public String getDataFilter() {
+        sharedPreferences = application.getSharedPreferences(PREFERENCE_FILE_KEY, Context.MODE_PRIVATE);
+        return sharedPreferences.getString(KEY_FILTER_STRING, "");
     }
 }

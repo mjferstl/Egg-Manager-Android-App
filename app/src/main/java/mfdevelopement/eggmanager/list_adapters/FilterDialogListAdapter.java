@@ -146,12 +146,12 @@ public class FilterDialogListAdapter extends RecyclerView.Adapter<FilterDialogLi
 
     private void setButtonPressed(Button btn) {
         btn.setSelected(true);
-        btn.setTextColor(parentContext.getResources().getColor(R.color.colorAccent));
+        btn.setTextColor(parentContext.getResources().getColor(R.color.white));
     }
 
     private void setButtonNotPressed(Button btn) {
         btn.setSelected(false);
-        btn.setTextColor(parentContext.getResources().getColor(R.color.colorPrimary));
+        btn.setTextColor(parentContext.getResources().getColor(R.color.main_text_color));
     }
 
     public void setFilterStrings(List<String> yearMonthFilterList) {

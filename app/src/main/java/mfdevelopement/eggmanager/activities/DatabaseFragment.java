@@ -1,17 +1,20 @@
 package mfdevelopement.eggmanager.activities;
 
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.Menu;
+import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.appcompat.widget.Toolbar;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentTransaction;
 import androidx.lifecycle.Observer;
@@ -28,14 +31,16 @@ import java.util.Locale;
 
 import mfdevelopement.eggmanager.R;
 import mfdevelopement.eggmanager.data_models.DailyBalance;
+import mfdevelopement.eggmanager.data_models.FilterButtonHelper;
 import mfdevelopement.eggmanager.dialog_fragments.FilterDialogFragment;
 import mfdevelopement.eggmanager.list_adapters.DailyBalanceListAdapter;
-import mfdevelopement.eggmanager.list_adapters.FilterDialogListAdapter;
-import mfdevelopement.eggmanager.viewmodels.DailyBalanceViewModel;
+import mfdevelopement.eggmanager.viewmodels.DatabaseActivityViewModel;
 
-public class MainActivity extends AppCompatActivity implements FilterDialogListAdapter.OnFilterSelectListener, FilterDialogFragment.OnClickListener{
+import static android.app.Activity.RESULT_CANCELED;
 
-    private DailyBalanceViewModel dailyBalanceViewModel;
+public class DatabaseFragment extends Fragment {
+
+    private DatabaseActivityViewModel databaseActivityViewModel;
     private DailyBalanceListAdapter adapter;
     private FilterDialogFragment filterDialogFragment;
 
@@ -49,7 +54,7 @@ public class MainActivity extends AppCompatActivity implements FilterDialogListA
 
     public static final String EXTRA_REQUEST_CODE_NAME = "requestCode";
     public static final String EXTRA_DAILY_BALANCE = "extraDailyBalance";
-    private final String LOG_TAG = "MainActivity";
+    private final String LOG_TAG = "DatabaseFragment";
     private int totalEggsSold, totalEggsCollected;
     private double totalMoneyEarned;
 
@@ -57,26 +62,38 @@ public class MainActivity extends AppCompatActivity implements FilterDialogListA
     private TextView txtv_summary_extra_info;
     private LinearLayout linLay_summary;
 
+    private View mainView;
+    private Context mainContext;
+
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
+    public void onAttach(@NonNull Context context) {
+        super.onAttach(context);
+        mainContext = context;
+    }
 
-        Toolbar toolbar = findViewById(R.id.toolbar);
-        setSupportActionBar(toolbar);
+    public View onCreateView(@NonNull LayoutInflater inflater,
+                             ViewGroup container, Bundle savedInstanceState) {
+        View root = inflater.inflate(R.layout.fragment_main_database, container, false);
 
-        linLay_summary = findViewById(R.id.fragment_summary);
+        setHasOptionsMenu(true);
+
+        mainView = root;
+
+        linLay_summary = root.findViewById(R.id.fragment_summary);
         hideSummary();
-        txtv_summary_eggs_collected = findViewById(R.id.txtv_summary_eggsCollected);
-        txtv_summary_eggs_sold = findViewById(R.id.txtv_summary_eggsSold);
-        txtv_summary_money_earned = findViewById(R.id.txtv_summary_money_earned);
-        txtv_summary_extra_info = findViewById(R.id.txtv_summary_extra_info);
+        txtv_summary_eggs_collected = root.findViewById(R.id.txtv_summary_eggsCollected);
+        txtv_summary_eggs_sold = root.findViewById(R.id.txtv_summary_eggsSold);
+        txtv_summary_money_earned = root.findViewById(R.id.txtv_summary_money_earned);
+        txtv_summary_extra_info = root.findViewById(R.id.txtv_summary_extra_info);
 
-        initFab();
+        // initalize floating action button
+        initFab(root);
 
-        dailyBalanceViewModel = new ViewModelProvider(this).get(DailyBalanceViewModel.class);
+        databaseActivityViewModel = new ViewModelProvider(getActivity()).get(DatabaseActivityViewModel.class);
 
-        setObservers();
+        setObservers(root);
+
+        return root;
     }
 
     private void setTotalEggsCollected(int amount) {
@@ -127,10 +144,9 @@ public class MainActivity extends AppCompatActivity implements FilterDialogListA
     }
 
     @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.menu_main, menu);
-        return true;
+    public void onCreateOptionsMenu(@NonNull Menu menu, MenuInflater inflater) {
+        inflater.inflate(R.menu.menu_main, menu);
+        super.onCreateOptionsMenu(menu, inflater);
     }
 
     /**
@@ -147,48 +163,39 @@ public class MainActivity extends AppCompatActivity implements FilterDialogListA
 
         switch (id) {
             case R.id.action_main_filter:
-                List<DailyBalance> allData = dailyBalanceViewModel.getDailyBalanceByDateKey("");
+                List<DailyBalance> allData = databaseActivityViewModel.getDailyBalanceByDateKey("");
                 if (allData.size() > 0)
                     showFilterDialog();
                 else
-                    Snackbar.make(findViewById(R.id.main_container),getString(R.string.snackbar_no_data),Snackbar.LENGTH_LONG).show();
-                break;
-            case R.id.action_settings:
-                Snackbar.make(findViewById(R.id.main_container),getString(R.string.snackbar_no_settings),Snackbar.LENGTH_SHORT).show();
-                break;
-            case R.id.action_main_backup:
-                startActivity(new Intent(this, DatabaseImportExportActivity.class));
-                break;
-            case R.id.action_main_about:
-                Intent intent = new Intent(this, AboutActivity.class);
-                intent.addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
-                startActivity(intent);
+                    Snackbar.make(mainView.findViewById(R.id.main_container),getString(R.string.snackbar_no_data),Snackbar.LENGTH_LONG).show();
                 break;
         }
         return super.onOptionsItemSelected(item);
     }
 
-    /**
+/**
      * show dialog to filter the displayed data
      */
     private void showFilterDialog() {
-        FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
-        Fragment prev = getSupportFragmentManager().findFragmentByTag("dialog");
-        if (prev != null) {
-            ft.remove(prev);
+        if (getActivity() != null) {
+            FragmentTransaction ft = getActivity().getSupportFragmentManager().beginTransaction();
+            Fragment prev = getActivity().getSupportFragmentManager().findFragmentByTag("dialog");
+            if (prev != null) {
+                ft.remove(prev);
+            }
+            ft.addToBackStack(null);
+            ft.commit();
+
+            // Create and show the dialog.
+            filterDialogFragment = FilterDialogFragment.newInstance(allDateKeys, databaseActivityViewModel.getFilterString());
+
+            //newFragment.setTargetFragment(this, 1);
+            filterDialogFragment.show(getActivity().getSupportFragmentManager(), "filterDialog");
         }
-        ft.addToBackStack(null);
-        ft.commit();
-
-        // Create and show the dialog.
-        filterDialogFragment = FilterDialogFragment.newInstance(allDateKeys, dailyBalanceViewModel.getFilterString());
-
-        //newFragment.setTargetFragment(this, 1);
-        filterDialogFragment.show(getSupportFragmentManager(), "filterDialog");
     }
 
     @Override
-    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+    public void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
 
         Log.d(LOG_TAG,"onActivityResult::requestCode=" + requestCode + ",resultCode=" + resultCode);
@@ -207,17 +214,17 @@ public class MainActivity extends AppCompatActivity implements FilterDialogListA
 
         // create a snackbar and display it
         if (!snackbarText.isEmpty())
-            Snackbar.make(findViewById(R.id.main_container),snackbarText,Snackbar.LENGTH_SHORT).show();
+            Snackbar.make(mainView.findViewById(R.id.main_container),snackbarText,Snackbar.LENGTH_SHORT).show();
     }
 
-    private void initFab() {
-        FloatingActionButton fab = findViewById(R.id.fab);
+    private void initFab(View v) {
+        FloatingActionButton fab = v.findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Intent intent = new Intent(MainActivity.this, NewEntityActivity.class);
+
+                Intent intent = new Intent(mainContext, NewEntityActivity.class);
                 intent.putExtra(EXTRA_REQUEST_CODE_NAME, NEW_ENTITY_REQUEST_CODE);
-                //startActivity(intent);
                 startActivityForResult(intent, NEW_ENTITY_REQUEST_CODE);
             }
         });
@@ -226,14 +233,14 @@ public class MainActivity extends AppCompatActivity implements FilterDialogListA
     /**
      * set observers for LiveData using the Room Database
      */
-    private void setObservers() {
+    private void setObservers(View container) {
 
-        RecyclerView recyclerView = findViewById(R.id.recyclerview);
-        adapter = new DailyBalanceListAdapter(this, dailyBalanceViewModel);
+        RecyclerView recyclerView = container.findViewById(R.id.recyclerview);
+        adapter = new DailyBalanceListAdapter(getActivity(), databaseActivityViewModel);
         recyclerView.setAdapter(adapter);
-        recyclerView.setLayoutManager(new LinearLayoutManager(this));
+        recyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
 
-        dailyBalanceViewModel.getAllDailyBalances().observe(this, new Observer<List<DailyBalance>>() {
+        databaseActivityViewModel.getAllDailyBalances().observe(getActivity(), new Observer<List<DailyBalance>>() {
             @Override
             public void onChanged(@Nullable final List<DailyBalance> dailyBalanceList) {
                 // Update the cached copy of the items in the adapter, if the list is not in filtered mode
@@ -245,7 +252,7 @@ public class MainActivity extends AppCompatActivity implements FilterDialogListA
             }
         });
 
-        dailyBalanceViewModel.getTotalEggsSold().observe(this, new Observer<Integer>() {
+        databaseActivityViewModel.getTotalEggsSold().observe(getActivity(), new Observer<Integer>() {
             @Override
             public void onChanged(Integer totalEggsSold) {
                 Log.d(LOG_TAG,"amount of total eggs sold changed. New value: " + String.format("%.4f",totalMoneyEarned));
@@ -256,7 +263,7 @@ public class MainActivity extends AppCompatActivity implements FilterDialogListA
             }
         });
 
-        dailyBalanceViewModel.getTotalMoneyEarned().observe(this, new Observer<Double>() {
+        databaseActivityViewModel.getTotalMoneyEarned().observe(getActivity(), new Observer<Double>() {
             @Override
             public void onChanged(Double totalMoneyEarned) {
                 Log.d(LOG_TAG,"amount of total money earned changed. New value: " + String.format("%.4f",totalMoneyEarned));
@@ -267,7 +274,7 @@ public class MainActivity extends AppCompatActivity implements FilterDialogListA
             }
         });
 
-        dailyBalanceViewModel.getTotalEggsCollected().observe(this, new Observer<Integer>() {
+        databaseActivityViewModel.getTotalEggsCollected().observe(getActivity(), new Observer<Integer>() {
             @Override
             public void onChanged(Integer totalEggsCollected) {
                 Log.d(LOG_TAG,"amount of total eggs collected changed. New value: " + String.format("%.4f",totalMoneyEarned));
@@ -278,18 +285,40 @@ public class MainActivity extends AppCompatActivity implements FilterDialogListA
             }
         });
 
-        dailyBalanceViewModel.getDateKeys().observe(this, new Observer<List<String>>() {
+        databaseActivityViewModel.getDateKeys().observe(getActivity(), new Observer<List<String>>() {
             @Override
             public void onChanged(List<String> strings) {
                 setAllDateKeys(strings);
             }
         });
-    }
 
-    @Override
-    public void onFilterSelected(String filterString, int buttonPosition, boolean isSelected) {
-        // update dialog fragment
-        filterDialogFragment.setButtonSelected(filterString, buttonPosition, isSelected);
+        databaseActivityViewModel.getLiveFilterButton().observe(getActivity(), new Observer<FilterButtonHelper>() {
+            @Override
+            public void onChanged(FilterButtonHelper filterButtonHelper) {
+                if (filterDialogFragment != null && filterDialogFragment.isVisible()) {
+                    filterDialogFragment.setButtonSelected(filterButtonHelper.getFilterString(), filterButtonHelper.getButtonPosition(), filterButtonHelper.isSelected());
+                }
+            }
+        });
+
+        databaseActivityViewModel.getFilterDialogOkClicked().observe(getActivity(), new Observer<Boolean>() {
+            @Override
+            public void onChanged(Boolean isClicked) {
+                if (isClicked) {
+                    filterDialogOkClicked(databaseActivityViewModel.getFilterString());
+                }
+            }
+        });
+
+        databaseActivityViewModel.getFilterDialogCancelClicked().observe(getActivity(), new Observer<Boolean>() {
+            @Override
+            public void onChanged(Boolean isClicked) {
+                if (isClicked) {
+                    databaseActivityViewModel.setFilterString("");
+                    filterDialogCancelClicked();
+                }
+            }
+        });
     }
 
     /**
@@ -297,40 +326,46 @@ public class MainActivity extends AppCompatActivity implements FilterDialogListA
      * show a Snackbar to inform the user about the selected filter
      * @param selectedFilterString String containing the filter for the primary key of the database
      */
-    @Override
-    public void onOkClicked(String selectedFilterString) {
+    private void filterDialogOkClicked(String selectedFilterString) {
 
-        if (selectedFilterString.equals(FilterDialogFragment.NOT_SET_FILTER_STRING)) {
-            dailyBalanceViewModel.setFilterString("");
-            Snackbar.make(findViewById(R.id.main_container),getString(R.string.data_not_filtered),Snackbar.LENGTH_SHORT).show();
+        Log.d(LOG_TAG,"filterDialogOkClicked: selectedFilterString = " + selectedFilterString);
+
+        if (selectedFilterString.equals(FilterDialogFragment.NOT_SET_FILTER_STRING) || selectedFilterString.equals("")) {
+            //databaseActivityViewModel.setFilterString("");
+            Snackbar.make(mainView.findViewById(R.id.main_container),mainContext.getString(R.string.data_not_filtered),Snackbar.LENGTH_SHORT).show();
         } else {
-            dailyBalanceViewModel.setFilterString(selectedFilterString);
+            //databaseActivityViewModel.setFilterString(selectedFilterString);
 
             // create a snackbar
-            String snackbarText = getString(R.string.selected_filter_part1);
+            String snackbarText = mainContext.getString(R.string.selected_filter_part1);
             if (selectedFilterString.length() == 4) {
                 snackbarText = snackbarText + selectedFilterString;
             } else if (selectedFilterString.length() == 6) {
                 int monthIndex = Integer.valueOf(selectedFilterString.substring(4,6))-1;
-                List<String> monthNames = Arrays.asList(this.getResources().getStringArray(R.array.month_names));
+                List<String> monthNames = Arrays.asList(mainContext.getResources().getStringArray(R.array.month_names));
                 String monthName = monthNames.get(monthIndex);
                 String year = selectedFilterString.substring(0,4);
                 snackbarText = snackbarText + monthName + " " + year;
             } else {
+                Log.d(LOG_TAG,"filterDialogOkClicked:: no matching case found...");
                 return;
             }
 
-            snackbarText = snackbarText + getString(R.string.selected_filter_part2);
+            snackbarText = snackbarText + mainContext.getString(R.string.selected_filter_part2);
 
             // show Snackbar to inform the user about the selected filter
-            Snackbar.make(findViewById(R.id.main_container),snackbarText,Snackbar.LENGTH_SHORT).show();
+            Snackbar.make(mainView.findViewById(R.id.main_container),snackbarText,Snackbar.LENGTH_SHORT).show();
         }
 
         // dismiss dialog
-        filterDialogFragment.dismiss();
+        if (filterDialogFragment != null && filterDialogFragment.isVisible()) {
+            filterDialogFragment.dismiss();
+        } else {
+            Log.e(LOG_TAG,"filterDialogFragment = " + filterDialogFragment);
+        }
 
         // update recycler view
-        List<DailyBalance> filteredDailyBalances = dailyBalanceViewModel.getFilteredDailyBalances();
+        List<DailyBalance> filteredDailyBalances = databaseActivityViewModel.getFilteredDailyBalances();
         adapter.setDailyBalances(filteredDailyBalances);
 
         // update summary
@@ -350,8 +385,10 @@ public class MainActivity extends AppCompatActivity implements FilterDialogListA
     /**
      * dismiss dialog when the user cancels the filter dialog
      */
-    @Override
-    public void onCancelClicked() {
-        filterDialogFragment.dismiss();
+    private void filterDialogCancelClicked() {
+        if (filterDialogFragment != null && filterDialogFragment.isVisible()) {
+            filterDialogFragment.dismiss();
+            Snackbar.make(mainView.findViewById(R.id.main_container), mainContext.getString(R.string.data_not_filtered), Snackbar.LENGTH_SHORT).show();
+        }
     }
 }
