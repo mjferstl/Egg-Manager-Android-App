@@ -17,13 +17,13 @@
         <include
             android:id="@+id/fragment_summary"
             layout="@layout/fragment_main_summary"
-            app:layout_constraintBottom_toTopOf="@+id/recyclerview"
+            app:layout_constraintBottom_toTopOf="@+id/database_recyclerview"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"/>
 
         <androidx.recyclerview.widget.RecyclerView
-            android:id="@+id/recyclerview"
+            android:id="@+id/database_recyclerview"
             android:layout_width="0dp"
             android:layout_height="0dp"
             android:background="@color/main_background"
@@ -31,10 +31,27 @@
             android:paddingTop="@dimen/small_padding"
             android:paddingBottom="80dp"
             android:clipToPadding="false"
-            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintBottom_toTopOf="@id/txtv_database_empty_recyclerview"
             app:layout_constraintLeft_toLeftOf="parent"
             app:layout_constraintRight_toRightOf="parent"
             app:layout_constraintTop_toBottomOf="@id/fragment_summary" />
+
+        <TextView
+            android:id="@+id/txtv_database_empty_recyclerview"
+            style="@style/basic_text"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:text="@string/text_empty_recyclerview"
+            android:textSize="@dimen/textAppearanceBody1"
+            android:background="@color/transparent"
+            android:layout_marginTop="@dimen/large_padding"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.5"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/database_recyclerview"
+            app:layout_constraintVertical_bias="0" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 

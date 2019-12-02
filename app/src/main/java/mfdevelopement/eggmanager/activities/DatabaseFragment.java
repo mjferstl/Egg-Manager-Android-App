@@ -60,10 +60,13 @@ public class DatabaseFragment extends Fragment {
 
     private TextView txtv_summary_eggs_collected, txtv_summary_eggs_sold, txtv_summary_money_earned;
     private TextView txtv_summary_extra_info;
+    private TextView txtv_empty_recyclerview;
     private LinearLayout linLay_summary;
 
     private View mainView;
     private Context mainContext;
+
+    private RecyclerView recyclerView;
 
     @Override
     public void onAttach(@NonNull Context context) {
@@ -74,24 +77,37 @@ public class DatabaseFragment extends Fragment {
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
         View root = inflater.inflate(R.layout.fragment_main_database, container, false);
-
-        setHasOptionsMenu(true);
-
         mainView = root;
 
+        // get view model
+        if (getActivity() != null) {
+            databaseActivityViewModel = new ViewModelProvider(getActivity()).get(DatabaseActivityViewModel.class);
+        } else {
+            String errorMsg = "Es ist ein Fehler beim Laden des ViewModels aufgetreten";
+            Log.wtf(LOG_TAG,errorMsg);
+            Snackbar.make(mainView.findViewById(R.id.main_container), errorMsg, Snackbar.LENGTH_LONG).show();
+        }
+
+        // this framgent has its own options menu
+        setHasOptionsMenu(true);
+
+        // get all GUI elements
         linLay_summary = root.findViewById(R.id.fragment_summary);
         hideSummary();
         txtv_summary_eggs_collected = root.findViewById(R.id.txtv_summary_eggsCollected);
         txtv_summary_eggs_sold = root.findViewById(R.id.txtv_summary_eggsSold);
         txtv_summary_money_earned = root.findViewById(R.id.txtv_summary_money_earned);
         txtv_summary_extra_info = root.findViewById(R.id.txtv_summary_extra_info);
+        txtv_empty_recyclerview = root.findViewById(R.id.txtv_database_empty_recyclerview);
+
+        // Recyclerview - get reference, init data
+        recyclerView = root.findViewById(R.id.database_recyclerview);
+        initRecyclerView();
 
         // initalize floating action button
         initFab(root);
 
-        databaseActivityViewModel = new ViewModelProvider(getActivity()).get(DatabaseActivityViewModel.class);
-
-        setObservers(root);
+        setObservers();
 
         return root;
     }
@@ -116,7 +132,7 @@ public class DatabaseFragment extends Fragment {
         // show summary if the recycler view contains 2 or more items
         if (adapter != null) {
             int numItems = adapter.getItemCount();
-            String extraInfo = +numItems + " Einträge";
+            String extraInfo = numItems + " Einträge";
             if (numItems >= 2) {
                 showSummary();
             } else {
@@ -173,7 +189,24 @@ public class DatabaseFragment extends Fragment {
         return super.onOptionsItemSelected(item);
     }
 
-/**
+    private void initRecyclerView() {
+        adapter = new DailyBalanceListAdapter(getActivity(), databaseActivityViewModel);
+        recyclerView.setAdapter(adapter);
+        recyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
+        showTextEmptyRecyclerview(true);
+    }
+
+    private void showTextEmptyRecyclerview(boolean show) {
+        if (txtv_empty_recyclerview != null) {
+            if (show) {
+                txtv_empty_recyclerview.setVisibility(View.VISIBLE);
+            } else {
+                txtv_empty_recyclerview.setVisibility(View.GONE);
+            }
+        }
+    }
+
+    /**
      * show dialog to filter the displayed data
      */
     private void showFilterDialog() {
@@ -188,8 +221,6 @@ public class DatabaseFragment extends Fragment {
 
             // Create and show the dialog.
             filterDialogFragment = FilterDialogFragment.newInstance(allDateKeys, databaseActivityViewModel.getFilterString());
-
-            //newFragment.setTargetFragment(this, 1);
             filterDialogFragment.show(getActivity().getSupportFragmentManager(), "filterDialog");
         }
     }
@@ -222,7 +253,6 @@ public class DatabaseFragment extends Fragment {
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-
                 Intent intent = new Intent(mainContext, NewEntityActivity.class);
                 intent.putExtra(EXTRA_REQUEST_CODE_NAME, NEW_ENTITY_REQUEST_CODE);
                 startActivityForResult(intent, NEW_ENTITY_REQUEST_CODE);
@@ -233,14 +263,9 @@ public class DatabaseFragment extends Fragment {
     /**
      * set observers for LiveData using the Room Database
      */
-    private void setObservers(View container) {
+    private void setObservers() {
 
-        RecyclerView recyclerView = container.findViewById(R.id.recyclerview);
-        adapter = new DailyBalanceListAdapter(getActivity(), databaseActivityViewModel);
-        recyclerView.setAdapter(adapter);
-        recyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
-
-        databaseActivityViewModel.getAllDailyBalances().observe(getActivity(), new Observer<List<DailyBalance>>() {
+        databaseActivityViewModel.getAllDailyBalances().observe(getViewLifecycleOwner(), new Observer<List<DailyBalance>>() {
             @Override
             public void onChanged(@Nullable final List<DailyBalance> dailyBalanceList) {
                 // Update the cached copy of the items in the adapter, if the list is not in filtered mode
@@ -248,11 +273,25 @@ public class DatabaseFragment extends Fragment {
                 if (dailyBalanceList != null) {
                     adapter.setDailyBalances(dailyBalanceList);
                     updateSummary();
+                    if (adapter.getItemCount() == 0) {
+                        showTextEmptyRecyclerview(true);
+                    } else {
+                        showTextEmptyRecyclerview(false);
+                    }
+
+                    // hide summary and show text field if the recycler view is not visible
+                    boolean recyclerViewNotVisibile = (recyclerView.getVisibility() == View.GONE) || (recyclerView.getVisibility() == View.INVISIBLE);
+                    if (recyclerViewNotVisibile) {
+                        Log.d(LOG_TAG,"recyclerView is not visible");
+                        txtv_empty_recyclerview.setText(getString(R.string.text_recyclerview_not_visible));
+                        hideSummary();
+                        showTextEmptyRecyclerview(true);
+                    }
                 }
             }
         });
 
-        databaseActivityViewModel.getTotalEggsSold().observe(getActivity(), new Observer<Integer>() {
+        databaseActivityViewModel.getTotalEggsSold().observe(getViewLifecycleOwner(), new Observer<Integer>() {
             @Override
             public void onChanged(Integer totalEggsSold) {
                 Log.d(LOG_TAG,"amount of total eggs sold changed. New value: " + String.format("%.4f",totalMoneyEarned));
@@ -263,7 +302,7 @@ public class DatabaseFragment extends Fragment {
             }
         });
 
-        databaseActivityViewModel.getTotalMoneyEarned().observe(getActivity(), new Observer<Double>() {
+        databaseActivityViewModel.getTotalMoneyEarned().observe(getViewLifecycleOwner(), new Observer<Double>() {
             @Override
             public void onChanged(Double totalMoneyEarned) {
                 Log.d(LOG_TAG,"amount of total money earned changed. New value: " + String.format("%.4f",totalMoneyEarned));
@@ -274,7 +313,7 @@ public class DatabaseFragment extends Fragment {
             }
         });
 
-        databaseActivityViewModel.getTotalEggsCollected().observe(getActivity(), new Observer<Integer>() {
+        databaseActivityViewModel.getTotalEggsCollected().observe(getViewLifecycleOwner(), new Observer<Integer>() {
             @Override
             public void onChanged(Integer totalEggsCollected) {
                 Log.d(LOG_TAG,"amount of total eggs collected changed. New value: " + String.format("%.4f",totalMoneyEarned));
@@ -285,14 +324,14 @@ public class DatabaseFragment extends Fragment {
             }
         });
 
-        databaseActivityViewModel.getDateKeys().observe(getActivity(), new Observer<List<String>>() {
+        databaseActivityViewModel.getDateKeys().observe(getViewLifecycleOwner(), new Observer<List<String>>() {
             @Override
             public void onChanged(List<String> strings) {
                 setAllDateKeys(strings);
             }
         });
 
-        databaseActivityViewModel.getLiveFilterButton().observe(getActivity(), new Observer<FilterButtonHelper>() {
+        databaseActivityViewModel.getLiveFilterButton().observe(getViewLifecycleOwner(), new Observer<FilterButtonHelper>() {
             @Override
             public void onChanged(FilterButtonHelper filterButtonHelper) {
                 if (filterDialogFragment != null && filterDialogFragment.isVisible()) {
@@ -301,7 +340,7 @@ public class DatabaseFragment extends Fragment {
             }
         });
 
-        databaseActivityViewModel.getFilterDialogOkClicked().observe(getActivity(), new Observer<Boolean>() {
+        databaseActivityViewModel.getFilterDialogOkClicked().observe(getViewLifecycleOwner(), new Observer<Boolean>() {
             @Override
             public void onChanged(Boolean isClicked) {
                 if (isClicked) {
@@ -310,7 +349,7 @@ public class DatabaseFragment extends Fragment {
             }
         });
 
-        databaseActivityViewModel.getFilterDialogCancelClicked().observe(getActivity(), new Observer<Boolean>() {
+        databaseActivityViewModel.getFilterDialogCancelClicked().observe(getViewLifecycleOwner(), new Observer<Boolean>() {
             @Override
             public void onChanged(Boolean isClicked) {
                 if (isClicked) {
@@ -332,10 +371,8 @@ public class DatabaseFragment extends Fragment {
 
         if (selectedFilterString.equals(FilterDialogFragment.NOT_SET_FILTER_STRING) || selectedFilterString.equals("")) {
             //databaseActivityViewModel.setFilterString("");
-            Snackbar.make(mainView.findViewById(R.id.main_container),mainContext.getString(R.string.data_not_filtered),Snackbar.LENGTH_SHORT).show();
+            Snackbar.make(mainView.findViewById(R.id.main_container),mainContext.getString(R.string.snackbar_data_not_filtered),Snackbar.LENGTH_SHORT).show();
         } else {
-            //databaseActivityViewModel.setFilterString(selectedFilterString);
-
             // create a snackbar
             String snackbarText = mainContext.getString(R.string.selected_filter_part1);
             if (selectedFilterString.length() == 4) {
@@ -388,7 +425,7 @@ public class DatabaseFragment extends Fragment {
     private void filterDialogCancelClicked() {
         if (filterDialogFragment != null && filterDialogFragment.isVisible()) {
             filterDialogFragment.dismiss();
-            Snackbar.make(mainView.findViewById(R.id.main_container), mainContext.getString(R.string.data_not_filtered), Snackbar.LENGTH_SHORT).show();
+            Snackbar.make(mainView.findViewById(R.id.main_container), mainContext.getString(R.string.snackbar_data_filter_canceled), Snackbar.LENGTH_SHORT).show();
         }
     }
 }

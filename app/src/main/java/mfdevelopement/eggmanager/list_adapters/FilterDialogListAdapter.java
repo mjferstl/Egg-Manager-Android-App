@@ -52,21 +52,6 @@ public class FilterDialogListAdapter extends RecyclerView.Adapter<FilterDialogLi
         listener = clickListener;
     }
 
-    public FilterDialogListAdapter(Context context) {
-        mInflater = LayoutInflater.from(context);
-        monthNames = Arrays.asList(context.getResources().getStringArray(R.array.month_names));
-        parentContext = context;
-
-        if (context instanceof OnFilterSelectListener) {
-            listener = (OnFilterSelectListener) context;
-        } else {
-            throw new ClassCastException(context.toString()
-                    + " must implement FilterDialogListAdapter.OnFilterSelectListener");
-        }
-
-        sSelectedItems = new SparseBooleanArray();
-    }
-
     public FilterDialogListAdapter(Context context, String currentFilterString) {
         // set inital filter string
         initialFilterString = currentFilterString;
@@ -158,7 +143,6 @@ public class FilterDialogListAdapter extends RecyclerView.Adapter<FilterDialogLi
         if (filterList != yearMonthFilterList) {
             filterList = yearMonthFilterList;
             notifyDataSetChanged();
-            Log.d(LOG_TAG, "setFilterStrings::notifyDataSetChanged");
         }
     }
 
@@ -178,8 +162,6 @@ public class FilterDialogListAdapter extends RecyclerView.Adapter<FilterDialogLi
         notifyDataSetChanged();
     }
 
-    // getItemCount() is called many times, and when it is first called,
-    // mWords has not been updated (means initially, it's null, and we can't return null).
     @Override
     public int getItemCount() {
         if (filterList != null)

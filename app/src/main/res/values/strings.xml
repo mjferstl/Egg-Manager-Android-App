@@ -23,8 +23,13 @@
     <string name="snackbar_permission_ext_storage_denied">Zugriff auf externen Speicher verweigert. Backup kann nicht durchgeführt werden.</string>
     <string name="snackbar_data_exported_successfully">Daten erfolgreich exportiert</string>
     <string name="snackbar_data_imported_successfully">Daten für %d Tage erfolgreich importiert.</string>
+    <string name="snackbar_data_filter_canceled">Filter-Einstellungen nicht geändert</string>
+    <string name="snackbar_data_not_filtered">Daten nicht gefiltert</string>
 
-    <!-- main activity -->
+    <!-- line chart activty -->
+    <string name="txt_title_eggs_collected">Abgenommene Eier</string>
+
+    <!-- database activity -->
     <string name="button_save">@string/action_save</string>
     <string name="entry_not_added">Kein Eintrag erstellt</string>
     <string name="new_entity_saved">Neuer Eintrag gespeichert</string>
@@ -35,7 +40,8 @@
     <string name="selected_filter_part1">Daten nach\u0020</string>
     <string name="selected_filter_part2">\u0020gefiltert</string>
     <string name="filter_removed">Filter entfernt</string>
-    <string name="data_not_filtered">Daten nicht gefiltert</string>
+    <string name="text_empty_recyclerview">Keine Daten vorhanden.\nLegen Sie einen Datensatz an.\nKlicken Sie dazu auf das +</string>
+    <string name="text_recyclerview_not_visible">Die Daten wurden ausgeblendet</string>
 
     <!-- databse import export activity -->
     <string name="txt_save_database">Sichern der Daten in einer Datei auf dem Gerät.</string>
@@ -72,8 +78,7 @@
     <string name="whitespace">\u0020</string>
 
 
-
-    <string name="title_activity_main2" translatable="false">Main2Activity</string>
+    <string name="title_activity_main2" translatable="false">MainActivity</string>
     <string name="navigation_drawer_open" translatable="false">Open navigation drawer</string>
     <string name="navigation_drawer_close" translatable="false">Close navigation drawer</string>
     <string name="nav_header_title" translatable="false">EggManager</string>

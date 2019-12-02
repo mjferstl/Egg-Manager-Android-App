@@ -16,7 +16,6 @@ import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
@@ -28,7 +27,6 @@ public class FilterDialogFragment extends DialogFragment {
 
     private final String LOG_TAG = "FilterDialogFragment";
     private static List<String> dateKeys;
-    private List<String> monthNames;
     private Context parentContext;
     private TextView txtv_caption_months;
     public static final String NOT_SET_FILTER_STRING = "0000";
@@ -52,7 +50,6 @@ public class FilterDialogFragment extends DialogFragment {
         parentContext = context;
         monthsAdapter = new FilterDialogListAdapter(parentContext, initialFilterString);
         Log.d(LOG_TAG,"context of FilterDialogFragment: " + parentContext);
-        monthNames = Arrays.asList(context.getResources().getStringArray(R.array.month_names));
 
         if (context instanceof OnFilterDialogClickListener) {
             filterDialogClickListener = (OnFilterDialogClickListener) context;
@@ -64,6 +61,7 @@ public class FilterDialogFragment extends DialogFragment {
 
     public static FilterDialogFragment newInstance(List<String> dateKeysList, String currentFilterString) {
         dateKeys = getUniqueYearMonthKeys(dateKeysList);
+        Collections.sort(dateKeys); // sort in ascending order
         initialFilterString = currentFilterString;
         return new FilterDialogFragment();
     }
@@ -142,16 +140,6 @@ public class FilterDialogFragment extends DialogFragment {
             String currYear = uniqueYearKeys.get(iYear);
             Log.d(LOG_TAG,"sortTest: " + currYear);
             yearFilterList.add(currYear);
-
-            // all keys of the selected year --> all months with data
-            List<String> currYearDateKeys = getDateKeysByYear(dateKeys,uniqueYearKeys.get(iYear));
-            List<String> currMonthKeys = getMonthKeys(currYearDateKeys);
-
-            // loop over all months
-            for (int iMonth=0; iMonth<currMonthKeys.size(); iMonth++) {
-                int indexMonth = Integer.valueOf(currMonthKeys.get(iMonth))-1;
-                Log.d(LOG_TAG,"sortTestMonth:" + monthNames.get(indexMonth));
-            }
         }
 
         yearsAdapter.setFilterStrings(yearFilterList);
@@ -175,15 +163,6 @@ public class FilterDialogFragment extends DialogFragment {
                 itemsCurrentYear.add(dateKeyList.get(i));
         }
         return itemsCurrentYear;
-    }
-
-    private List<String> getMonthKeys(List<String> stringList) {
-        List<String> monthKeys = new ArrayList<>();
-        for (int i=0; i<stringList.size(); i++) {
-            monthKeys.add(stringList.get(i).substring(4,6));
-        }
-        Collections.sort(monthKeys);
-        return new ArrayList<>(new HashSet<>(monthKeys));
     }
 
     private List<String> getUniqueYearKeys(List<String> stringList) {

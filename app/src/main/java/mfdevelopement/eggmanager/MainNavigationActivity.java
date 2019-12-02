@@ -31,7 +31,7 @@ public class MainNavigationActivity extends AppCompatActivity implements FilterD
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main2);
+        setContentView(R.layout.activity_main);
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
@@ -79,6 +79,9 @@ public class MainNavigationActivity extends AppCompatActivity implements FilterD
     public void onFilterSelected(String filterString, int buttonPosition, boolean isSelected) {
         FilterButtonHelper fbh = new FilterButtonHelper(filterString,buttonPosition,isSelected);
 
+        Log.d(LOG_TAG,"Button with the filterString " + filterString + " at position " + buttonPosition + " has been selected: " + isSelected);
+
+        // override the filterString, if the button has been unselected
         if (!isSelected) {
             if (filterString.length() == 4) {
                 fbh.setFilterString(NOT_SET_FILTER_STRING);
