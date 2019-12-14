@@ -30,6 +30,7 @@ import java.util.List;
 import java.util.Locale;
 
 import mfdevelopement.eggmanager.R;
+import mfdevelopement.eggmanager.activities.FilterActivity;
 import mfdevelopement.eggmanager.activities.NewEntityActivity;
 import mfdevelopement.eggmanager.data_models.DailyBalance;
 import mfdevelopement.eggmanager.data_models.FilterButtonHelper;
@@ -47,9 +48,12 @@ public class DatabaseFragment extends Fragment {
 
     public static final int NEW_ENTITY_REQUEST_CODE = 2;
     public static final int EDIT_ENTITY_REQUEST_CODE = 3;
+    public static final int EDIT_FILTER_STRING_REQUEST_CODE = 4;
 
     public static final int NEW_ENTITY_RESULT_CODE = 2;
     public static final int EDITED_ENTITY_RESULT_CODE = 3;
+    public static final int FILTER_ACTIVITY_OK_RESULT_CODE = 4;
+    public static final int FILTER_ACTIVITY_CANCEL_RESULT_CODE = 5;
 
     private List<String> allDateKeys;
 
@@ -180,14 +184,21 @@ public class DatabaseFragment extends Fragment {
 
         switch (id) {
             case R.id.action_main_filter:
-                List<DailyBalance> allData = databaseActivityViewModel.getDailyBalanceByDateKey("");
+                openFilterActivity();
+/*                List<DailyBalance> allData = databaseActivityViewModel.getDailyBalanceByDateKey("");
                 if (allData.size() > 0)
                     showFilterDialog();
                 else
-                    Snackbar.make(mainView.findViewById(R.id.main_container),getString(R.string.snackbar_no_data),Snackbar.LENGTH_LONG).show();
+                    Snackbar.make(mainView.findViewById(R.id.main_container),getString(R.string.snackbar_no_data),Snackbar.LENGTH_LONG).show();*/
                 break;
         }
         return super.onOptionsItemSelected(item);
+    }
+
+    private void openFilterActivity() {
+        Intent intent = new Intent(mainContext, FilterActivity.class);
+        intent.putExtra(EXTRA_REQUEST_CODE_NAME, EDIT_FILTER_STRING_REQUEST_CODE);
+        startActivityForResult(intent, EDIT_FILTER_STRING_REQUEST_CODE);
     }
 
     private void initRecyclerView() {
@@ -242,11 +253,24 @@ public class DatabaseFragment extends Fragment {
         }
         else if (requestCode == EDIT_ENTITY_REQUEST_CODE && resultCode == EDITED_ENTITY_RESULT_CODE) {
             snackbarText = getString(R.string.changes_saved);
+        } else if (requestCode == EDIT_FILTER_STRING_REQUEST_CODE && (resultCode == FILTER_ACTIVITY_OK_RESULT_CODE || requestCode == FILTER_ACTIVITY_CANCEL_RESULT_CODE)) {
+            Log.d(LOG_TAG,"activity finished. User changed filter string");
+
+            // try to get the filter string from the FilterActivity
+            if ((data != null) && (data.getData() != null)) {
+                String newFilterString = data.getData().toString();
+                Log.d(LOG_TAG,"new filter string: " + newFilterString);
+                snackbarText = "Neuer Filter: " + newFilterString;
+            } else {
+                Log.e(LOG_TAG,"Error when receiving new filter string from FilterActivity");
+            }
+
         }
 
         // create a snackbar and display it
-        if (!snackbarText.isEmpty())
-            Snackbar.make(mainView.findViewById(R.id.main_container),snackbarText,Snackbar.LENGTH_SHORT).show();
+        if (!snackbarText.isEmpty()) {
+            Snackbar.make(mainView.findViewById(R.id.main_container), snackbarText, Snackbar.LENGTH_SHORT).show();
+        }
     }
 
     private void initFab(View v) {

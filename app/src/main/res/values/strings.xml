@@ -6,6 +6,7 @@
     <string name="title_activity_about">\u00DCber EggManager</string> <!-- \u00DC = Ü -->
     <string name="title_activity_new_entity">Tagesbilanz</string>
     <string name="title_activity_database_import_export">Datensicherung</string>
+    <string name="title_activity_filter">Daten filtern</string>
 
     <!-- action bars -->
     <string name="action_settings">Einstellungen</string>
@@ -43,11 +44,14 @@
     <string name="text_empty_recyclerview">Keine Daten vorhanden.\nLegen Sie einen Datensatz an.\nKlicken Sie dazu auf das +</string>
     <string name="text_recyclerview_not_visible">Die Daten wurden ausgeblendet</string>
 
-    <!-- databse import export activity -->
+    <!-- import export activity -->
     <string name="txt_save_database">Sichern der Daten in einer Datei auf dem Gerät.</string>
     <string name="btn_txt_export_data">Daten exportieren</string>
     <string name="txt_import_data">Einlesen der Daten aus einer Sicherungsdatei. Durch den Import werden alle vorhandenen Daten überschrieben. Wählen Sie das Datum der Sicherung aus</string>
     <string name="btn_txt_import_data">Daten importieren</string>
+
+    <!-- filter activity -->
+    <string name="menu_action_apply">Anwenden</string>
 
     <!-- hints -->
     <string name="hint_eggs_collected">gelegt</string>
