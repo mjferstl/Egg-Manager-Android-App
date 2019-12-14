@@ -10,7 +10,7 @@
     android:paddingTop="@dimen/small_padding"
     android:paddingBottom="@dimen/small_padding"
     app:layout_behavior="@string/appbar_scrolling_view_behavior"
-    tools:context=".activities.DatabaseImportExportActivity"
+    tools:context=".fragments.ImportExportFragment"
     tools:showIn="@layout/activity_database_import_export"
     android:id="@+id/database_import_export_container">
 

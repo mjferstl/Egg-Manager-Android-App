@@ -36,6 +36,7 @@ import java.util.Locale;
 import mfdevelopement.eggmanager.R;
 import mfdevelopement.eggmanager.data_models.DailyBalance;
 import mfdevelopement.eggmanager.dialog_fragments.DatePickerFragment;
+import mfdevelopement.eggmanager.fragments.DatabaseFragment;
 import mfdevelopement.eggmanager.utils.InputManager;
 import mfdevelopement.eggmanager.viewmodels.NewEntityViewModel;
 

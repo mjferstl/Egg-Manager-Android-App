@@ -1,4 +1,4 @@
-package mfdevelopement.eggmanager.activities;
+package mfdevelopement.eggmanager.fragments;
 
 import android.Manifest;
 import android.content.pm.PackageManager;
@@ -42,7 +42,7 @@ import mfdevelopement.eggmanager.R;
 import mfdevelopement.eggmanager.data_models.DailyBalance;
 import mfdevelopement.eggmanager.viewmodels.DatabaseImportExportViewModel;
 
-public class DatabaseImportExportActivity extends Fragment implements View.OnClickListener {
+public class ImportExportFragment extends Fragment implements View.OnClickListener {
 
     // LOG_TAG containing the name of the current class for debugging purpose
     private final String LOG_TAG = "DatabaseImportExportAct";

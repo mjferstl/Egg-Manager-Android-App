@@ -1,4 +1,4 @@
-package mfdevelopement.eggmanager.activities;
+package mfdevelopement.eggmanager.fragments;
 
 import android.content.Context;
 import android.content.Intent;
@@ -30,6 +30,7 @@ import java.util.List;
 import java.util.Locale;
 
 import mfdevelopement.eggmanager.R;
+import mfdevelopement.eggmanager.activities.NewEntityActivity;
 import mfdevelopement.eggmanager.data_models.DailyBalance;
 import mfdevelopement.eggmanager.data_models.FilterButtonHelper;
 import mfdevelopement.eggmanager.dialog_fragments.FilterDialogFragment;
@@ -161,7 +162,7 @@ public class DatabaseFragment extends Fragment {
 
     @Override
     public void onCreateOptionsMenu(@NonNull Menu menu, MenuInflater inflater) {
-        inflater.inflate(R.menu.menu_main, menu);
+        inflater.inflate(R.menu.menu_database, menu);
         super.onCreateOptionsMenu(menu, inflater);
     }
 

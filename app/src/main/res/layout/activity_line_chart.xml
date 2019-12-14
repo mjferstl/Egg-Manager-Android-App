@@ -9,7 +9,7 @@
     android:paddingStart="@dimen/small_padding"
     android:paddingBottom="@dimen/small_padding"
     android:paddingEnd="@dimen/small_padding"
-    tools:context=".activities.LineChartActivity">
+    tools:context=".fragments.ChartFragment">
     
     <include layout="@layout/content_line_chart"/>
 

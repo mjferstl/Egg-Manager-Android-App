@@ -1,4 +1,4 @@
-package mfdevelopement.eggmanager;
+package mfdevelopement.eggmanager.activities;
 
 import android.os.Bundle;
 import android.util.Log;
@@ -14,6 +14,7 @@ import androidx.navigation.ui.NavigationUI;
 
 import com.google.android.material.navigation.NavigationView;
 
+import mfdevelopement.eggmanager.R;
 import mfdevelopement.eggmanager.data_models.FilterButtonHelper;
 import mfdevelopement.eggmanager.dialog_fragments.FilterDialogFragment;
 import mfdevelopement.eggmanager.list_adapters.FilterDialogListAdapter;

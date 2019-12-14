@@ -1,4 +1,4 @@
-package mfdevelopement.eggmanager.activities;
+package mfdevelopement.eggmanager.fragments;
 
 import android.os.Bundle;
 import android.view.LayoutInflater;
@@ -13,7 +13,7 @@ import androidx.fragment.app.Fragment;
 import mfdevelopement.eggmanager.BuildConfig;
 import mfdevelopement.eggmanager.R;
 
-public class AboutActivity extends Fragment {
+public class AboutFragment extends Fragment {
 
     @Nullable
     @Override
@@ -28,21 +28,4 @@ public class AboutActivity extends Fragment {
 
         return root;
     }
-
-/*    @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_about);
-        Toolbar toolbar = findViewById(R.id.toolbar_about_activity);
-        setSupportActionBar(toolbar);
-
-        if (getSupportActionBar() != null)
-            getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-
-        String versionName = "Version " + BuildConfig.VERSION_NAME;
-
-        TextView txt_app_version = findViewById(R.id.txtv_about_appversion);
-        txt_app_version.setText(versionName);
-    }*/
-
 }

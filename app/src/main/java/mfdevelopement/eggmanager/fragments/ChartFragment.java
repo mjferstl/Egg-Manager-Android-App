@@ -1,8 +1,10 @@
-package mfdevelopement.eggmanager.activities;
+package mfdevelopement.eggmanager.fragments;
 
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
@@ -31,11 +33,11 @@ import java.util.Locale;
 import mfdevelopement.eggmanager.R;
 import mfdevelopement.eggmanager.viewmodels.LineChartViewModel;
 
-public class LineChartActivity extends Fragment {
+public class ChartFragment extends Fragment {
 
     private final int DATA_LINE_WIDTH = 3;
     private final int TEXT_SIZE = 12;
-    private final String LOG_TAG = "LineChartActivity";
+    private final String LOG_TAG = "ChartFragment";
     private final int GRANULARITY_DAY = 1;
 
     private LineChartViewModel viewModel;
@@ -46,6 +48,9 @@ public class LineChartActivity extends Fragment {
 
         // get reference to view model
         viewModel = new ViewModelProvider(this).get(LineChartViewModel.class);
+
+        // this framgent has its own options menu
+        setHasOptionsMenu(true);
 
         // get references to GUI elements
         TextView txtv_title = root.findViewById(R.id.txtv_chart_title);
@@ -58,7 +63,7 @@ public class LineChartActivity extends Fragment {
 
         // Description
         Description description = chart.getDescription();   // get description
-        String desc = "Statistik im Oktober";
+        String desc = "";
         description.setText(desc);                          // text for description
         description.setEnabled(false);                      // hide description
 
@@ -158,6 +163,12 @@ public class LineChartActivity extends Fragment {
 
     private int roundToNextFive(float value) {
         return ((int)value/5)*5+5;
+    }
+
+    @Override
+    public void onCreateOptionsMenu(@NonNull Menu menu, @NonNull MenuInflater inflater) {
+        inflater.inflate(R.menu.menu_charts, menu);
+        super.onCreateOptionsMenu(menu, inflater);
     }
 
     /**
