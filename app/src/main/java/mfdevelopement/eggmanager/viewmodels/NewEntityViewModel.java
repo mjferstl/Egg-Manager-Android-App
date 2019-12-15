@@ -21,7 +21,7 @@ public class NewEntityViewModel extends AndroidViewModel {
         super(application);
         repository = new EggManagerRepository(application);
         pricePerEgg = repository.getPricePerEgg();
-        mAllData = repository.getAllData();
+        mAllData = repository.getAllDailyBalances();
         ldDateKeys = repository.getDateKeys();
     }
 

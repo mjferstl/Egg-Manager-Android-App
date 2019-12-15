@@ -169,6 +169,7 @@ public class DailyBalanceListAdapter extends RecyclerView.Adapter<DailyBalanceLi
     public int getItemCount() {
         if (mDailyBalances != null)
             return mDailyBalances.size();
-        else return 0;
+        else
+            return 0;
     }
 }

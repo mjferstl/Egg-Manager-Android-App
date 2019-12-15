@@ -110,4 +110,28 @@ public class DailyBalance implements Serializable {
     public void setMoneyEarned(double money) {
         this.moneyEarned = money;
     }
+
+    public static String getYearByDateKey(String dateKey) {
+        if (dateKey.length() >= 4) {
+            return dateKey.substring(0,4).trim();
+        } else {
+            return "";
+        }
+    }
+
+    public static String getMonthByDateKey(String dateKey) {
+        if (dateKey.length() >= 6) {
+            return dateKey.substring(4, 6).trim();
+        } else {
+            return "";
+        }
+    }
+
+    public static String getDayByDateKey(String dateKey) {
+        if (dateKey.length() >= 8) {
+            return dateKey.substring(6, 8).trim();
+        } else {
+            return "";
+        }
+    }
 }

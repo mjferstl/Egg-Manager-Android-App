@@ -49,7 +49,10 @@ public interface DailyBalanceDao {
     LiveData<Integer> getTotalEggsCollected();
 
     @Query("SELECT " + COL_DATE_PRIMARY_KEY + " FROM " + tableName)
-    LiveData<List<String>> getDateKeys();
+    LiveData<List<String>> getDateKeysLiveData();
+
+    @Query("SELECT " + COL_DATE_PRIMARY_KEY + " FROM " + tableName)
+    List<String> getDateKeysList();
 
     @Query("SELECT * FROM " + tableName + " WHERE " + COL_DATE_PRIMARY_KEY + " LIKE :dateKey || '%' ORDER BY " + COL_DATE_PRIMARY_KEY + " ASC")
     List<DailyBalance> getDailyBalancesByDateKey(String dateKey);

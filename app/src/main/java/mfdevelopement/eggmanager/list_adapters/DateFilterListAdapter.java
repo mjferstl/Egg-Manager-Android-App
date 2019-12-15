@@ -22,13 +22,19 @@ public class DateFilterListAdapter extends RecyclerView.Adapter<DateFilterListAd
 
     private final LayoutInflater mInflater;
 
+    private OnButtonClickListener listener;
+
+    public interface OnButtonClickListener {
+        void OnButtonClicked(String buttonText, boolean isSelected);
+    }
+
     // Provide a reference to the views for each data item
     // Complex data items may need more than one view per item, and
     // you provide access to all the views for a data item in a view holder
-    public static class DateFilterViewHolder extends RecyclerView.ViewHolder {
+    static class DateFilterViewHolder extends RecyclerView.ViewHolder {
         // each data item is just a string in this case
         Button btn;
-        public DateFilterViewHolder(View v) {
+        private DateFilterViewHolder(View v) {
             super(v);
             btn = itemView.findViewById(R.id.txtv_recycler_item_filter_dialog_year);
         }
@@ -37,12 +43,20 @@ public class DateFilterListAdapter extends RecyclerView.Adapter<DateFilterListAd
     // Provide a suitable constructor (depends on the kind of dataset)
     public DateFilterListAdapter(Context context, List<String> dateStringList, String initialSelectedDate) {
 
-        Log.d(LOG_TAG,"starting constructor with " + dateStringList.size() + " items");
+        Log.d(LOG_TAG,"starting list adapter with " + dateStringList.size() + " items and the initial filter key \"" + initialSelectedDate + "\"");
 
         mInflater = LayoutInflater.from(context);
         dateStrings = dateStringList;
+        currentSelection = initialSelectedDate;
 
-        Log.d(LOG_TAG,"finished constructor");
+        if (context instanceof OnButtonClickListener) {
+            listener = (OnButtonClickListener) context;
+        } else {
+            throw new ClassCastException(context.toString()
+                    + " must implement DateFilterListAdapter.OnButtonClickListener");
+        }
+
+        Log.d(LOG_TAG,"finished DateFilterListAdapter constructor");
     }
 
     // Create new views (invoked by the layout manager)
@@ -59,7 +73,7 @@ public class DateFilterListAdapter extends RecyclerView.Adapter<DateFilterListAd
     public void onBindViewHolder(final DateFilterViewHolder holder, int position) {
         // - get element from your dataset at this position
         // - replace the contents of the view with that element
-        Log.d(LOG_TAG,"starting onBindViewHolder()");
+//        Log.d(LOG_TAG,"starting onBindViewHolder()");
 
         final String buttonText = String.format("%s", dateStrings.get(position));
 
@@ -72,21 +86,31 @@ public class DateFilterListAdapter extends RecyclerView.Adapter<DateFilterListAd
         holder.btn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Log.d(LOG_TAG,"user clicked on button with text \"" + buttonText + "\"");
+                Log.d(LOG_TAG,"user clicked on button \"" + buttonText + "\"");
                 if (holder.btn.isSelected()) {
                     currentSelection = "";
                 } else {
                     currentSelection = buttonText;
                 }
+                listener.OnButtonClicked(buttonText, !holder.btn.isSelected());
                 notifyDataSetChanged();
             }
         });
 
-        Log.d(LOG_TAG,"finished onBindViewHolder()");
+//        Log.d(LOG_TAG,"finished onBindViewHolder()");
     }
 
-    public void setDatesList(List<String> datesList) {
+    /**
+     * method to set the content of the recycler view
+     * @param datesList list of strings containing the data to be displayed
+     * @param clearSelection flag, if the current selected button should be unselected
+     */
+    public void setDatesList(List<String> datesList, boolean clearSelection) {
         dateStrings = datesList;
+        // delete the last selection
+        if (clearSelection) {
+            currentSelection = "";
+        }
         notifyDataSetChanged();
     }
 

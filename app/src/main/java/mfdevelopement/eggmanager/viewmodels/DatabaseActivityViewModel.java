@@ -1,23 +1,21 @@
 package mfdevelopement.eggmanager.viewmodels;
 
 import android.app.Application;
-import android.util.Log;
 
 import androidx.lifecycle.AndroidViewModel;
 import androidx.lifecycle.LiveData;
-import androidx.lifecycle.MutableLiveData;
 
+import java.util.Arrays;
 import java.util.List;
 
+import mfdevelopement.eggmanager.R;
 import mfdevelopement.eggmanager.data_models.DailyBalance;
-import mfdevelopement.eggmanager.data_models.FilterButtonHelper;
 import mfdevelopement.eggmanager.database.EggManagerRepository;
-
-import static mfdevelopement.eggmanager.dialog_fragments.FilterDialogFragment.NOT_SET_FILTER_STRING;
 
 public class DatabaseActivityViewModel extends AndroidViewModel {
 
     private final String LOG_TAG = "DatabaseActivityViewMod";
+    private final String NOT_SET_FILTER_STRING = "0000";
 
     private EggManagerRepository mRepository;
     private LiveData<List<DailyBalance>> mAllDailyBalances;
@@ -25,11 +23,7 @@ public class DatabaseActivityViewModel extends AndroidViewModel {
     private LiveData<Double> mMoneyEarned;
     private LiveData<List<String>> ldDateKeys;
     private String filterString = NOT_SET_FILTER_STRING;
-
-    // Mutuable LiveData
-    private MutableLiveData<FilterButtonHelper> liveButtonListener = new MutableLiveData<>();
-    private MutableLiveData<Boolean> filterDialogOkClicked = new MutableLiveData<>(false);
-    private MutableLiveData<Boolean> filterDialogCancelClicked = new MutableLiveData<>(false);
+    private List<String> monthNamesReference;
 
     public DatabaseActivityViewModel(Application application) {
         super(application);
@@ -39,7 +33,7 @@ public class DatabaseActivityViewModel extends AndroidViewModel {
         mMoneyEarned = mRepository.getTotalMoneyEarned();
         mTotalEggsCollected = mRepository.getTotalEggsCollected();
         ldDateKeys = mRepository.getDateKeys();
-
+        monthNamesReference = Arrays.asList(getApplication().getResources().getStringArray(R.array.month_names));
     }
 
     public LiveData<List<DailyBalance>> getAllDailyBalances() { return mAllDailyBalances; }
@@ -59,55 +53,22 @@ public class DatabaseActivityViewModel extends AndroidViewModel {
         return mRepository.getDailyBalancesByDateKey(dateKeyPattern);
     }
 
-    public List<DailyBalance> getFilteredDailyBalances() {return getDailyBalanceByDateKey(filterString); }
+    public List<DailyBalance> getFilteredDailyBalances() {
+        return getDailyBalanceByDateKey(mRepository.getDataFilter());
+    }
 
     public LiveData<List<String>> getDateKeys() { return ldDateKeys;}
 
-    public void setFilterString(String string) {
-        if (string.equals(NOT_SET_FILTER_STRING)) {
-            resetFilterString();
-        } else {
-            filterString = string;
-            mRepository.setDataFilter(string);
-        }
-
-        Log.d(LOG_TAG,"setFilterString::filterString = " + filterString);
-        mAllDailyBalances = mRepository.getFilteredDailyBalance(filterString);
-    }
-
-    public void resetFilterString() {
-        filterString = "";
-        mRepository.setDataFilter("");
-    }
-
     public String getFilterString() {
-        return filterString;
+        return mRepository.getDataFilter();
     }
 
-    public void setFilterButtonListener(FilterButtonHelper filterButtonHelper) {
-        filterString = filterButtonHelper.getFilterString();
-        liveButtonListener.setValue(filterButtonHelper);
-    }
-
-    public LiveData<FilterButtonHelper> getLiveFilterButton() {
-        return liveButtonListener;
-    }
-
-
-    public void setFilterDialogOkClicked(boolean isClicked) {
-        filterDialogOkClicked.setValue(isClicked);
-    }
-
-    public LiveData<Boolean> getFilterDialogOkClicked() {
-        return filterDialogOkClicked;
-    }
-
-
-    public void setFilterDialogCancelClicked(boolean isClicked) {
-        filterDialogCancelClicked.setValue(isClicked);
-    }
-
-    public LiveData<Boolean> getFilterDialogCancelClicked() {
-        return filterDialogCancelClicked;
+    /**
+     * get the name of a month by its index in the range 1..12
+     * @param index ranges from 1 to 12
+     * @return Name of the month (January .. December)
+     */
+    public String getMonthNameByIndex(int index) {
+        return monthNamesReference.get(index-1);
     }
 }

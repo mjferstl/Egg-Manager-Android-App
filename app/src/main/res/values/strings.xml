@@ -52,6 +52,8 @@
 
     <!-- filter activity -->
     <string name="menu_action_apply">Anwenden</string>
+    <string name="subheading_years">Jahr</string>
+    <string name="subheading_month">Monat</string>
 
     <!-- hints -->
     <string name="hint_eggs_collected">gelegt</string>

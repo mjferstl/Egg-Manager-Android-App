@@ -21,7 +21,6 @@ public class EggManagerRepository {
     private final String PREFERENCE_FILE_KEY = "mfdevelopment.eggmanager.PREFERENCE_FILE_KEY";
     private final String KEY_PRICE_PER_EGG = "pricePerEgg";
     private final String KEY_FILTER_STRING = "filterString";
-    private double pricePerEgg;
     private String filterString = "";
     private final String LOG_TAG = "EggManagerRepository";
 
@@ -41,13 +40,11 @@ public class EggManagerRepository {
         ldTotalEggsSold = dailyBalanceDao.getTotalEggsSold();
         ldTotalMoneyEarned = dailyBalanceDao.getTotalMoneyEarned();
         ldTotalEggsCollected = dailyBalanceDao.getTotalEggsCollected();
-        ldDateKeys = dailyBalanceDao.getDateKeys();
+        ldDateKeys = dailyBalanceDao.getDateKeysLiveData();
         ldFilteredList = dailyBalanceDao.getLiveDailyBalancesByDateKey(filterString);
-
-        pricePerEgg = getPricePerEgg();
     }
 
-    public LiveData<List<DailyBalance>> getAllData() {
+    public LiveData<List<DailyBalance>> getAllDailyBalances() {
         return mAllData;
     }
 
@@ -91,6 +88,18 @@ public class EggManagerRepository {
     }
 
     public LiveData<List<String>> getDateKeys() { return ldDateKeys; }
+
+    public List<String> getDateKeysList() {
+        List<String> dateKeys = new ArrayList<>();
+        try {
+            dateKeys = new getAllDateKeys(dailyBalanceDao).execute().get();
+        } catch (ExecutionException e) {
+            e.printStackTrace();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+        return dateKeys;
+    }
 
     public List<DailyBalance> getDailyBalancesByDateKey(String dateKeyPattern) {
         List<DailyBalance> dailyBalanceList = new ArrayList<>();
@@ -166,6 +175,20 @@ public class EggManagerRepository {
         @Override
         protected List<DailyBalance> doInBackground(Void... voids) {
             return mAsyncTaskDao.getAscendingItemsList();
+        }
+    }
+
+    private static class getAllDateKeys extends AsyncTask<Void, Void, List<String>> {
+
+        private DailyBalanceDao mAsyncTaskDao;
+
+        getAllDateKeys(DailyBalanceDao dao) {
+            mAsyncTaskDao = dao;
+        }
+
+        @Override
+        protected List<String> doInBackground(Void... voids) {
+            return mAsyncTaskDao.getDateKeysList();
         }
     }
 
