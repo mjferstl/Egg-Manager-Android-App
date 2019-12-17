@@ -36,6 +36,7 @@ import mfdevelopement.eggmanager.list_adapters.DailyBalanceListAdapter;
 import mfdevelopement.eggmanager.viewmodels.DatabaseActivityViewModel;
 
 import static android.app.Activity.RESULT_CANCELED;
+import static mfdevelopement.eggmanager.utils.FilterActivityResultHandler.handleFilterActivityResult;
 
 public class DatabaseFragment extends Fragment {
 
@@ -227,10 +228,12 @@ public class DatabaseFragment extends Fragment {
     }
 
     private void showTextEmptyRecyclerview(boolean show) {
-        if (txtv_empty_recyclerview != null) {
+        if (txtv_empty_recyclerview != null && recyclerView != null) {
             if (show) {
+                recyclerView.setVisibility(View.GONE);
                 txtv_empty_recyclerview.setVisibility(View.VISIBLE);
             } else {
+                recyclerView.setVisibility(View.VISIBLE);
                 txtv_empty_recyclerview.setVisibility(View.GONE);
             }
         }
@@ -255,62 +258,51 @@ public class DatabaseFragment extends Fragment {
         }
         // results from FilterActivity
         else if (requestCode == EDIT_FILTER_STRING_REQUEST_CODE) {
+            handleFilterActivityResult(resultCode, data, databaseActivityViewModel);
+
             if (resultCode == FILTER_ACTIVITY_OK_RESULT_CODE) {
-                Log.d(LOG_TAG, "activity finished. User changed filter string");
 
-                // try to get the filter string from the FilterActivity
-                if ((data != null) && (data.getData() != null)) {
+                // load filtered list of daily balances and update the list
+                List<DailyBalance> filteredDailyBalances = databaseActivityViewModel.getFilteredDailyBalances();
+                Log.d(LOG_TAG, "filtered list of daily balanced with filter key \"" + databaseActivityViewModel.getFilterString() + "\" has " + filteredDailyBalances.size() + " items");
+                adapter.setDailyBalances(filteredDailyBalances);
 
-                    // compare received filter string from the FilterActivity and the filter string from the view model
-                    // they need to be the same!
-                    String newFilterString = data.getData().toString();
-                    String loadedFilterString = databaseActivityViewModel.getFilterString();
-                    Log.d(LOG_TAG, "new filter string: from activity: \"" + newFilterString + "\", from viewModel: \"" + loadedFilterString + "\"");
-                    if (!newFilterString.equals(loadedFilterString)) {
-                        Log.e(LOG_TAG, "error when receiving the filter string, because string from the activity and string from the view model are not the same");
-                        return;
-                    }
+                // show a textview instead of the recycler view, if the recycler view has no items
+                showTextEmptyRecyclerview(false);
+                if (adapter.getItemCount() == 0)
+                    showTextEmptyRecyclerview(true);
 
-                    // load filtered list of daily balances and update the list
-                    List<DailyBalance> filteredDailyBalances = databaseActivityViewModel.getFilteredDailyBalances();
-                    Log.d(LOG_TAG, "filtered list of daily balanced with filter key \"" + loadedFilterString + "\" has " + filteredDailyBalances.size() + " items");
-                    adapter.setDailyBalances(filteredDailyBalances);
-                    if (adapter.getItemCount() == 0) {
-                        showTextEmptyRecyclerview(true);
-                    } else {
-                        showTextEmptyRecyclerview(false);
-                    }
+                // get the new filter string
+                String newFilterString = databaseActivityViewModel.getFilterString();
 
-                    // update the summary
-                    updateSummary();
-
-                    // show a Snachbar to inform the user about the filter
-                    if (loadedFilterString.isEmpty()) {
-                        snackbarText = "Daten nicht gefiltert";
-                    } else {
-                        String filterName = "";
-                        if (loadedFilterString.length() == 4) {
-                            filterName = loadedFilterString;
-                        }
-                        if (loadedFilterString.length() >= 6) {
-                            String year = DailyBalance.getYearByDateKey(loadedFilterString);
-
-                            int indexMonth = Integer.parseInt(DailyBalance.getMonthByDateKey(loadedFilterString));
-                            String month = databaseActivityViewModel.getMonthNameByIndex(indexMonth);
-
-                            filterName = month + " " + year;
-                        }
-
-                        if (!filterName.isEmpty()) {
-                            snackbarText = "Daten nach " + filterName + " gefiltert";
-                        }
-                    }
+                // show a Snackbar to inform the user about the new filter
+                if (newFilterString.isEmpty()) {
+                    snackbarText = "Daten nicht gefiltert";
                 } else {
-                    Log.e(LOG_TAG, "Error when receiving new filter string from FilterActivity");
+                    String filterName = "";
+                    if (newFilterString.length() == 4) {
+                        filterName = newFilterString;
+                    }
+                    if (newFilterString.length() >= 6) {
+                        String year = DailyBalance.getYearByDateKey(newFilterString);
+
+                        int indexMonth = Integer.parseInt(DailyBalance.getMonthByDateKey(newFilterString));
+                        String month = databaseActivityViewModel.getMonthNameByIndex(indexMonth);
+
+                        filterName = month + " " + year;
+                    }
+
+                    if (!filterName.isEmpty())
+                        snackbarText = "Daten nach " + filterName + " gefiltert";
                 }
-            } else if (resultCode == FILTER_ACTIVITY_CANCEL_RESULT_CODE) {
-                Log.d(LOG_TAG,"activity finished because user canceled the activity");
+
+                // update the summary
+                updateSummary();
             }
+            if (getActivity() != null)
+                getActivity().invalidateOptionsMenu();
+        } else {
+            // Do nothing
         }
 
         // create a snackbar and display it

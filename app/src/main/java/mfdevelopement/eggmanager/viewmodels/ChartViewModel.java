@@ -7,23 +7,28 @@ import androidx.lifecycle.AndroidViewModel;
 import com.github.mikephil.charting.data.Entry;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Calendar;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
+import mfdevelopement.eggmanager.FilterStringHandle;
+import mfdevelopement.eggmanager.R;
 import mfdevelopement.eggmanager.data_models.DailyBalance;
 import mfdevelopement.eggmanager.database.EggManagerRepository;
 
-public class LineChartViewModel extends AndroidViewModel {
+public class ChartViewModel extends AndroidViewModel  implements FilterStringHandle {
 
     private EggManagerRepository repository;
-    private final String LOG_TAG = "LineChartViewModel";
+    private final String LOG_TAG = "ChartViewModel";
     private Calendar ref_cal;
+    private List<String> monthNamesReference;
 
-    public LineChartViewModel(Application application) {
+    public ChartViewModel(Application application) {
         super(application);
         repository = new EggManagerRepository(application);
         ref_cal = getReferenceCalendar();
+        monthNamesReference = Arrays.asList(getApplication().getResources().getStringArray(R.array.month_names));
     }
 
     private String getDataFilterString() {
@@ -52,5 +57,19 @@ public class LineChartViewModel extends AndroidViewModel {
         Calendar referenceCalendar = Calendar.getInstance();
         referenceCalendar.set(2000,0,1,0,0,0);
         return referenceCalendar;
+    }
+
+    @Override
+    public String getFilterString() {
+        return repository.getDataFilter();
+    }
+
+    /**
+     * get the name of a month by its index in the range 1..12
+     * @param index ranges from 1 to 12
+     * @return Name of the month (January .. December)
+     */
+    public String getMonthNameByIndex(int index) {
+        return monthNamesReference.get(index-1);
     }
 }

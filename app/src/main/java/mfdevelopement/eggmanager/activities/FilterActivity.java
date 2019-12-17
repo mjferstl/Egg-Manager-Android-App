@@ -11,6 +11,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.LinearLayout;
 
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.lifecycle.Observer;
@@ -58,7 +59,7 @@ public class FilterActivity extends AppCompatActivity implements DateFilterListA
         // get the view model
         viewModel = new ViewModelProvider(this).get(FilterActivityViewModel.class);
 
-        //
+        // initialize the oberservers for handling LiveData
         initObservers();
 
         // initialize the GUI
@@ -173,18 +174,28 @@ public class FilterActivity extends AppCompatActivity implements DateFilterListA
                 viewModel.setFilterString(newFiterString);
 
                 // finish the activity with a result code
-                setResult(DatabaseFragment.FILTER_ACTIVITY_OK_RESULT_CODE, new Intent().setData(Uri.parse(newFiterString)));
-                finish();
+                endActivity(DatabaseFragment.FILTER_ACTIVITY_OK_RESULT_CODE, new Intent().setData(Uri.parse(newFiterString)));
+                break;
+            case android.R.id.home:
+                // action when clicking on the home up button
+                endActivity(DatabaseFragment.FILTER_ACTIVITY_CANCEL_RESULT_CODE, null);
                 break;
         }
+        return true;
+        //return super.onOptionsItemSelected(item);
+    }
 
-        return super.onOptionsItemSelected(item);
+    private void endActivity(int resultCode, @Nullable Intent data) {
+        if (data != null)
+            setResult(resultCode, data);
+        else
+            setResult(resultCode);
+        super.onBackPressed();
     }
 
     @Override
     public void onBackPressed() {
-        setResult(DatabaseFragment.FILTER_ACTIVITY_CANCEL_RESULT_CODE);
-        super.onBackPressed();
+        endActivity(DatabaseFragment.FILTER_ACTIVITY_CANCEL_RESULT_CODE, null);
     }
 
     private String parseSelectedFilter() {

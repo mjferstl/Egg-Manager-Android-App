@@ -8,11 +8,12 @@ import androidx.lifecycle.LiveData;
 import java.util.Arrays;
 import java.util.List;
 
+import mfdevelopement.eggmanager.FilterStringHandle;
 import mfdevelopement.eggmanager.R;
 import mfdevelopement.eggmanager.data_models.DailyBalance;
 import mfdevelopement.eggmanager.database.EggManagerRepository;
 
-public class DatabaseActivityViewModel extends AndroidViewModel {
+public class DatabaseActivityViewModel extends AndroidViewModel implements FilterStringHandle {
 
     private final String LOG_TAG = "DatabaseActivityViewMod";
     private final String NOT_SET_FILTER_STRING = "0000";
