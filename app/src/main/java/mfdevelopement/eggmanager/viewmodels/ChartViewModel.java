@@ -60,7 +60,7 @@ public class ChartViewModel extends AndroidViewModel  implements FilterStringHan
     }
 
     @Override
-    public String getFilterString() {
+    public String loadDateFilter() {
         return repository.getDataFilter();
     }
 

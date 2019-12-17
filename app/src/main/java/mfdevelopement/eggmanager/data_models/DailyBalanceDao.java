@@ -36,17 +36,14 @@ public interface DailyBalanceDao {
     @Query("SELECT * from " + tableName + " ORDER BY " + COL_DATE_PRIMARY_KEY + " ASC")
     List<DailyBalance> getAscendingItemsList();
 
-    @Query("SELECT * FROM " + tableName + " WHERE " + COL_DATE_PRIMARY_KEY + " = :dateKey")
-    DailyBalance getDailyBalanceByDateKey(String dateKey);
+    @Query("SELECT SUM(" + COL_EGGS_SOLD_NAME + ") FROM " + tableName + " WHERE "+ COL_DATE_PRIMARY_KEY + " LIKE :dateFilter || '%' ")
+    LiveData<Integer> getFilteredEggsSold(String dateFilter);
 
-    @Query("SELECT SUM(" + COL_EGGS_SOLD_NAME + ") FROM " + tableName)
-    LiveData<Integer> getTotalEggsSold();
+    @Query("SELECT SUM(" + COL_MONEY_EARNED + ") FROM " + tableName + " WHERE "+ COL_DATE_PRIMARY_KEY + " LIKE :dateFilter || '%' ")
+    LiveData<Double> getFilteredMoneyEarned(String dateFilter);
 
-    @Query("SELECT SUM(" + COL_MONEY_EARNED + ") FROM " + tableName)
-    LiveData<Double> getTotalMoneyEarned();
-
-    @Query("SELECT SUM(" + COL_EGGS_COLLECTED_NAME + ") FROM " + tableName)
-    LiveData<Integer> getTotalEggsCollected();
+    @Query("SELECT SUM(" + COL_EGGS_COLLECTED_NAME + ") FROM " + tableName + " WHERE "+ COL_DATE_PRIMARY_KEY + " LIKE :dateFilter || '%' ")
+    LiveData<Integer> getFilteredEggsCollected(String dateFilter);
 
     @Query("SELECT " + COL_DATE_PRIMARY_KEY + " FROM " + tableName)
     LiveData<List<String>> getDateKeysLiveData();
@@ -58,5 +55,5 @@ public interface DailyBalanceDao {
     List<DailyBalance> getDailyBalancesByDateKey(String dateKey);
 
     @Query("SELECT * FROM " + tableName + " WHERE " + COL_DATE_PRIMARY_KEY + " LIKE (:dateKey || '%') ORDER BY " + COL_DATE_PRIMARY_KEY + " ASC")
-    LiveData<List<DailyBalance>> getLiveDailyBalancesByDateKey(String dateKey);
+    LiveData<List<DailyBalance>> getFilteredDailyBalance(String dateKey);
 }

@@ -7,6 +7,8 @@ import android.os.AsyncTask;
 import android.util.Log;
 
 import androidx.lifecycle.LiveData;
+import androidx.lifecycle.MutableLiveData;
+import androidx.lifecycle.Transformations;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -21,27 +23,30 @@ public class EggManagerRepository {
     private final String PREFERENCE_FILE_KEY = "mfdevelopment.eggmanager.PREFERENCE_FILE_KEY";
     private final String KEY_PRICE_PER_EGG = "pricePerEgg";
     private final String KEY_FILTER_STRING = "filterString";
-    private String filterString = "";
     private final String LOG_TAG = "EggManagerRepository";
 
     private Application application;
 
     private DailyBalanceDao dailyBalanceDao;
-    private LiveData<List<DailyBalance>> mAllData, ldFilteredList;
-    private LiveData<Integer> ldTotalEggsSold, ldTotalEggsCollected;
-    private LiveData<Double> ldTotalMoneyEarned;
+    private LiveData<List<DailyBalance>> mAllData, ldFilteredDailyBalance;
+    private LiveData<Integer> ldFilteredEggsSold, ldFilteredEggsCollected;
+    private LiveData<Double> ldFilteredMoneyEarned;
     private LiveData<List<String>> ldDateKeys;
+
+    private MutableLiveData<String> dateFilter = new MutableLiveData<>();
 
     public EggManagerRepository(Application application){
         this.application = application;
         EggManagerRoomDatabase db = EggManagerRoomDatabase.getDatabase(application);
         dailyBalanceDao = db.dailyBalanceDao();
         mAllData = dailyBalanceDao.getAscendingItems();
-        ldTotalEggsSold = dailyBalanceDao.getTotalEggsSold();
-        ldTotalMoneyEarned = dailyBalanceDao.getTotalMoneyEarned();
-        ldTotalEggsCollected = dailyBalanceDao.getTotalEggsCollected();
         ldDateKeys = dailyBalanceDao.getDateKeysLiveData();
-        ldFilteredList = dailyBalanceDao.getLiveDailyBalancesByDateKey(filterString);
+
+        dateFilter.setValue(getDataFilter());
+        ldFilteredDailyBalance = Transformations.switchMap(dateFilter, filter -> dailyBalanceDao.getFilteredDailyBalance(filter));
+        ldFilteredMoneyEarned = Transformations.switchMap(dateFilter, filter -> dailyBalanceDao.getFilteredMoneyEarned(filter));
+        ldFilteredEggsCollected = Transformations.switchMap(dateFilter, filter -> dailyBalanceDao.getFilteredEggsCollected(filter));
+        ldFilteredEggsSold = Transformations.switchMap(dateFilter, filter -> dailyBalanceDao.getFilteredEggsSold(filter));
     }
 
     public LiveData<List<DailyBalance>> getAllDailyBalances() {
@@ -75,16 +80,24 @@ public class EggManagerRepository {
         new deleteAsyncTask(dailyBalanceDao).execute(dailyBalance);
     }
 
-    public LiveData<Integer> getTotalEggsSold() {
-        return ldTotalEggsSold;
+    public LiveData<List<DailyBalance>> getFilteredDailyBalance(String dateFilter) {
+        this.dateFilter.setValue(dateFilter);
+        return ldFilteredDailyBalance;
     }
 
-    public LiveData<Double> getTotalMoneyEarned() {
-        return ldTotalMoneyEarned;
+    public LiveData<Double> getFilteredMoneyEarned(String dateFilter) {
+        this.dateFilter.setValue(dateFilter);
+        return ldFilteredMoneyEarned;
     }
 
-    public LiveData<Integer> getTotalEggsCollected() {
-        return ldTotalEggsCollected;
+    public LiveData<Integer> getFilteredEggsSold(String dateFilter) {
+        this.dateFilter.setValue(dateFilter);
+        return ldFilteredEggsSold;
+    }
+
+    public LiveData<Integer> getFilteredEggsCollected(String dateFilter) {
+        this.dateFilter.setValue(dateFilter);
+        return ldFilteredEggsCollected;
     }
 
     public LiveData<List<String>> getDateKeys() { return ldDateKeys; }
@@ -113,11 +126,6 @@ public class EggManagerRepository {
         }
 
         return dailyBalanceList;
-    }
-
-    public LiveData<List<DailyBalance>> getFilteredDailyBalance(String string) {
-        filterString = string;
-        return ldFilteredList;
     }
 
     private static class insertAsyncTask extends AsyncTask<DailyBalance, Void, Void> {

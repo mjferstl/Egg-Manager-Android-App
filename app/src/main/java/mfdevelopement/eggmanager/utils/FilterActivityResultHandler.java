@@ -25,7 +25,7 @@ public class FilterActivityResultHandler {
                 // compare received filter string from the FilterActivity and the filter string from the view model
                 // they need to be the same!
                 String newFilterString = data.getData().toString();
-                String loadedFilterString = viewModel.getFilterString();
+                String loadedFilterString = viewModel.loadDateFilter();
 
                 Log.d(LOG_TAG, "new filter string: from activity: \"" + newFilterString + "\", from viewModel: \"" + loadedFilterString + "\"");
 

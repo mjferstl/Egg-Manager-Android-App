@@ -17,7 +17,6 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
-import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -25,7 +24,6 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.snackbar.Snackbar;
 
-import java.util.List;
 import java.util.Locale;
 
 import mfdevelopement.eggmanager.R;
@@ -40,7 +38,7 @@ import static mfdevelopement.eggmanager.utils.FilterActivityResultHandler.handle
 
 public class DatabaseFragment extends Fragment {
 
-    private DatabaseActivityViewModel databaseActivityViewModel;
+    private DatabaseActivityViewModel viewModel;
     private DailyBalanceListAdapter adapter;
 
     public static final int NEW_ENTITY_REQUEST_CODE = 2;
@@ -52,20 +50,16 @@ public class DatabaseFragment extends Fragment {
     public static final int FILTER_ACTIVITY_OK_RESULT_CODE = 4;
     public static final int FILTER_ACTIVITY_CANCEL_RESULT_CODE = 5;
 
-    private List<String> allDateKeys;
-
     public static final String EXTRA_REQUEST_CODE_NAME = "requestCode";
     public static final String EXTRA_DAILY_BALANCE = "extraDailyBalance";
     private final String LOG_TAG = "DatabaseFragment";
-    private int totalEggsSold, totalEggsCollected;
-    private double totalMoneyEarned;
 
     private TextView txtv_summary_eggs_collected, txtv_summary_eggs_sold, txtv_summary_money_earned;
     private TextView txtv_summary_extra_info;
     private TextView txtv_empty_recyclerview;
     private LinearLayout linLay_summary;
 
-    private View mainView;
+    private View rootView;
     private Context mainContext;
 
     private RecyclerView recyclerView;
@@ -79,15 +73,15 @@ public class DatabaseFragment extends Fragment {
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
         View root = inflater.inflate(R.layout.fragment_main_database, container, false);
-        mainView = root;
+        rootView = root;
 
         // get view model
         if (getActivity() != null) {
-            databaseActivityViewModel = new ViewModelProvider(getActivity()).get(DatabaseActivityViewModel.class);
+            viewModel = new ViewModelProvider(getActivity()).get(DatabaseActivityViewModel.class);
         } else {
             String errorMsg = "Es ist ein Fehler beim Laden des ViewModels aufgetreten";
             Log.wtf(LOG_TAG,errorMsg);
-            Snackbar.make(mainView.findViewById(R.id.main_container), errorMsg, Snackbar.LENGTH_LONG).show();
+            Snackbar.make(rootView.findViewById(R.id.main_container), errorMsg, Snackbar.LENGTH_LONG).show();
         }
 
         // this framgent has its own options menu
@@ -95,7 +89,6 @@ public class DatabaseFragment extends Fragment {
 
         // get all GUI elements
         linLay_summary = root.findViewById(R.id.fragment_summary);
-        hideSummary();
         txtv_summary_eggs_collected = root.findViewById(R.id.txtv_summary_eggsCollected);
         txtv_summary_eggs_sold = root.findViewById(R.id.txtv_summary_eggsSold);
         txtv_summary_money_earned = root.findViewById(R.id.txtv_summary_money_earned);
@@ -107,56 +100,55 @@ public class DatabaseFragment extends Fragment {
         initRecyclerView();
 
         // initalize floating action button
-        initFab(root);
+        initFab();
 
-        setObservers();
+        // set all observers for receiving LiveData from the database
+        initObservers();
 
         return root;
     }
 
-    private void setTotalEggsCollected(int amount) {
-        this.totalEggsCollected = amount;
+    private void updateEggsCollected(int numEggs) {
+        Log.d(LOG_TAG,"updateEggsCollected(): updating number of collected eggs");
+        txtv_summary_eggs_collected.setText(String.format(Locale.getDefault(), "%d" , numEggs));
+        updateSummary();
     }
 
-    private void setTotalEggsSold(int amount) {
-        this.totalEggsSold = amount;
+    private void updateEggsSold(int numEggs) {
+        Log.d(LOG_TAG,"updateEggsSold(): updating number of sold eggs");
+        txtv_summary_eggs_sold.setText(String.format(Locale.getDefault(), "%d", numEggs));
+        updateSummary();
     }
 
-    private void setTotalMoneyEarned(double amount) {
-        this.totalMoneyEarned = amount;
+    private void updateMoneyEarned(double amountMoney) {
+        Log.d(LOG_TAG,"updateMoneyEarned(): updating the amount of money earned");
+        txtv_summary_money_earned.setText(String.format(Locale.getDefault(), "%.2f", amountMoney));
+        updateSummary();
     }
 
     private void updateSummary() {
-
-        // update recycler view
-        List<DailyBalance> filteredDailyBalances = databaseActivityViewModel.getFilteredDailyBalances();
-        adapter.setDailyBalances(filteredDailyBalances);
-
-        // update summary
-        int countEggsCollected = 0, countEggsSold = 0;
-        double countMoneyEarned = 0;
-        for(int i=0; i<filteredDailyBalances.size(); i++) {
-            countEggsCollected = countEggsCollected + filteredDailyBalances.get(i).getEggsCollected();
-            countEggsSold = countEggsSold + filteredDailyBalances.get(i).getEggsSold();
-            countMoneyEarned = countMoneyEarned + filteredDailyBalances.get(i).getMoneyEarned();
-        }
-        setTotalEggsCollected(countEggsCollected);
-        setTotalEggsSold(countEggsSold);
-        setTotalMoneyEarned(countMoneyEarned);
-
-        txtv_summary_eggs_collected.setText(String.format(Locale.getDefault(), "%d", totalEggsCollected));
-        txtv_summary_eggs_sold.setText(String.format(Locale.getDefault(), "%d", totalEggsSold));
-        txtv_summary_money_earned.setText(String.format(Locale.getDefault(), "%.2f", totalMoneyEarned));
-
+        // hide summary and show text field if the recycler view is not visible or contains less than 2 items
         // show summary if the recycler view contains 2 or more items
+        boolean recyclerViewNotVisibile = (recyclerView.getVisibility() == View.GONE) || (recyclerView.getVisibility() == View.INVISIBLE);
+        Log.d(LOG_TAG,"updateSummary(): recycler view is not visible = " + recyclerViewNotVisibile);
+        showTextEmptyRecyclerview(false);
+
         if (adapter != null) {
             int numItems = adapter.getItemCount();
             String extraInfo = numItems + " Einträge";
-            if (numItems >= 2) {
+            if (numItems >= 2)
                 showSummary();
-            } else {
+            else {
                 hideSummary();
-                txtv_summary_extra_info.setText("");
+                if (adapter.getItemCount() == 0) {
+                    Log.d(LOG_TAG,"recyclerView contains no items");
+                    showTextEmptyRecyclerview(true);
+                    txtv_empty_recyclerview.setText(getString(R.string.text_empty_recyclerview));
+                } else if (recyclerViewNotVisibile) {
+                    Log.d(LOG_TAG,"recyclerView is not visible");
+                    //showTextEmptyRecyclerview(true);
+                    txtv_empty_recyclerview.setText(getString(R.string.text_recyclerview_not_visible));
+                }
             }
             txtv_summary_extra_info.setText(extraInfo);
         }
@@ -172,10 +164,6 @@ public class DatabaseFragment extends Fragment {
         Log.d(LOG_TAG,"showSummary");
         if (linLay_summary != null)
             linLay_summary.setVisibility(View.VISIBLE);
-    }
-
-    private void setAllDateKeys(List<String> stringList) {
-        allDateKeys = stringList;
     }
 
     @Override
@@ -221,7 +209,7 @@ public class DatabaseFragment extends Fragment {
     }
 
     private void initRecyclerView() {
-        adapter = new DailyBalanceListAdapter(getActivity(), databaseActivityViewModel);
+        adapter = new DailyBalanceListAdapter(getActivity(), viewModel);
         recyclerView.setAdapter(adapter);
         recyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
         showTextEmptyRecyclerview(true);
@@ -258,22 +246,15 @@ public class DatabaseFragment extends Fragment {
         }
         // results from FilterActivity
         else if (requestCode == EDIT_FILTER_STRING_REQUEST_CODE) {
-            handleFilterActivityResult(resultCode, data, databaseActivityViewModel);
+            handleFilterActivityResult(resultCode, data, viewModel);
 
             if (resultCode == FILTER_ACTIVITY_OK_RESULT_CODE) {
 
-                // load filtered list of daily balances and update the list
-                List<DailyBalance> filteredDailyBalances = databaseActivityViewModel.getFilteredDailyBalances();
-                Log.d(LOG_TAG, "filtered list of daily balanced with filter key \"" + databaseActivityViewModel.getFilterString() + "\" has " + filteredDailyBalances.size() + " items");
-                adapter.setDailyBalances(filteredDailyBalances);
-
-                // show a textview instead of the recycler view, if the recycler view has no items
-                showTextEmptyRecyclerview(false);
-                if (adapter.getItemCount() == 0)
-                    showTextEmptyRecyclerview(true);
+                Log.d(LOG_TAG, "filtered list of daily balanced with filter key \"" + viewModel.loadDateFilter() + "\"");
+                viewModel.setDateFilter(viewModel.loadDateFilter());
 
                 // get the new filter string
-                String newFilterString = databaseActivityViewModel.getFilterString();
+                String newFilterString = viewModel.getDateFilter();
 
                 // show a Snackbar to inform the user about the new filter
                 if (newFilterString.isEmpty()) {
@@ -287,7 +268,7 @@ public class DatabaseFragment extends Fragment {
                         String year = DailyBalance.getYearByDateKey(newFilterString);
 
                         int indexMonth = Integer.parseInt(DailyBalance.getMonthByDateKey(newFilterString));
-                        String month = databaseActivityViewModel.getMonthNameByIndex(indexMonth);
+                        String month = viewModel.getMonthNameByIndex(indexMonth);
 
                         filterName = month + " " + year;
                     }
@@ -295,103 +276,54 @@ public class DatabaseFragment extends Fragment {
                     if (!filterName.isEmpty())
                         snackbarText = "Daten nach " + filterName + " gefiltert";
                 }
-
-                // update the summary
-                updateSummary();
             }
             if (getActivity() != null)
                 getActivity().invalidateOptionsMenu();
-        } else {
-            // Do nothing
         }
 
         // create a snackbar and display it
-        if (!snackbarText.isEmpty()) {
-            Snackbar.make(mainView.findViewById(R.id.main_container), snackbarText, Snackbar.LENGTH_SHORT).show();
-        }
+        if (!snackbarText.isEmpty())
+            Snackbar.make(rootView.findViewById(R.id.main_container), snackbarText, Snackbar.LENGTH_SHORT).show();
     }
 
-    private void initFab(View v) {
-        FloatingActionButton fab = v.findViewById(R.id.fab);
-        fab.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Intent intent = new Intent(mainContext, NewEntityActivity.class);
-                intent.putExtra(EXTRA_REQUEST_CODE_NAME, NEW_ENTITY_REQUEST_CODE);
-                startActivityForResult(intent, NEW_ENTITY_REQUEST_CODE);
-            }
+    private void initFab() {
+        FloatingActionButton fab = rootView.findViewById(R.id.fab);
+        fab.setOnClickListener(view -> {
+            Intent intent = new Intent(mainContext, NewEntityActivity.class);
+            intent.putExtra(EXTRA_REQUEST_CODE_NAME, NEW_ENTITY_REQUEST_CODE);
+            startActivityForResult(intent, NEW_ENTITY_REQUEST_CODE);
         });
     }
 
     /**
      * set observers for LiveData using the Room Database
      */
-    private void setObservers() {
+    private void initObservers() {
 
-        databaseActivityViewModel.getAllDailyBalances().observe(getViewLifecycleOwner(), new Observer<List<DailyBalance>>() {
-            @Override
-            public void onChanged(@Nullable final List<DailyBalance> dailyBalanceList) {
-                // Update the cached copy of the items in the adapter, if the list is not in filtered mode
-                Log.d(LOG_TAG,"updating recycler view");
-                if (dailyBalanceList != null) {
-                    adapter.setDailyBalances(dailyBalanceList);
-                    updateSummary();
-                    if (adapter.getItemCount() == 0) {
-                        showTextEmptyRecyclerview(true);
-                    } else {
-                        showTextEmptyRecyclerview(false);
-                    }
-
-                    // hide summary and show text field if the recycler view is not visible
-                    boolean recyclerViewNotVisibile = (recyclerView.getVisibility() == View.GONE) || (recyclerView.getVisibility() == View.INVISIBLE);
-                    if (recyclerViewNotVisibile) {
-                        Log.d(LOG_TAG,"recyclerView is not visible");
-                        txtv_empty_recyclerview.setText(getString(R.string.text_recyclerview_not_visible));
-                        hideSummary();
-                        showTextEmptyRecyclerview(true);
-                    }
-                }
+        viewModel.getFilteredDailyBalance().observe(getViewLifecycleOwner(), dailyBalanceList -> {
+            // Update the cached copy of the items in the adapter
+            Log.d(LOG_TAG,"getFilteredDailyBalance() received updated data");
+            if (dailyBalanceList != null) {
+                Log.d(LOG_TAG,"new list has " + dailyBalanceList.size() + " items");
+                // TODO: change the order to reverse, if the user wants 'DESC' order
+                adapter.setDailyBalances(dailyBalanceList);
+                updateSummary();
             }
         });
 
-        databaseActivityViewModel.getTotalEggsSold().observe(getViewLifecycleOwner(), new Observer<Integer>() {
-            @Override
-            public void onChanged(Integer totalEggsSold) {
-                Log.d(LOG_TAG,"amount of total eggs sold changed. New value: " + String.format("%.4f",totalMoneyEarned));
-                if (totalEggsSold != null) {
-                    setTotalEggsSold(totalEggsSold);
-                    updateSummary();
-                }
-            }
+        viewModel.getFilteredEggsCollected().observe(getViewLifecycleOwner(), eggsCollected -> {
+            Log.d(LOG_TAG,"getFilteredEggsCollected() received updated data");
+            updateEggsCollected(eggsCollected);
         });
 
-        databaseActivityViewModel.getTotalMoneyEarned().observe(getViewLifecycleOwner(), new Observer<Double>() {
-            @Override
-            public void onChanged(Double totalMoneyEarned) {
-                Log.d(LOG_TAG,"amount of total money earned changed. New value: " + String.format("%.4f",totalMoneyEarned));
-                if (totalMoneyEarned != null) {
-                    setTotalMoneyEarned(totalMoneyEarned);
-                    updateSummary();
-                }
-            }
+        viewModel.getFilteredEggsSold().observe(getViewLifecycleOwner(), eggsSold -> {
+            Log.d(LOG_TAG,"getFilteredEggsSold() received updated data");
+            updateEggsSold(eggsSold);
         });
 
-        databaseActivityViewModel.getTotalEggsCollected().observe(getViewLifecycleOwner(), new Observer<Integer>() {
-            @Override
-            public void onChanged(Integer totalEggsCollected) {
-                Log.d(LOG_TAG,"amount of total eggs collected changed. New value: " + String.format("%.4f",totalMoneyEarned));
-                if (totalEggsCollected != null) {
-                    setTotalEggsCollected(totalEggsCollected);
-                    updateSummary();
-                }
-            }
-        });
-
-        databaseActivityViewModel.getDateKeys().observe(getViewLifecycleOwner(), new Observer<List<String>>() {
-            @Override
-            public void onChanged(List<String> strings) {
-                setAllDateKeys(strings);
-            }
+        viewModel.getFilteredMoneyEarned().observe(getViewLifecycleOwner(), moneyEarned -> {
+            Log.d(LOG_TAG,"getFilteredMoneyEarned() received updated data");
+            updateMoneyEarned(moneyEarned);
         });
     }
 }

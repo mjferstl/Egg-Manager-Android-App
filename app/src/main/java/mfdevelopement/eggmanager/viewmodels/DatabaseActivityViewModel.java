@@ -1,9 +1,12 @@
 package mfdevelopement.eggmanager.viewmodels;
 
 import android.app.Application;
+import android.util.Log;
 
 import androidx.lifecycle.AndroidViewModel;
 import androidx.lifecycle.LiveData;
+import androidx.lifecycle.MutableLiveData;
+import androidx.lifecycle.Transformations;
 
 import java.util.Arrays;
 import java.util.List;
@@ -16,51 +19,63 @@ import mfdevelopement.eggmanager.database.EggManagerRepository;
 public class DatabaseActivityViewModel extends AndroidViewModel implements FilterStringHandle {
 
     private final String LOG_TAG = "DatabaseActivityViewMod";
-    private final String NOT_SET_FILTER_STRING = "0000";
 
     private EggManagerRepository mRepository;
-    private LiveData<List<DailyBalance>> mAllDailyBalances;
-    private LiveData<Integer> mNumberEggsSold, mTotalEggsCollected;
-    private LiveData<Double> mMoneyEarned;
-    private LiveData<List<String>> ldDateKeys;
-    private String filterString = NOT_SET_FILTER_STRING;
+    private LiveData<Integer> ldFilteredEggsCollected, ldFilteredEggsSold;
+    private LiveData<Double> ldFilteredMoneyEarned;
     private List<String> monthNamesReference;
+    private LiveData<List<DailyBalance>> filteredDailyBalances;
+
+    private MutableLiveData<String> dataFilter = new MutableLiveData<>();
 
     public DatabaseActivityViewModel(Application application) {
         super(application);
         mRepository = new EggManagerRepository(application);
-        mAllDailyBalances = mRepository.getFilteredDailyBalance(filterString);
-        mNumberEggsSold = mRepository.getTotalEggsSold();
-        mMoneyEarned = mRepository.getTotalMoneyEarned();
-        mTotalEggsCollected = mRepository.getTotalEggsCollected();
-        ldDateKeys = mRepository.getDateKeys();
+
+        // load month names
         monthNamesReference = Arrays.asList(getApplication().getResources().getStringArray(R.array.month_names));
+
+        dataFilter.setValue(mRepository.getDataFilter());
+        filteredDailyBalances = Transformations.switchMap(dataFilter, filter -> mRepository.getFilteredDailyBalance(filter));
+        ldFilteredMoneyEarned = Transformations.switchMap(dataFilter, filter -> mRepository.getFilteredMoneyEarned(filter));
+        ldFilteredEggsCollected = Transformations.switchMap(dataFilter, filter -> mRepository.getFilteredEggsCollected(filter));
+        ldFilteredEggsSold = Transformations.switchMap(dataFilter, filter -> mRepository.getFilteredEggsSold(filter));
     }
 
-    public LiveData<List<DailyBalance>> getAllDailyBalances() { return mAllDailyBalances; }
+    public LiveData<List<DailyBalance>> getFilteredDailyBalance() {
+        return filteredDailyBalances;
+    }
 
-    public void insert(DailyBalance dailyBalance) { mRepository.insert(dailyBalance); }
+    public LiveData<Double> getFilteredMoneyEarned() {
+        return ldFilteredMoneyEarned;
+    }
+
+    public LiveData<Integer> getFilteredEggsCollected() {
+        return ldFilteredEggsCollected;
+    }
+
+    public LiveData<Integer> getFilteredEggsSold() {
+        return ldFilteredEggsSold;
+    }
+
+    public void setDateFilter(String dateFilter) {
+        Log.d(LOG_TAG,"setDateFilter(): new filter \"" + dateFilter + "\" applied");
+        dataFilter.setValue(dateFilter);
+    }
+
+    public String getDateFilter() {
+        return this.dataFilter.getValue();
+    }
+
+    public void insert(DailyBalance dailyBalance) {
+        mRepository.insert(dailyBalance);
+    }
+
     public void delete(DailyBalance dailyBalance) {
         mRepository.delete(dailyBalance);
     }
 
-    public LiveData<Integer> getTotalEggsSold() { return  mNumberEggsSold; }
-
-    public LiveData<Double> getTotalMoneyEarned() { return mMoneyEarned; }
-
-    public LiveData<Integer> getTotalEggsCollected() { return mTotalEggsCollected; }
-
-    public List<DailyBalance> getDailyBalanceByDateKey(String dateKeyPattern) {
-        return mRepository.getDailyBalancesByDateKey(dateKeyPattern);
-    }
-
-    public List<DailyBalance> getFilteredDailyBalances() {
-        return getDailyBalanceByDateKey(mRepository.getDataFilter());
-    }
-
-    public LiveData<List<String>> getDateKeys() { return ldDateKeys;}
-
-    public String getFilterString() {
+    public String loadDateFilter() {
         return mRepository.getDataFilter();
     }
 

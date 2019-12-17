@@ -96,23 +96,16 @@
 
     <style name="recycler_item_icon">
         <item name="android:layout_width">wrap_content</item>
-        <item name="android:layout_height">match_parent</item>
-        <item name="android:maxHeight">30dp</item>
+        <item name="android:layout_height">30dp</item>
+        <item name="android:maxHeight">10dp</item>
         <item name="android:tint">@color/main_text_color</item>
         <item name="android:layout_gravity">center_vertical</item>
         <item name="android:layout_marginStart">@dimen/small_padding</item>
         <item name="android:layout_marginEnd">@dimen/small_padding</item>
     </style>
 
-    <style name="recycler_item_small_icon">
-        <item name="android:layout_width">wrap_content</item>
-        <item name="android:layout_height">match_parent</item>
-        <item name="android:scaleY">0.8</item>
-        <item name="android:scaleX">0.8</item>
-        <item name="android:tint">@color/main_text_color</item>
-        <item name="android:layout_gravity">center_vertical</item>
-        <item name="android:layout_marginStart">@dimen/small_padding</item>
-        <item name="android:layout_marginEnd">@dimen/small_padding</item>
+    <style name="recycler_item_small_icon" parent="recycler_item_icon">
+        <item name="android:layout_height">20dp</item>
     </style>
 
     <style name="basic_text">

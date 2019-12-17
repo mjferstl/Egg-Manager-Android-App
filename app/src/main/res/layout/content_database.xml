@@ -16,7 +16,7 @@
 
         <include
             android:id="@+id/fragment_summary"
-            layout="@layout/fragment_main_summary"
+            layout="@layout/fragment_data_summary"
             app:layout_constraintBottom_toTopOf="@+id/database_recyclerview"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
