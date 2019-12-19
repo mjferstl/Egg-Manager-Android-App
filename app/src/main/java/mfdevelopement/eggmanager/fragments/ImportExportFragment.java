@@ -40,7 +40,7 @@ import java.util.Locale;
 
 import mfdevelopement.eggmanager.R;
 import mfdevelopement.eggmanager.data_models.DailyBalance;
-import mfdevelopement.eggmanager.viewmodels.DatabaseImportExportViewModel;
+import mfdevelopement.eggmanager.viewmodels.ImportExportViewModel;
 
 public class ImportExportFragment extends Fragment implements View.OnClickListener {
 
@@ -51,7 +51,7 @@ public class ImportExportFragment extends Fragment implements View.OnClickListen
     private final Locale stringFormatLocale = Locale.ENGLISH;
 
     // View Model
-    private DatabaseImportExportViewModel viewModel;
+    private ImportExportViewModel viewModel;
 
     // id of container for showing Snackbars
     private int idSnackbarContainer;
@@ -79,7 +79,7 @@ public class ImportExportFragment extends Fragment implements View.OnClickListen
         View root = inflater.inflate(R.layout.fragment_backup, container,false);
         mainRoot = root;
 
-        viewModel = new ViewModelProvider(this).get(DatabaseImportExportViewModel.class);
+        viewModel = new ViewModelProvider(this).get(ImportExportViewModel.class);
         idSnackbarContainer = R.id.database_import_export_container;
 
         initButtons(root);
@@ -100,7 +100,7 @@ public class ImportExportFragment extends Fragment implements View.OnClickListen
         if (getSupportActionBar() != null)
             getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
-        viewModel = new ViewModelProvider(this).get(DatabaseImportExportViewModel.class);
+        viewModel = new ViewModelProvider(this).get(ImportExportViewModel.class);
         idSnackbarContainer = R.id.database_import_export_container;
 
         initButtons();

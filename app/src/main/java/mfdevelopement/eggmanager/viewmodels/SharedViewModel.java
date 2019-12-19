@@ -8,15 +8,20 @@ import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.Transformations;
 
+import com.github.mikephil.charting.data.Entry;
+
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Calendar;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 import mfdevelopement.eggmanager.FilterStringHandle;
 import mfdevelopement.eggmanager.R;
 import mfdevelopement.eggmanager.data_models.DailyBalance;
 import mfdevelopement.eggmanager.database.EggManagerRepository;
 
-public class DatabaseActivityViewModel extends AndroidViewModel implements FilterStringHandle {
+public class SharedViewModel extends AndroidViewModel implements FilterStringHandle {
 
     // String for assignment when printing out logs
     private final String LOG_TAG = "DatabaseActivityViewMod";
@@ -34,9 +39,12 @@ public class DatabaseActivityViewModel extends AndroidViewModel implements Filte
     private MutableLiveData<String> dataFilter = new MutableLiveData<>();
     private MutableLiveData<String> sortingOrder = new MutableLiveData<>();
 
+    // Calendar containing the reference date
+    private final Calendar referenceDate;
+
 
     // Constructor
-    public DatabaseActivityViewModel(Application application) {
+    public SharedViewModel(Application application) {
         super(application);
         mRepository = new EggManagerRepository(application);
 
@@ -45,6 +53,9 @@ public class DatabaseActivityViewModel extends AndroidViewModel implements Filte
 
         // sorting order
         sortingOrder.setValue(mRepository.getSortingOrder());
+
+        // set the reference date
+        referenceDate = getReferenceDate();
 
         // filtered live data
         dataFilter.setValue(mRepository.getDataFilter());
@@ -101,7 +112,9 @@ public class DatabaseActivityViewModel extends AndroidViewModel implements Filte
      * @return Name of the month (January .. December)
      */
     public String getMonthNameByIndex(int index) {
-        return monthNamesReference.get(index-1);
+        String monthName = monthNamesReference.get(index-1);
+        Log.d(LOG_TAG,"getMonthNameByIndex(): index = " + index + ", month = " + monthName);
+        return monthName;
     }
 
     /**
@@ -126,5 +139,32 @@ public class DatabaseActivityViewModel extends AndroidViewModel implements Filte
     public String getSortingOrder() {
         sortingOrder.setValue(mRepository.getSortingOrder());
         return sortingOrder.getValue();
+    }
+
+    public List<Entry> getDataEggsCollected(List<DailyBalance> dailyBalanceList) {
+        List<Entry> entries = new ArrayList<>();
+        for (DailyBalance db: dailyBalanceList) {
+            long days_iterator = getDifferenceInDays(db.getDate().getTime(),referenceDate.getTimeInMillis())+1;
+            entries.add(new Entry((float)days_iterator, db.getEggsCollected()));
+        }
+        return entries;
+    }
+
+    /**
+     * Calculates the difference in days between two timestamps in milliseconds
+     * result = timestamp_first - timestamp_second
+     * @param timestamp_first first timestamp in milliseconds
+     * @param timestamp_second second timestamp in milliseconds
+     * @return difference between both timestamps in days
+     */
+    private long getDifferenceInDays(long timestamp_first, long timestamp_second) {
+        long difference = timestamp_first-timestamp_second;
+        return TimeUnit.DAYS.convert(difference, TimeUnit.MILLISECONDS);
+    }
+
+    public Calendar getReferenceDate() {
+        Calendar reference = Calendar.getInstance();
+        reference.set(2000, 0, 1, 0, 0, 0);
+        return reference;
     }
 }

@@ -29,18 +29,17 @@ import com.github.mikephil.charting.formatter.ValueFormatter;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 
 import mfdevelopement.eggmanager.R;
 import mfdevelopement.eggmanager.activities.FilterActivity;
 import mfdevelopement.eggmanager.data_models.ChartAxisLimits;
-import mfdevelopement.eggmanager.utils.FilterActivityResultHandler;
-import mfdevelopement.eggmanager.viewmodels.ChartViewModel;
+import mfdevelopement.eggmanager.viewmodels.SharedViewModel;
 
 import static mfdevelopement.eggmanager.fragments.DatabaseFragment.EDIT_FILTER_STRING_REQUEST_CODE;
 import static mfdevelopement.eggmanager.fragments.DatabaseFragment.EXTRA_REQUEST_CODE_NAME;
+import static mfdevelopement.eggmanager.utils.FilterActivityResultHandler.handleFilterActivityResult;
 
 public class ChartFragment extends Fragment {
 
@@ -49,17 +48,22 @@ public class ChartFragment extends Fragment {
     private final String LOG_TAG = "ChartFragment";
     private final int GRANULARITY_DAY = 1;
 
-    private ChartViewModel viewModel;
+    private SharedViewModel viewModel;
 
     private LineChart lineChart;
     private TextView txtv_title;
+
+    public final static String NAME_EGGS_COLLECTED = "Abgenommene Eier";
 
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
         View root = inflater.inflate(R.layout.fragment_diagrams, container, false);
 
         // get reference to view model
-        viewModel = new ViewModelProvider(this).get(ChartViewModel.class);
+        viewModel = new ViewModelProvider(this).get(SharedViewModel.class);
+
+        // make sure the filter is up to date, e.g. when the user switched to this fragment
+        viewModel.setDateFilter(viewModel.loadDateFilter());
 
         // this framgent has its own options menu
         setHasOptionsMenu(true);
@@ -81,8 +85,8 @@ public class ChartFragment extends Fragment {
         description.setText(desc);                          // text for description
         description.setEnabled(false);                      // hide description
 
-        // update the charts for the collected eggs
-        updateChartEggsCollected(lineChart);
+        // init observers
+        initObservers();
 
         return root;
     }
@@ -109,6 +113,9 @@ public class ChartFragment extends Fragment {
     }
 
     private void modifyXAxis(LineChart chart, float min, float max) {
+
+        SimpleDateFormat sdf = new SimpleDateFormat("dd.MM.yyyy", Locale.getDefault());
+
         // // X-Axis Style // //
         XAxis xAxis;
         xAxis = chart.getXAxis();                       // get the x axis
@@ -118,9 +125,11 @@ public class ChartFragment extends Fragment {
         xAxis.setTextColor(getResources().getColor(R.color.main_text_color)); // text color
 
         // get the first and the last day of the x data
-        Calendar startDate = ChartViewModel.getReferenceCalendar();
+        Calendar startDate = viewModel.getReferenceDate();
+        Log.d(LOG_TAG,"modifyXAxis(): startDate = " + sdf.format(startDate.getTimeInMillis()));
         startDate.add(Calendar.DAY_OF_MONTH,(int)min);
-        Calendar endDate = ChartViewModel.getReferenceCalendar();
+        Log.d(LOG_TAG,"modifyXAxis(): updated startDate = " + sdf.format(startDate.getTimeInMillis()));
+        Calendar endDate = viewModel.getReferenceDate();
         endDate.add(Calendar.DAY_OF_MONTH,(int)max);
 
         // If all dates are of the same year, then no year information is shown in the x labels
@@ -164,17 +173,14 @@ public class ChartFragment extends Fragment {
         Log.d(LOG_TAG,"yAxis label count: " + yAxis.getLabelCount());
     }
 
-    private LineDataSet getDataSetEggsCollected() {
-        // line data set for collected eggs
-        String dataSetName = "Abgenommene Eier";
-        List<Entry> dataEggsCollected = viewModel.getDataEggsCollected(viewModel.getFilteredDailyBalance());
-        LineDataSet dataSet = new LineDataSet(dataEggsCollected, dataSetName);
+    private LineDataSet createLineDataSet(List<Entry> entries, String dataSetName) {
+        LineDataSet dataSet = new LineDataSet(entries, dataSetName);
         dataSet.setColor(getResources().getColor(R.color.colorPrimary));
         dataSet.setDrawCircles(false);
         dataSet.setLineWidth(DATA_LINE_WIDTH);
         dataSet.setValueTextColor(getResources().getColor(R.color.main_text_color));
         dataSet.setValueTextSize(TEXT_SIZE);            // text size of the text for each data point
-        if (dataEggsCollected.size() > 5) {
+        if (entries.size() > 5) {
             dataSet.setDrawValues(false);                   // do not show the value of each data point
         } else {
             dataSet.setDrawValues(true);
@@ -184,9 +190,8 @@ public class ChartFragment extends Fragment {
 
     private List<Entry> getEntriesOfLineDataSet(LineDataSet lineDataSet) {
         List<Entry> entries = new ArrayList<>();
-        for (int i=0; i<lineDataSet.getEntryCount(); i++){
+        for (int i=0; i<lineDataSet.getEntryCount(); i++)
             entries.add(lineDataSet.getEntryForIndex(i));
-        }
         return entries;
     }
 
@@ -211,16 +216,14 @@ public class ChartFragment extends Fragment {
         lineChart.invalidate();
     }
 
-    private void updateChartEggsCollected(LineChart lineChart) {
-        // DataSet for all collected eggs
-        LineDataSet dataSetEggsCollected = getDataSetEggsCollected();
+    private void updateChart(LineChart lineChart, LineDataSet lineDataSet) {
 
         // modify both axes
-        ChartAxisLimits axisLimits = calcAxisLimits(dataSetEggsCollected);
+        ChartAxisLimits axisLimits = calcAxisLimits(lineDataSet);
         modifyAxes(lineChart, axisLimits);
 
         // add line data to the chart
-        lineChart.setData(createLineData(dataSetEggsCollected));
+        lineChart.setData(createLineData(lineDataSet));
         refreshChart(lineChart);
     }
 
@@ -261,11 +264,24 @@ public class ChartFragment extends Fragment {
         if (requestCode == EDIT_FILTER_STRING_REQUEST_CODE) {
 
             // handle the return value from the FilterActivity
-            FilterActivityResultHandler.handleFilterActivityResult(resultCode, data, viewModel);
+            handleFilterActivityResult(resultCode, data);
 
             if (resultCode == DatabaseFragment.FILTER_ACTIVITY_OK_RESULT_CODE) {
-                updateChartEggsCollected(lineChart);
+                // update the new filter string in the view model
+                viewModel.setDateFilter(viewModel.loadDateFilter());
             }
+        }
+    }
+
+    private void initObservers() {
+        if (getActivity() ==  null)
+            Log.e(LOG_TAG,"initObservers(): observers cannot be initialized, because getActivity = null");
+        else {
+            viewModel.getFilteredDailyBalance().observe(getActivity(), dailyBalanceList -> {
+                List<Entry> entries = viewModel.getDataEggsCollected(dailyBalanceList);
+                LineDataSet lineDataSet = createLineDataSet(entries, NAME_EGGS_COLLECTED);
+                updateChart(lineChart, lineDataSet);
+            });
         }
     }
 
@@ -278,9 +294,9 @@ public class ChartFragment extends Fragment {
 
         @Override
         public String getAxisLabel(float value, AxisBase axis) {
-            Calendar cal = ChartViewModel.getReferenceCalendar();
+            Calendar cal = viewModel.getReferenceDate();
             cal.add(Calendar.DAY_OF_MONTH,(int)value);
-            return sdf.format(new Date(cal.getTimeInMillis()));
+            return sdf.format(cal.getTimeInMillis());
         }
     }
 
@@ -290,9 +306,9 @@ public class ChartFragment extends Fragment {
 
         @Override
         public String getAxisLabel(float value, AxisBase axis) {
-            Calendar cal = ChartViewModel.getReferenceCalendar();
+            Calendar cal = viewModel.getReferenceDate();
             cal.add(Calendar.DAY_OF_MONTH,(int)value);
-            return sdf.format(new Date(cal.getTimeInMillis()));
+            return sdf.format(cal.getTimeInMillis());
         }
     }
 }

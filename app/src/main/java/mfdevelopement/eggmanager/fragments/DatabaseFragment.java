@@ -39,14 +39,14 @@ import mfdevelopement.eggmanager.data_models.SortingItem;
 import mfdevelopement.eggmanager.data_models.SortingItemCollection;
 import mfdevelopement.eggmanager.dialog_fragments.SortingDialogFragment;
 import mfdevelopement.eggmanager.list_adapters.DailyBalanceListAdapter;
-import mfdevelopement.eggmanager.viewmodels.DatabaseActivityViewModel;
+import mfdevelopement.eggmanager.viewmodels.SharedViewModel;
 
 import static android.app.Activity.RESULT_CANCELED;
 import static mfdevelopement.eggmanager.utils.FilterActivityResultHandler.handleFilterActivityResult;
 
 public class DatabaseFragment extends Fragment {
 
-    private DatabaseActivityViewModel viewModel;
+    private SharedViewModel viewModel;
     private DailyBalanceListAdapter adapter;
 
     public static final int NEW_ENTITY_REQUEST_CODE = 2;
@@ -85,7 +85,7 @@ public class DatabaseFragment extends Fragment {
 
         // get view model
         if (getActivity() != null) {
-            viewModel = new ViewModelProvider(getActivity()).get(DatabaseActivityViewModel.class);
+            viewModel = new ViewModelProvider(getActivity()).get(SharedViewModel.class);
         } else {
             String errorMsg = "Es ist ein Fehler beim Laden des ViewModels aufgetreten";
             Log.wtf(LOG_TAG,errorMsg);
@@ -110,6 +110,9 @@ public class DatabaseFragment extends Fragment {
         // Recyclerview - get reference, init data
         recyclerView = root.findViewById(R.id.database_recyclerview);
         initRecyclerView();
+
+        // make sure the filter is up to date, e.g. when the user switched to this fragment
+        viewModel.setDateFilter(viewModel.loadDateFilter());
 
         // initalize floating action button
         initFab();
@@ -301,7 +304,7 @@ public class DatabaseFragment extends Fragment {
         }
         // results from FilterActivity
         else if (requestCode == EDIT_FILTER_STRING_REQUEST_CODE) {
-            handleFilterActivityResult(resultCode, data, viewModel);
+            handleFilterActivityResult(resultCode, data);
 
             if (resultCode == FILTER_ACTIVITY_OK_RESULT_CODE) {
 

@@ -16,14 +16,14 @@ import com.google.android.material.navigation.NavigationView;
 
 import mfdevelopement.eggmanager.R;
 import mfdevelopement.eggmanager.dialog_fragments.SortingDialogFragment;
-import mfdevelopement.eggmanager.viewmodels.DatabaseActivityViewModel;
+import mfdevelopement.eggmanager.viewmodels.SharedViewModel;
 
 public class MainNavigationActivity extends AppCompatActivity implements SortingDialogFragment.OnSortingItemClickListener {
 
     private AppBarConfiguration mAppBarConfiguration;
     private final String LOG_TAG = "MainNavigationActivity";
     private NavController navController;
-    private DatabaseActivityViewModel viewModel;
+    private SharedViewModel viewModel;
 
     public SortingOrderChangedListener sortingOrderChangedListener;
 
@@ -58,7 +58,7 @@ public class MainNavigationActivity extends AppCompatActivity implements Sorting
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
-        viewModel = new ViewModelProvider(this).get(DatabaseActivityViewModel.class);
+        viewModel = new ViewModelProvider(this).get(SharedViewModel.class);
 
         DrawerLayout drawer = findViewById(R.id.drawer_layout);
         NavigationView navigationView = findViewById(R.id.nav_view);

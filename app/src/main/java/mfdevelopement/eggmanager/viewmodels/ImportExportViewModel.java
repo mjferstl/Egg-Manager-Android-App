@@ -9,11 +9,11 @@ import java.util.List;
 import mfdevelopement.eggmanager.data_models.DailyBalance;
 import mfdevelopement.eggmanager.database.EggManagerRepository;
 
-public class DatabaseImportExportViewModel extends AndroidViewModel {
+public class ImportExportViewModel extends AndroidViewModel {
 
     private EggManagerRepository repository;
 
-    public DatabaseImportExportViewModel(Application application) {
+    public ImportExportViewModel(Application application) {
         super(application);
         repository = new EggManagerRepository(application);
     }

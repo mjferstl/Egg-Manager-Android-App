@@ -25,11 +25,11 @@ import mfdevelopement.eggmanager.R;
 import mfdevelopement.eggmanager.activities.NewEntityActivity;
 import mfdevelopement.eggmanager.data_models.DailyBalance;
 import mfdevelopement.eggmanager.fragments.DatabaseFragment;
-import mfdevelopement.eggmanager.viewmodels.DatabaseActivityViewModel;
+import mfdevelopement.eggmanager.viewmodels.SharedViewModel;
 
 public class DailyBalanceListAdapter extends RecyclerView.Adapter<DailyBalanceListAdapter.DailyBalanceViewHolder> {
 
-    private DatabaseActivityViewModel viewModel;
+    private SharedViewModel viewModel;
     private final String LOG_TAG = "DailyBalanceListAdapter";
     private final SimpleDateFormat sdf = new SimpleDateFormat("EE, dd.MM.yyyy", Locale.getDefault());
     private final LayoutInflater mInflater;
@@ -54,7 +54,7 @@ public class DailyBalanceListAdapter extends RecyclerView.Adapter<DailyBalanceLi
         }
     }
 
-    public DailyBalanceListAdapter(Context context, DatabaseActivityViewModel viewModel) {
+    public DailyBalanceListAdapter(Context context, SharedViewModel viewModel) {
         this.viewModel = viewModel;
         mInflater = LayoutInflater.from(context);
     }

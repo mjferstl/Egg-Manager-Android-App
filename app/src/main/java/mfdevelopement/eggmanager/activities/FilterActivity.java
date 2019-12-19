@@ -14,7 +14,6 @@ import android.widget.LinearLayout;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
-import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -118,7 +117,7 @@ public class FilterActivity extends AppCompatActivity implements DateFilterListA
             int indexMonth = Integer.parseInt(DailyBalance.getMonthByDateKey(initialFilterString));
             initialMonthName = viewModel.getMonthNameByIndex(indexMonth);
         }
-        adapterMonths = new DateFilterListAdapter(this, new ArrayList<String>(), initialMonthName);
+        adapterMonths = new DateFilterListAdapter(this, new ArrayList<>(), initialMonthName);
         recyclerViewMonths.setAdapter(adapterMonths);
 
         // change visibility depending on the initial filter string
@@ -143,17 +142,14 @@ public class FilterActivity extends AppCompatActivity implements DateFilterListA
 
     private void initObservers() {
         Log.d(LOG_TAG,"initializing observers");
-        viewModel.getAllDateKeys().observe(this, new Observer<List<String>>() {
-            @Override
-            public void onChanged(List<String> stringList) {
-                List<String> yearNamesList = new ArrayList<>();
-                for (String dateString : stringList) {
-                    yearNamesList.add(dateString.substring(0,4));
-                }
-                viewModel.setYearNames(yearNamesList);
-                viewModel.setYearMonthNames(stringList);
-                adapterYears.setDatesList(viewModel.getYearNames(), false);
+        viewModel.getAllDateKeys().observe(this, stringList -> {
+            List<String> yearNamesList = new ArrayList<>();
+            for (String dateString : stringList) {
+                yearNamesList.add(dateString.substring(0,4));
             }
+            viewModel.setYearNames(yearNamesList);
+            viewModel.setYearMonthNames(stringList);
+            adapterYears.setDatesList(viewModel.getYearNames(), false);
         });
     }
 
