@@ -3,14 +3,14 @@
     xmlns:tools="http://schemas.android.com/tools"
     tools:context="mfdevelopement.eggmanager.fragments.DatabaseFragment">
     <item
-        android:id="@+id/action_main_filter"
+        android:id="@+id/action_data_filter"
         android:orderInCategory="99"
         android:title="@string/action_filter"
         android:icon="@drawable/ic_filter_list_black_24dp"
         app:showAsAction="ifRoom"
         app:iconTint="@color/white"/>
     <item
-        android:id="@+id/action_sort"
+        android:id="@+id/action_data_sort"
         android:orderInCategory="100"
         android:title=""
         android:icon="@drawable/ic_sort_black_24dp"

@@ -1,7 +1,6 @@
 package mfdevelopement.eggmanager.activities;
 
 import android.app.AlertDialog;
-import android.content.DialogInterface;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
@@ -9,7 +8,6 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
-import android.view.View;
 import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -267,20 +265,18 @@ public class NewEntityActivity extends AppCompatActivity implements DatePickerFr
                     .setTitle("Eintrag überschreiben")
                     .setMessage("Für den ausgewählten Tag ist bereits ein Eintrag vorhanden. Soll dieser Eintrag überschrieben werden?")
 
-                    // Specifying a listener allows you to take an action before dismissing the dialog.
+                    // Specifying a sortingOrderChangedListener allows you to take an action before dismissing the dialog.
                     // The dialog is automatically dismissed when a dialog button is clicked.
-                    .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
-                        public void onClick(DialogInterface dialog, int which) {
-                            // Continue with delete operation
-                            newEntityViewModel.deleteDailyBalance(loadedDailyBalance);
-                            newEntityViewModel.addDailyBalance(dailyBalance);
-                            fragmentActivity.setResult(DatabaseFragment.EDITED_ENTITY_RESULT_CODE);
+                    .setPositiveButton(android.R.string.yes, (dialog, which) -> {
+                        // Continue with delete operation
+                        newEntityViewModel.deleteDailyBalance(loadedDailyBalance);
+                        newEntityViewModel.addDailyBalance(dailyBalance);
+                        fragmentActivity.setResult(DatabaseFragment.EDITED_ENTITY_RESULT_CODE);
 
-                            fragmentActivity.finish();
-                        }
+                        fragmentActivity.finish();
                     })
 
-                    // A null listener allows the button to dismiss the dialog and take no further action.
+                    // A null sortingOrderChangedListener allows the button to dismiss the dialog and take no further action.
                     .setNegativeButton(android.R.string.no, null)
                     .setIcon(R.drawable.ic_warning_black_24dp)
                     .show();
@@ -323,29 +319,26 @@ public class NewEntityActivity extends AppCompatActivity implements DatePickerFr
      */
     private void initOnClickListeners() {
         // open dialog to select a date
-        dateTextView.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                FragmentTransaction ft = fragmentActivity.getSupportFragmentManager().beginTransaction();
-                Fragment prev = fragmentActivity.getSupportFragmentManager().findFragmentByTag("dialog");
-                if (prev != null) {
-                    ft.remove(prev);
-                }
-                ft.addToBackStack(null);
-                ft.commit();
-
-                // Create and show the dialog.
-                DialogFragment newFragment = DatePickerFragment.newInstance();
-                if (!dateTextView.getText().toString().equals("")) {
-                    try {
-                        newFragment = DatePickerFragment.newInstance(getDateFromString(dateTextView.getText().toString()));
-                    } catch (Exception e) {
-                        e.printStackTrace();
-                    }
-                }
-                //newFragment.setTargetFragment(this, 1);
-                newFragment.show(fragmentActivity.getSupportFragmentManager(), "datePicker");
+        dateTextView.setOnClickListener(v -> {
+            FragmentTransaction ft = fragmentActivity.getSupportFragmentManager().beginTransaction();
+            Fragment prev = fragmentActivity.getSupportFragmentManager().findFragmentByTag("dialog");
+            if (prev != null) {
+                ft.remove(prev);
             }
+            ft.addToBackStack(null);
+            ft.commit();
+
+            // Create and show the dialog.
+            DialogFragment newFragment = DatePickerFragment.newInstance();
+            if (!dateTextView.getText().toString().equals("")) {
+                try {
+                    newFragment = DatePickerFragment.newInstance(getDateFromString(dateTextView.getText().toString()));
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+
+            newFragment.show(fragmentActivity.getSupportFragmentManager(), "datePicker");
         });
     }
 

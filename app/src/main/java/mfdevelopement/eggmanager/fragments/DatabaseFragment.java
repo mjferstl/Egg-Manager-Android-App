@@ -16,7 +16,9 @@ import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.fragment.app.DialogFragment;
 import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentTransaction;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -24,12 +26,18 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.snackbar.Snackbar;
 
+import java.util.Collections;
+import java.util.List;
 import java.util.Locale;
 
 import mfdevelopement.eggmanager.R;
 import mfdevelopement.eggmanager.activities.FilterActivity;
+import mfdevelopement.eggmanager.activities.MainNavigationActivity;
 import mfdevelopement.eggmanager.activities.NewEntityActivity;
 import mfdevelopement.eggmanager.data_models.DailyBalance;
+import mfdevelopement.eggmanager.data_models.SortingItem;
+import mfdevelopement.eggmanager.data_models.SortingItemCollection;
+import mfdevelopement.eggmanager.dialog_fragments.SortingDialogFragment;
 import mfdevelopement.eggmanager.list_adapters.DailyBalanceListAdapter;
 import mfdevelopement.eggmanager.viewmodels.DatabaseActivityViewModel;
 
@@ -83,6 +91,10 @@ public class DatabaseFragment extends Fragment {
             Log.wtf(LOG_TAG,errorMsg);
             Snackbar.make(rootView.findViewById(R.id.main_container), errorMsg, Snackbar.LENGTH_LONG).show();
         }
+
+        // add sortingOrderChangedListener
+        // when the user changes the sorting order, then the recycler view needs to be updated manually
+        ((MainNavigationActivity)getActivity()).setSortingOrderChangedListener(this::reverseRecyclerView);
 
         // this framgent has its own options menu
         setHasOptionsMenu(true);
@@ -185,11 +197,44 @@ public class DatabaseFragment extends Fragment {
         int id = item.getItemId();
 
         switch (id) {
-            case R.id.action_main_filter:
+            case R.id.action_data_filter:
                 openFilterActivity();
                 break;
+            case R.id.action_data_sort:
+                showSortingDialog();
         }
         return super.onOptionsItemSelected(item);
+    }
+
+    private void showSortingDialog() {
+        // DialogFragment.show() will take care of adding the fragment
+        // in a transaction.  We also want to remove any currently showing
+        // dialog, so make our own transaction and take care of that here.
+        if (getActivity() != null) {
+            // FragmentActivity.getSupportFragmentManager()
+            FragmentTransaction ft = getActivity().getSupportFragmentManager().beginTransaction();
+            Fragment prev = getActivity().getSupportFragmentManager().findFragmentByTag("dialog");
+            if (prev != null) {
+                ft.remove(prev);
+            }
+            ft.addToBackStack(null);
+
+            //
+            SortingItemCollection sortingList = new SortingItemCollection();
+            sortingList.addItem(new SortingItem("Aufsteigend","ASC",false));
+            sortingList.addItem(new SortingItem("Absteigend","DESC",false));
+            String savedSortingOrder = viewModel.getSortingOrder();
+            for (SortingItem item : sortingList.getItems()) {
+                if (item.getSortingOrder().equals(savedSortingOrder))
+                    item.setSelected(true);
+            }
+
+            // Create and show the dialog.
+            DialogFragment newFragment = SortingDialogFragment.newInstance(sortingList);
+            newFragment.show(ft, "dialog");
+        } else {
+            Log.e(LOG_TAG,"getFragmentManager() = null");
+        }
     }
 
     private void openFilterActivity() {
@@ -225,6 +270,16 @@ public class DatabaseFragment extends Fragment {
                 txtv_empty_recyclerview.setVisibility(View.GONE);
             }
         }
+    }
+
+    /**
+     * Re-Sort the items of the recycler view, if the sorting order changed
+     */
+    private void reverseRecyclerView() {
+        Log.d(LOG_TAG,"reverseRecyclerView(): updating recycler view items, because the sorting order may has changed");
+                List<DailyBalance> currentList = adapter.getItems();
+                Collections.reverse(currentList);
+                adapter.setDailyBalances(currentList);
     }
 
     @Override
@@ -305,8 +360,16 @@ public class DatabaseFragment extends Fragment {
             Log.d(LOG_TAG,"getFilteredDailyBalance() received updated data");
             if (dailyBalanceList != null) {
                 Log.d(LOG_TAG,"new list has " + dailyBalanceList.size() + " items");
-                // TODO: change the order to reverse, if the user wants 'DESC' order
+
+                // if the user wants to get the items in the recycler view in descending order, then reverse the list
+                String savedSortingOrder = viewModel.getSortingOrder();
+                if (savedSortingOrder.equals("DESC"))
+                    Collections.reverse(dailyBalanceList);
+
+                // update the recycler view
                 adapter.setDailyBalances(dailyBalanceList);
+
+                // update the summary
                 updateSummary();
             }
         });

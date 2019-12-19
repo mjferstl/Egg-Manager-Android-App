@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/linLay_sorting_dialog_item"
+    android:orientation="horizontal"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:paddingTop="@dimen/small_padding"
+    android:paddingStart="@dimen/large_padding"
+    android:paddingEnd="@dimen/large_padding"
+    android:paddingBottom="@dimen/small_padding">
+
+    <TextView
+        android:id="@+id/txtv_sorting_dialog_item"
+        android:layout_width="0dp"
+        android:layout_weight="1"
+        android:layout_height="wrap_content"
+        style="@style/basic_text"
+        android:layout_marginEnd="@dimen/large_padding"/>
+
+    <ImageView
+        android:id="@+id/imgv_sorting_dialog_item"
+        android:layout_width="30dp"
+        android:layout_height="30dp"
+        android:contentDescription="checkmark"
+        android:src="@drawable/ic_check_black_24dp"
+        android:scaleType="fitCenter"
+        android:tint="@color/gray"
+        android:layout_gravity="center_vertical"
+        android:paddingStart="@dimen/small_padding"
+        android:paddingEnd="@dimen/small_padding"/>
+
+</LinearLayout>

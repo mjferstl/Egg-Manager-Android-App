@@ -4,7 +4,6 @@ import android.app.Activity;
 import android.app.ActivityOptions;
 import android.app.AlertDialog;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.util.Log;
 import android.util.Pair;
@@ -22,10 +21,10 @@ import java.text.SimpleDateFormat;
 import java.util.List;
 import java.util.Locale;
 
-import mfdevelopement.eggmanager.fragments.DatabaseFragment;
-import mfdevelopement.eggmanager.data_models.DailyBalance;
 import mfdevelopement.eggmanager.R;
 import mfdevelopement.eggmanager.activities.NewEntityActivity;
+import mfdevelopement.eggmanager.data_models.DailyBalance;
+import mfdevelopement.eggmanager.fragments.DatabaseFragment;
 import mfdevelopement.eggmanager.viewmodels.DatabaseActivityViewModel;
 
 public class DailyBalanceListAdapter extends RecyclerView.Adapter<DailyBalanceListAdapter.DailyBalanceViewHolder> {
@@ -97,33 +96,24 @@ public class DailyBalanceListAdapter extends RecyclerView.Adapter<DailyBalanceLi
                 holder.txtv_money_earned_currency.setVisibility(View.GONE);
             }
 
-            // listener for image button
-            holder.imgbtn_delete_item.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
+            // sortingOrderChangedListener for image button
+            holder.imgbtn_delete_item.setOnClickListener(v -> new AlertDialog.Builder(v.getContext())
+                    .setTitle("Eintrag löschen")
+                    .setMessage("Möchten Sie den Eintrag löschen?")
 
-                    new AlertDialog.Builder(v.getContext())
-                            .setTitle("Eintrag löschen")
-                            .setMessage("Möchten Sie den Eintrag löschen?")
+                    // Specifying a sortingOrderChangedListener allows you to take an action before dismissing the dialog.
+                    // The dialog is automatically dismissed when a dialog button is clicked.
+                    .setPositiveButton(android.R.string.yes, (dialog, which) -> {
+                        // Continue with delete operation
+                        Log.d(LOG_TAG,"removing item at position " + position);
+                        viewModel.delete(current);
+                        notifyDataSetChanged();
+                    })
 
-                            // Specifying a listener allows you to take an action before dismissing the dialog.
-                            // The dialog is automatically dismissed when a dialog button is clicked.
-                            .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
-                                public void onClick(DialogInterface dialog, int which) {
-                                    // Continue with delete operation
-                                    Log.d(LOG_TAG,"removing item at position " + position);
-                                    viewModel.delete(current);
-                                    notifyDataSetChanged();
-                                }
-                            })
-
-                            // A null listener allows the button to dismiss the dialog and take no further action.
-                            .setNegativeButton(android.R.string.no, null)
-                            .setIcon(R.drawable.ic_warning_black_24dp)
-                            .show();
-
-                }
-            });
+                    // A null sortingOrderChangedListener allows the button to dismiss the dialog and take no further action.
+                    .setNegativeButton(android.R.string.no, null)
+                    .setIcon(R.drawable.ic_warning_black_24dp)
+                    .show());
 
             holder.imgbtn_edit_item.setOnClickListener(new View.OnClickListener() {
                 @Override
@@ -171,5 +161,9 @@ public class DailyBalanceListAdapter extends RecyclerView.Adapter<DailyBalanceLi
             return mDailyBalances.size();
         else
             return 0;
+    }
+
+    public List<DailyBalance> getItems() {
+        return mDailyBalances;
     }
 }

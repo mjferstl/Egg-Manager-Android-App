@@ -22,8 +22,8 @@ public class DatePickerFragment extends DialogFragment {
     private final String LOG_TAG = "DatePickerFragment";
     private static Date initialDate;
 
-    // Define the listener of the interface type
-    // listener will the activity instance containing fragment
+    // Define the sortingOrderChangedListener of the interface type
+    // sortingOrderChangedListener will the activity instance containing fragment
     private OnAddDateListener listener;
 
 

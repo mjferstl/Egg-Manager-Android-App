@@ -136,4 +136,9 @@
         <item name="android:minHeight">@dimen/btn_recycler_view_min_height</item>
     </style>
 
+    <style name="dialog_title" parent="basic_text">
+        <item name="android:textColor">@color/colorAccent</item>
+        <item name="android:textStyle">bold</item>
+    </style>
+
 </resources>

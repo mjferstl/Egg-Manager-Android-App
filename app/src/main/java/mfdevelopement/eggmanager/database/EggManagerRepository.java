@@ -23,6 +23,7 @@ public class EggManagerRepository {
     private final String PREFERENCE_FILE_KEY = "mfdevelopment.eggmanager.PREFERENCE_FILE_KEY";
     private final String KEY_PRICE_PER_EGG = "pricePerEgg";
     private final String KEY_FILTER_STRING = "filterString";
+    private final String KEY_SORTING_ORDER = "sortingOrder";
     private final String LOG_TAG = "EggManagerRepository";
 
     private Application application;
@@ -222,5 +223,21 @@ public class EggManagerRepository {
     public String getDataFilter() {
         sharedPreferences = application.getSharedPreferences(PREFERENCE_FILE_KEY, Context.MODE_PRIVATE);
         return sharedPreferences.getString(KEY_FILTER_STRING, "");
+    }
+
+    public void setSortingOrder(String sortingOrder) {
+        if (sortingOrder.equals("ASC") || sortingOrder.equals("DESC")) {
+            sharedPreferences = application.getSharedPreferences(PREFERENCE_FILE_KEY, Context.MODE_PRIVATE);
+            SharedPreferences.Editor editor = sharedPreferences.edit();
+            editor.putString(KEY_SORTING_ORDER, sortingOrder);
+            editor.apply();
+        } else {
+            throw new IllegalArgumentException("The argument " + sortingOrder + " needs to be \"ASC\" or \"DESC\"");
+        }
+    }
+
+    public String getSortingOrder() {
+        sharedPreferences = application.getSharedPreferences(PREFERENCE_FILE_KEY, Context.MODE_PRIVATE);
+        return sharedPreferences.getString(KEY_SORTING_ORDER, "ASC");
     }
 }
