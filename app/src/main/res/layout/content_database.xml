@@ -29,7 +29,7 @@
             android:background="@color/main_background"
             tools:listitem="@layout/recyclerview_item"
             android:paddingTop="@dimen/small_padding"
-            android:paddingBottom="80dp"
+            android:paddingBottom="@dimen/recycler_view_padding_bottom_for_fab"
             android:clipToPadding="false"
             app:layout_constraintBottom_toTopOf="@id/txtv_database_empty_recyclerview"
             app:layout_constraintLeft_toLeftOf="parent"

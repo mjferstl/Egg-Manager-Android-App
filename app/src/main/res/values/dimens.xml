@@ -9,6 +9,8 @@
     <dimen name="huge_padding">32dp</dimen>
     <dimen name="HUGE_padding">48dp</dimen>
 
+    <dimen name="recycler_view_padding_bottom_for_fab">80dp</dimen>
+
     <dimen name="main_text_size">18sp</dimen>
 
     <!-- material design text sizes-->

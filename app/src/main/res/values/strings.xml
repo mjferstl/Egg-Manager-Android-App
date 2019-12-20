@@ -1,3 +1,4 @@
+<?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">EggManager</string>
 
@@ -49,6 +50,8 @@
     <string name="btn_txt_export_data">Daten exportieren</string>
     <string name="txt_import_data">Einlesen der Daten aus einer Sicherungsdatei. Durch den Import werden alle vorhandenen Daten überschrieben. Wählen Sie das Datum der Sicherung aus</string>
     <string name="btn_txt_import_data">Daten importieren</string>
+    <string name="txt_backup">Sichern Sie Ihre Daten in einer Datei auf dem Gerät. Gespeicherte Daten können Sie bei Bedarf wieder laden.\nUm ein neues Backup zu erstellen, klicken Sie auf das +.</string>
+    <string name="txt_no_backup_files">Es wurde noch keine Datensicherung erstellt. Klicken Sie auf das + um Ihre Daten auf dem Gerät zu sichern.</string>
 
     <!-- filter activity -->
     <string name="menu_action_apply">Anwenden</string>
@@ -58,6 +61,10 @@
     <!-- dialogs -->
     <!-- sorting dialog -->
     <string name="title_sorting_dialog">Daten sortieren</string>
+
+    <!-- options dialog -->
+    <string name="txt_option_delete">Löschen</string>
+    <string name="txt_option_import">Importieren</string>
 
     <!-- hints -->
     <string name="hint_eggs_collected">gelegt</string>

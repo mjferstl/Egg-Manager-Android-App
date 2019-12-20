@@ -33,7 +33,7 @@ public class SharedViewModel extends AndroidViewModel implements FilterStringHan
     private LiveData<Integer> ldFilteredEggsCollected, ldFilteredEggsSold;
     private LiveData<Double> ldFilteredMoneyEarned;
     private List<String> monthNamesReference;
-    private LiveData<List<DailyBalance>> filteredDailyBalances;
+    private LiveData<List<DailyBalance>> filteredDailyBalances, allDailyBalances;
 
     // Mutable LiveData
     private MutableLiveData<String> dataFilter = new MutableLiveData<>();
@@ -57,12 +57,18 @@ public class SharedViewModel extends AndroidViewModel implements FilterStringHan
         // set the reference date
         referenceDate = getReferenceDate();
 
+        allDailyBalances = mRepository.getAllDailyBalances();
+
         // filtered live data
         dataFilter.setValue(mRepository.getDataFilter());
         filteredDailyBalances = Transformations.switchMap(dataFilter, filter -> mRepository.getFilteredDailyBalance(filter));
         ldFilteredMoneyEarned = Transformations.switchMap(dataFilter, filter -> mRepository.getFilteredMoneyEarned(filter));
         ldFilteredEggsCollected = Transformations.switchMap(dataFilter, filter -> mRepository.getFilteredEggsCollected(filter));
         ldFilteredEggsSold = Transformations.switchMap(dataFilter, filter -> mRepository.getFilteredEggsSold(filter));
+    }
+
+    public LiveData<List<DailyBalance>> getAllDailyBalances() {
+        return allDailyBalances;
     }
 
     /**

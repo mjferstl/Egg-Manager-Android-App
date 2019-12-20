@@ -15,10 +15,17 @@ import androidx.navigation.ui.NavigationUI;
 import com.google.android.material.navigation.NavigationView;
 
 import mfdevelopement.eggmanager.R;
+import mfdevelopement.eggmanager.data_models.DatabaseBackup;
+import mfdevelopement.eggmanager.dialog_fragments.BackupOptionsDialogFragment;
 import mfdevelopement.eggmanager.dialog_fragments.SortingDialogFragment;
+import mfdevelopement.eggmanager.list_adapters.DatabaseBackupListAdapter;
 import mfdevelopement.eggmanager.viewmodels.SharedViewModel;
 
-public class MainNavigationActivity extends AppCompatActivity implements SortingDialogFragment.OnSortingItemClickListener {
+import static mfdevelopement.eggmanager.dialog_fragments.BackupOptionsDialogFragment.OPTION_DELETE;
+import static mfdevelopement.eggmanager.dialog_fragments.BackupOptionsDialogFragment.OPTION_IMPORT;
+
+public class MainNavigationActivity extends AppCompatActivity
+        implements SortingDialogFragment.OnSortingItemClickListener, DatabaseBackupListAdapter.BackupItemClickListener, BackupOptionsDialogFragment.BackupOptionClickListener {
 
     private AppBarConfiguration mAppBarConfiguration;
     private final String LOG_TAG = "MainNavigationActivity";
@@ -26,6 +33,7 @@ public class MainNavigationActivity extends AppCompatActivity implements Sorting
     private SharedViewModel viewModel;
 
     public SortingOrderChangedListener sortingOrderChangedListener;
+    public BackupSelectedListener backupSelectedListener;
 
     /**
      * Interface for use in the fragments, if the sorting order gets changed
@@ -48,6 +56,20 @@ public class MainNavigationActivity extends AppCompatActivity implements Sorting
      */
     public void setSortingOrderChangedListener(SortingOrderChangedListener sortingOrderChangedListener) {
         this.sortingOrderChangedListener = sortingOrderChangedListener;
+    }
+
+    public interface BackupSelectedListener {
+        void onBackupSelected(DatabaseBackup backup);
+        void onBackupDeleteClicked(DatabaseBackup backup);
+        void onBackupImportClicked(DatabaseBackup backup);
+    }
+
+    public BackupSelectedListener getBackupSelectedListener() {
+        return backupSelectedListener;
+    }
+
+    public void setBackupSelectedListener(BackupSelectedListener backupSelectedListener) {
+        this.backupSelectedListener = backupSelectedListener;
     }
 
     @Override
@@ -100,5 +122,21 @@ public class MainNavigationActivity extends AppCompatActivity implements Sorting
                     getSortingOrderChangedListener().onSortingOrderReversed();
             }
         }
+    }
+
+    @Override
+    public void onBackupItemClicked(DatabaseBackup backup) {
+        Log.d(LOG_TAG,"user clicked on backup with the name \"" + backup.getName() + "\"");
+        getBackupSelectedListener().onBackupSelected(backup);
+    }
+
+    @Override
+    public void onOptionClicked(int option, DatabaseBackup backup) {
+        if (option == OPTION_DELETE)
+            getBackupSelectedListener().onBackupDeleteClicked(backup);
+        else if (option == OPTION_IMPORT)
+            getBackupSelectedListener().onBackupImportClicked(backup);
+        else
+            Log.e(LOG_TAG,"onOptionClicked(): no valid option clicked");
     }
 }

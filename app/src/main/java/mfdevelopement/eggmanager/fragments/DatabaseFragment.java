@@ -236,7 +236,7 @@ public class DatabaseFragment extends Fragment {
             DialogFragment newFragment = SortingDialogFragment.newInstance(sortingList);
             newFragment.show(ft, "dialog");
         } else {
-            Log.e(LOG_TAG,"getFragmentManager() = null");
+            Log.e(LOG_TAG,"getActivity() = null");
         }
     }
 
