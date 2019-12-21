@@ -50,8 +50,8 @@
     <string name="btn_txt_export_data">Daten exportieren</string>
     <string name="txt_import_data">Einlesen der Daten aus einer Sicherungsdatei. Durch den Import werden alle vorhandenen Daten überschrieben. Wählen Sie das Datum der Sicherung aus</string>
     <string name="btn_txt_import_data">Daten importieren</string>
-    <string name="txt_backup">Sichern Sie Ihre Daten in einer Datei auf dem Gerät. Gespeicherte Daten können Sie bei Bedarf wieder laden.\nUm ein neues Backup zu erstellen, klicken Sie auf das +.</string>
-    <string name="txt_no_backup_files">Es wurde noch keine Datensicherung erstellt. Klicken Sie auf das + um Ihre Daten auf dem Gerät zu sichern.</string>
+    <string name="txt_backup">Sichern Sie Ihre Daten in einer Datei auf dem Gerät. Gespeicherte Daten können Sie bei Bedarf wieder laden.</string>
+    <string name="txt_no_backup_files">Es wurde noch keine Datensicherung erstellt. Klicken Sie auf dieses Feld oder das + um eine neue Datensicherung auf dem Gerät zu erstellen.</string>
 
     <!-- filter activity -->
     <string name="menu_action_apply">Anwenden</string>
@@ -103,7 +103,7 @@
     <string name="nav_header_desc" translatable="false">Navigation header</string>
 
     <string name="menu_main_database" translatable="false">Daten</string>
-    <string name="menu_diagrams" translatable="false">Statistiken</string>
+    <string name="menu_diagrams" translatable="false">Statistik</string>
     <string name="menu_about" translatable="false">Über EggManager</string>
     <string name="menu_backup_data" translatable="false">Datensicherung</string>
     <string name="menu_settings" translatable="false">Einstellungen</string>

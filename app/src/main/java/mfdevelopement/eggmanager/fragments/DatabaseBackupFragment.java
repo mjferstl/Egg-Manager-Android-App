@@ -8,13 +8,14 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.LinearLayout;
+import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
-import androidx.fragment.app.FragmentTransaction;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -43,21 +44,23 @@ import mfdevelopement.eggmanager.R;
 import mfdevelopement.eggmanager.activities.MainNavigationActivity;
 import mfdevelopement.eggmanager.data_models.DailyBalance;
 import mfdevelopement.eggmanager.data_models.DatabaseBackup;
-import mfdevelopement.eggmanager.dialog_fragments.BackupOptionsDialogFragment;
 import mfdevelopement.eggmanager.list_adapters.DatabaseBackupListAdapter;
 import mfdevelopement.eggmanager.viewmodels.SharedViewModel;
 
-public class DatabseBackupFragment extends Fragment {
+public class DatabaseBackupFragment extends Fragment {
 
     // LOG_TAG containing the name of the current class for debugging purpose
     private final String LOG_TAG = "DatabaseImportExportAct";
 
+    private final String exportFilePrefix = "EggManager_backup_";
+    private final String exportFileDataType = ".emb"; // EggManagerBackup
+
     // Locale is ENGLISH for importing and exporting data
     private final Locale stringFormatLocale = Locale.ENGLISH;
+    private final SimpleDateFormat sdf_date = new SimpleDateFormat("dd.MM.yyyy", stringFormatLocale);
 
     // get path to the directory, where the EggManager backup files are stored
     private final String publicDataDir = Environment.getExternalStorageDirectory().getPath();
-
 
     // View Model
     private SharedViewModel viewModel;
@@ -65,22 +68,15 @@ public class DatabseBackupFragment extends Fragment {
     // id of container for showing Snackbars
     private int idSnackbarContainer;
 
-    // parts of the filename of the exported file
-    private final SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd_HHmmss", stringFormatLocale);
-    private final SimpleDateFormat sdf_date = new SimpleDateFormat("dd.MM.yyyy", stringFormatLocale);
-
-    private final String exportFilePrefix = "EggManager_backup_";
-    private final String exportFileDataType = ".emb"; // EggManagerBackup
-
     // request codes
     private final int REQUEST_CODE_WRITE_EXTERNAL_STORAGE_PERMISSION = 20;
 
     private View mainRoot;
     private DatabaseBackupListAdapter adapter;
 
-    private BackupOptionsDialogFragment backupOptionsDialog;
-
     private List<DailyBalance> allDailyBalances;
+
+    private RecyclerView recyclerView;
 
 
     @Nullable
@@ -109,23 +105,19 @@ public class DatabseBackupFragment extends Fragment {
         // when the user changes the sorting order, then the recycler view needs to be updated manually
         if (getActivity() != null)
             ((MainNavigationActivity)getActivity()).setBackupSelectedListener(new MainNavigationActivity.BackupSelectedListener() {
-                @Override
-                public void onBackupSelected(DatabaseBackup backup) {
-                    showBackupOptionsDialog(backup);
-                }
 
                 @Override
-                public void onBackupDeleteClicked(DatabaseBackup backup) {
-                    Log.d(LOG_TAG,"user wants to delete the backup with the name \"" + backup.getName() + "\"");
-                    backupOptionsDialog.dismiss();
-                    deleteFile(backup.getFilename());
-                }
-
-                @Override
-                public void onBackupImportClicked(DatabaseBackup backup) {
+                public void onBackupImportClicked(int position) {
+                    DatabaseBackup backup = adapter.getItem(position);
                     Log.d(LOG_TAG,"user wants to import the backup with the name \"" + backup.getName() + "\"");
-                    backupOptionsDialog.dismiss();
                     importBackup(backup);
+                }
+
+                @Override
+                public void onBackupDeleteClicked(int position) {
+                    DatabaseBackup backup = adapter.getItem(position);
+                    Log.d(LOG_TAG,"user wants to delete the backup with the name \"" + backup.getName() + "\"");
+                    deleteFile(backup.getFilename());
                 }
             });
     }
@@ -158,55 +150,39 @@ public class DatabseBackupFragment extends Fragment {
         }
     }
 
-    private void showBackupOptionsDialog(DatabaseBackup backup) {
-        Log.d(LOG_TAG,"user clicked on item with name " + backup.getName());
-
-        // DialogFragment.show() will take care of adding the fragment
-        // in a transaction.  We also want to remove any currently showing
-        // dialog, so make our own transaction and take care of that here.
-        if (getActivity() != null) {
-            // FragmentActivity.getSupportFragmentManager()
-            FragmentTransaction ft = getActivity().getSupportFragmentManager().beginTransaction();
-            Fragment prev = getActivity().getSupportFragmentManager().findFragmentByTag("dialog");
-            if (prev != null) {
-                ft.remove(prev);
-            }
-            ft.addToBackStack(null);
-
-            // Create and show the dialog
-            backupOptionsDialog = BackupOptionsDialogFragment.newInstance(backup);
-            backupOptionsDialog.show(ft, "dialog");
-        } else {
-            Log.e(LOG_TAG,"getActivity() = null");
-        }
-    }
-
     private void initRecyclerView() {
         List<DatabaseBackup> backupList = getBackupFiles();
 
-        RecyclerView recyclerView = mainRoot.findViewById(R.id.recv_database_backup);
+        recyclerView = mainRoot.findViewById(R.id.recv_database_backup);
         adapter = new DatabaseBackupListAdapter(getContext(), backupList);
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
         recyclerView.setAdapter(adapter);
+
+        updateRecyclerView();
     }
 
     private void updateRecyclerView() {
         List<DatabaseBackup> backupList = getBackupFiles();
         adapter.setDatabaseBackupList(backupList);
+
+        LinearLayout linearLayoutRecyclerView = mainRoot.findViewById(R.id.linLay_database_backup_recv);
+        LinearLayout linearLayoutRecyclerViewEmpty = mainRoot.findViewById(R.id.linLay_database_backup_recv_empty);
+        TextView txtv_recv_empty = mainRoot.findViewById(R.id.txtv_database_backup_recv_empty);
+
+        if (adapter.getItemCount() == 0) {
+            linearLayoutRecyclerView.setVisibility(View.GONE);
+            linearLayoutRecyclerViewEmpty.setVisibility(View.VISIBLE);
+            txtv_recv_empty.setOnClickListener(v -> createNewBackup());
+        } else {
+            linearLayoutRecyclerView.setVisibility(View.VISIBLE);
+            linearLayoutRecyclerViewEmpty.setVisibility(View.GONE);
+        }
     }
 
     private void deleteFile(String filename) {
 
         // Delete the file
         File file = new File(publicDataDir, filename);
-
-        File directory = new File(publicDataDir);
-        File[] files = directory.listFiles();
-
-        for (File f : files)
-            Log.d(LOG_TAG,"File in " + publicDataDir + ": " + f.getName());
-
-        Log.d(LOG_TAG,"check if the file " + file.getAbsolutePath() + " exists: " + file.exists());
         boolean fileDeleted = file.delete();
 
         // create snackbar text depending on the result of the delete process
@@ -223,6 +199,10 @@ public class DatabseBackupFragment extends Fragment {
         updateRecyclerView();
     }
 
+    /**
+     * Import data from a backup file and overwrite existing entries in the database
+     * @param backup DatabaseBackup
+     */
     private void importBackup(DatabaseBackup backup) {
         String filename = backup.getFilename();
 
@@ -477,9 +457,8 @@ public class DatabseBackupFragment extends Fragment {
 
                 // check if the file is a EggManager backup file
                 if (DatabaseBackup.isEggManagerBackupFile(fileName)) {
-                    Log.d(LOG_TAG, "Found a backup file: " + fileName);
 
-                    // remove prefix and extension of the filename. The rest of the filename is just the date
+                    // remove prefix and extension of the filename. The rest of the filename is just the name and the  date
                     String backupName = fileName.replace(exportFilePrefix, "").replace(exportFileDataType, "");
 
                     // create a new DataBase object
@@ -508,7 +487,7 @@ public class DatabseBackupFragment extends Fragment {
             // sort in descending order
             Collections.sort(backupFiles);
 
-            Log.d(LOG_TAG, "found " + backupFiles.size() + " backup files");
+            Log.d(LOG_TAG, "Found " + backupFiles.size() + " backup files");
         } else {
             Log.e(LOG_TAG,"external storage is not readable");
             Snackbar.make(mainRoot.findViewById(idSnackbarContainer),"Berechtigung zum Lesen des Speichers fehlt", Snackbar.LENGTH_LONG).show();
@@ -531,6 +510,9 @@ public class DatabseBackupFragment extends Fragment {
         }
     }
 
+    /**
+     * Initialize the Floating Action Button for creating new backups
+     */
     private void initFab() {
         FloatingActionButton fab = mainRoot.findViewById(R.id.fab_database_content);
         fab.setOnClickListener(v -> {
@@ -539,6 +521,10 @@ public class DatabseBackupFragment extends Fragment {
         });
     }
 
+
+    /**
+     * Initialize observers for receiving LiveData
+     */
     private void initObservers() {
         viewModel.getAllDailyBalances().observe(getViewLifecycleOwner(), dailyBalanceList -> allDailyBalances = dailyBalanceList);
     }

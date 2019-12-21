@@ -25,7 +25,7 @@
 
     <fragment
         android:id="@+id/nav_backup"
-        android:name="mfdevelopement.eggmanager.fragments.DatabseBackupFragment"
+        android:name="mfdevelopement.eggmanager.fragments.DatabaseBackupFragment"
         android:label="@string/menu_backup_data"
         tools:layout="@layout/fragment_database_backup" />
 

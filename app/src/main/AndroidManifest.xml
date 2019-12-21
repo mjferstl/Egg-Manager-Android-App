@@ -30,7 +30,7 @@
             android:name=".fragments.ChartFragment"
             android:theme="@style/AppTheme.NoActionBar"/>
         <activity
-            android:name=".fragments.DatabseBackupFragment"
+            android:name=".fragments.DatabaseBackupFragment"
             android:label="@string/title_activity_database_import_export"
             android:parentActivityName=".fragments.DatabaseFragment"
             android:theme="@style/AppTheme.NoActionBar">

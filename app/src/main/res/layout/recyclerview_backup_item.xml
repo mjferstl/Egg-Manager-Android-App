@@ -10,8 +10,6 @@
     android:paddingStart="@dimen/small_padding"
     android:paddingEnd="@dimen/small_padding"
     android:paddingBottom="@dimen/small_padding"
-    android:layout_marginStart="@dimen/small_padding"
-    android:layout_marginEnd="@dimen/small_padding"
     android:background="@drawable/recycler_item_data_backup_background">
 
     <TextView

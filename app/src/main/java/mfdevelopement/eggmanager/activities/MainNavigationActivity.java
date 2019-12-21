@@ -2,7 +2,9 @@ package mfdevelopement.eggmanager.activities;
 
 import android.os.Bundle;
 import android.util.Log;
+import android.view.MenuItem;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.drawerlayout.widget.DrawerLayout;
@@ -15,17 +17,11 @@ import androidx.navigation.ui.NavigationUI;
 import com.google.android.material.navigation.NavigationView;
 
 import mfdevelopement.eggmanager.R;
-import mfdevelopement.eggmanager.data_models.DatabaseBackup;
-import mfdevelopement.eggmanager.dialog_fragments.BackupOptionsDialogFragment;
 import mfdevelopement.eggmanager.dialog_fragments.SortingDialogFragment;
-import mfdevelopement.eggmanager.list_adapters.DatabaseBackupListAdapter;
 import mfdevelopement.eggmanager.viewmodels.SharedViewModel;
 
-import static mfdevelopement.eggmanager.dialog_fragments.BackupOptionsDialogFragment.OPTION_DELETE;
-import static mfdevelopement.eggmanager.dialog_fragments.BackupOptionsDialogFragment.OPTION_IMPORT;
-
 public class MainNavigationActivity extends AppCompatActivity
-        implements SortingDialogFragment.OnSortingItemClickListener, DatabaseBackupListAdapter.BackupItemClickListener, BackupOptionsDialogFragment.BackupOptionClickListener {
+        implements SortingDialogFragment.OnSortingItemClickListener{
 
     private AppBarConfiguration mAppBarConfiguration;
     private final String LOG_TAG = "MainNavigationActivity";
@@ -59,9 +55,8 @@ public class MainNavigationActivity extends AppCompatActivity
     }
 
     public interface BackupSelectedListener {
-        void onBackupSelected(DatabaseBackup backup);
-        void onBackupDeleteClicked(DatabaseBackup backup);
-        void onBackupImportClicked(DatabaseBackup backup);
+        void onBackupImportClicked(int position);
+        void onBackupDeleteClicked(int position);
     }
 
     public BackupSelectedListener getBackupSelectedListener() {
@@ -125,18 +120,18 @@ public class MainNavigationActivity extends AppCompatActivity
     }
 
     @Override
-    public void onBackupItemClicked(DatabaseBackup backup) {
-        Log.d(LOG_TAG,"user clicked on backup with the name \"" + backup.getName() + "\"");
-        getBackupSelectedListener().onBackupSelected(backup);
-    }
+    public boolean onContextItemSelected(@NonNull MenuItem item) {
+        String selectedOption = item.getTitle().toString();
+        int position = item.getOrder();
+        Log.d(LOG_TAG,"user clicked on the item with title: " + selectedOption + ", order/position: " + position);
 
-    @Override
-    public void onOptionClicked(int option, DatabaseBackup backup) {
-        if (option == OPTION_DELETE)
-            getBackupSelectedListener().onBackupDeleteClicked(backup);
-        else if (option == OPTION_IMPORT)
-            getBackupSelectedListener().onBackupImportClicked(backup);
-        else
-            Log.e(LOG_TAG,"onOptionClicked(): no valid option clicked");
+        if (selectedOption.equals(getString(R.string.txt_option_import))) {
+            getBackupSelectedListener().onBackupImportClicked(position);
+            return true;
+        } else if (selectedOption.equals(getString(R.string.txt_option_delete))) {
+            getBackupSelectedListener().onBackupDeleteClicked(position);
+            return true;
+        } else
+            return super.onContextItemSelected(item);
     }
 }

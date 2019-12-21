@@ -4,9 +4,10 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     app:layout_behavior="@string/appbar_scrolling_view_behavior"
-    tools:context=".fragments.DatabseBackupFragment"
+    tools:context=".fragments.DatabaseBackupFragment"
     android:layout_height="match_parent"
-    android:layout_width="match_parent">
+    android:layout_width="match_parent"
+    android:background="@color/main_background">
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/database_import_export_container"
@@ -25,37 +26,71 @@
             android:text="@string/txt_backup"
             android:layout_marginTop="@dimen/small_padding"
             android:layout_marginBottom="@dimen/small_padding"
-            android:paddingBottom="@dimen/small_padding"
+            android:paddingBottom="@dimen/large_padding"
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintBottom_toTopOf="@+id/recv_database_backup"/>
+            app:layout_constraintBottom_toTopOf="@+id/linLay_database_backup_recv"/>
 
-        <androidx.recyclerview.widget.RecyclerView
-            android:id="@+id/recv_database_backup"
+        <LinearLayout
+            android:id="@+id/linLay_database_backup_recv"
             android:layout_width="0dp"
             android:layout_height="0dp"
-            android:paddingBottom="@dimen/recycler_view_padding_bottom_for_fab"
-            android:clipToPadding="false"
-            tools:listitem="@layout/recyclerview_backup_item"
+            android:orientation="vertical"
+            android:visibility="visible"
             app:layout_constraintTop_toBottomOf="@+id/txtv_database_backup_title"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintBottom_toBottomOf="parent"/>
+            app:layout_constraintBottom_toTopOf="@+id/linLay_database_backup_recv_empty">
 
-        <TextView
-            android:id="@+id/txtv_database_backup_recv_empty"
+            <TextView
+                android:id="@+id/txtv_recyclerview_heading"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Vorhandene Datensicherungen"
+                android:textSize="@dimen/textAppearanceHeadline6"
+                android:textColor="@color/white"
+                android:padding="@dimen/small_padding"
+                android:background="@drawable/background_backups_recv_heading"/>
+
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/recv_database_backup"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:paddingTop="@dimen/tiny_padding"
+                android:paddingBottom="@dimen/recycler_view_padding_bottom_for_fab"
+                android:clipToPadding="false"
+                tools:listitem="@layout/recyclerview_backup_item" />
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/linLay_database_backup_recv_empty"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            style="@style/basic_text"
-            android:text="@string/txt_no_backup_files"
-            android:gravity="center_horizontal"
-            android:paddingTop="@dimen/LARGE_padding"
-            android:paddingBottom="@dimen/LARGE_padding"
+            android:layout_height="0dp"
+            android:orientation="vertical"
             android:visibility="gone"
-            app:layout_constraintTop_toBottomOf="@id/txtv_database_backup_title"
+            app:layout_constraintTop_toBottomOf="@id/linLay_database_backup_recv"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"/>
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent">
+
+            <TextView
+                android:id="@+id/txtv_database_backup_recv_empty"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                style="@style/basic_text"
+                android:background="@drawable/txtv_recv_empty_background"
+                android:text="@string/txt_no_backup_files"
+                android:gravity="center"
+                android:paddingStart="@dimen/large_padding"
+                android:paddingEnd="@dimen/large_padding"
+                android:paddingTop="@dimen/LARGE_padding"
+                android:paddingBottom="@dimen/LARGE_padding"/>
+
+        </LinearLayout>
+
+
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 
