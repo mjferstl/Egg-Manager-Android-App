@@ -1,10 +1,15 @@
 package mfdevelopement.eggmanager.data_models;
 
+import android.util.Log;
+
 import androidx.annotation.NonNull;
 import androidx.room.ColumnInfo;
 import androidx.room.Entity;
 import androidx.room.Ignore;
 import androidx.room.PrimaryKey;
+
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.io.Serializable;
 import java.text.ParseException;
@@ -13,7 +18,7 @@ import java.util.Date;
 import java.util.Locale;
 
 @Entity(tableName = "dailyBalanceTable")
-public class DailyBalance implements Serializable {
+public class DailyBalance implements Serializable, Comparable<DailyBalance> {
 
     public static final String COL_DATE_PRIMARY_KEY = "dateKey";
     public static final String COL_EGGS_COLLECTED_NAME = "eggsFetched";
@@ -23,6 +28,8 @@ public class DailyBalance implements Serializable {
     public static final String COL_MONEY_EARNED = "moneyEarned";
     public static final String dateKeyFormat = "yyyyMMdd";
     public static final int NOT_SET = 0;
+
+    private static final String LOG_TAG = "DailyBalance";
 
     @PrimaryKey
     @NonNull
@@ -133,5 +140,41 @@ public class DailyBalance implements Serializable {
         } else {
             return "";
         }
+    }
+
+
+    /**
+     * create a JSONObject
+     * @return JSONObject representing the DailyBalance object in JSON notation
+     */
+    public JSONObject toJSON() {
+
+        // new JSONObject
+        JSONObject jsonObject = new JSONObject();
+
+        try {
+            jsonObject.put(DailyBalance.COL_DATE_PRIMARY_KEY, this.getDateKey());
+            jsonObject.put(DailyBalance.COL_EGGS_COLLECTED_NAME, this.getEggsCollected());
+            jsonObject.put(DailyBalance.COL_EGGS_SOLD_NAME, this.getEggsSold());
+            jsonObject.put(DailyBalance.COL_PRICE_PER_EGG, this.getPricePerEgg());
+            jsonObject.put(DailyBalance.COL_MONEY_EARNED, this.getMoneyEarned());
+            jsonObject.put(DailyBalance.COL_NUMBER_HENS, this.getNumHens());
+
+        } catch (JSONException e) {
+            e.printStackTrace();
+            Log.d(LOG_TAG, "Error when adding fields to JSONObject");
+        }
+
+        return jsonObject;
+    }
+
+    @Override
+    public int compareTo(DailyBalance otherDailyBalance) {
+
+        int dateKeyInt1 = Integer.parseInt(this.dateKey);
+        int dateKeyInt2 = Integer.parseInt(otherDailyBalance.getDateKey());
+        int diff = dateKeyInt2 - dateKeyInt1;
+
+        return Integer.compare(diff, 0);
     }
 }

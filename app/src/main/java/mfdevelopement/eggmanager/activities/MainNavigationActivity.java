@@ -29,7 +29,7 @@ public class MainNavigationActivity extends AppCompatActivity
     private SharedViewModel viewModel;
 
     public SortingOrderChangedListener sortingOrderChangedListener;
-    public BackupSelectedListener backupSelectedListener;
+    public BackupListener backupListener;
 
     /**
      * Interface for use in the fragments, if the sorting order gets changed
@@ -54,17 +54,18 @@ public class MainNavigationActivity extends AppCompatActivity
         this.sortingOrderChangedListener = sortingOrderChangedListener;
     }
 
-    public interface BackupSelectedListener {
+    public interface BackupListener {
         void onBackupImportClicked(int position);
         void onBackupDeleteClicked(int position);
+        void onBackupCreated(String filename);
     }
 
-    public BackupSelectedListener getBackupSelectedListener() {
-        return backupSelectedListener;
+    public BackupListener getBackupListener() {
+        return backupListener;
     }
 
-    public void setBackupSelectedListener(BackupSelectedListener backupSelectedListener) {
-        this.backupSelectedListener = backupSelectedListener;
+    public void setBackupListener(BackupListener backupListener) {
+        this.backupListener = backupListener;
     }
 
     @Override
@@ -126,12 +127,16 @@ public class MainNavigationActivity extends AppCompatActivity
         Log.d(LOG_TAG,"user clicked on the item with title: " + selectedOption + ", order/position: " + position);
 
         if (selectedOption.equals(getString(R.string.txt_option_import))) {
-            getBackupSelectedListener().onBackupImportClicked(position);
+            getBackupListener().onBackupImportClicked(position);
             return true;
         } else if (selectedOption.equals(getString(R.string.txt_option_delete))) {
-            getBackupSelectedListener().onBackupDeleteClicked(position);
+            getBackupListener().onBackupDeleteClicked(position);
             return true;
         } else
             return super.onContextItemSelected(item);
+    }
+
+    public void abc(String filename) {
+        getBackupListener().onBackupCreated(filename);
     }
 }

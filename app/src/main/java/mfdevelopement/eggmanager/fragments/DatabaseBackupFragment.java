@@ -2,6 +2,7 @@ package mfdevelopement.eggmanager.fragments;
 
 import android.Manifest;
 import android.content.pm.PackageManager;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Environment;
 import android.util.Log;
@@ -27,15 +28,10 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileReader;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.text.ParseException;
+import java.lang.ref.WeakReference;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
@@ -45,15 +41,14 @@ import mfdevelopement.eggmanager.activities.MainNavigationActivity;
 import mfdevelopement.eggmanager.data_models.DailyBalance;
 import mfdevelopement.eggmanager.data_models.DatabaseBackup;
 import mfdevelopement.eggmanager.list_adapters.DatabaseBackupListAdapter;
+import mfdevelopement.eggmanager.utils.FileUtil;
+import mfdevelopement.eggmanager.utils.JSONUtil;
 import mfdevelopement.eggmanager.viewmodels.SharedViewModel;
 
 public class DatabaseBackupFragment extends Fragment {
 
     // LOG_TAG containing the name of the current class for debugging purpose
     private final String LOG_TAG = "DatabaseImportExportAct";
-
-    private final String exportFilePrefix = "EggManager_backup_";
-    private final String exportFileDataType = ".emb"; // EggManagerBackup
 
     // Locale is ENGLISH for importing and exporting data
     private final Locale stringFormatLocale = Locale.ENGLISH;
@@ -75,8 +70,6 @@ public class DatabaseBackupFragment extends Fragment {
     private DatabaseBackupListAdapter adapter;
 
     private List<DailyBalance> allDailyBalances;
-
-    private RecyclerView recyclerView;
 
 
     @Nullable
@@ -100,65 +93,48 @@ public class DatabaseBackupFragment extends Fragment {
         return root;
     }
 
+    @Override
+    public void onResume() {
+        super.onResume();
+
+        // update items in recyclerview, because files may have been deleted or added
+        updateRecyclerView();
+    }
+
     private void initListeners() {
-        // add BackupSelectedListener
+        // add BackupListener
         // when the user changes the sorting order, then the recycler view needs to be updated manually
         if (getActivity() != null)
-            ((MainNavigationActivity)getActivity()).setBackupSelectedListener(new MainNavigationActivity.BackupSelectedListener() {
+            ((MainNavigationActivity)getActivity()).setBackupListener(new MainNavigationActivity.BackupListener() {
 
                 @Override
                 public void onBackupImportClicked(int position) {
                     DatabaseBackup backup = adapter.getItem(position);
-                    Log.d(LOG_TAG,"user wants to import the backup with the name \"" + backup.getName() + "\"");
+                    Log.d(LOG_TAG,"user wants to import the backup with the name \"" + backup.getBackupName() + "\"");
                     importBackup(backup);
                 }
 
                 @Override
                 public void onBackupDeleteClicked(int position) {
                     DatabaseBackup backup = adapter.getItem(position);
-                    Log.d(LOG_TAG,"user wants to delete the backup with the name \"" + backup.getName() + "\"");
+                    Log.d(LOG_TAG,"user wants to delete the backup with the name \"" + backup.getBackupName() + "\"");
                     deleteFile(backup.getFilename());
                 }
-            });
-    }
 
-    private void createNewBackup() {
-        requestWritePermission();
-
-        if (isExternalStorageWritable()) {
-
-            if (isWritePermissionGranted()) {
-
-                // if data was not loaded, the list == null
-                if (allDailyBalances == null)
-                    Snackbar.make(mainRoot.findViewById(idSnackbarContainer), getString(R.string.snackbar_error_loading_data_from_database), Snackbar.LENGTH_LONG).show();
-                else {
-                    // create a JSONArray
-                    JSONArray jsonArray = createJsonArrayFromDailyBalance(allDailyBalances);
-
-                    // save the JSONArray to file as a String
-                    DatabaseBackup backup = new DatabaseBackup();
-                    exportDataToFile(backup.getFilename(), jsonArray.toString());
+                @Override
+                public void onBackupCreated(String filename) {
                     updateRecyclerView();
                 }
-            } else {
-                // inform the user, that no write persmission is granted
-                Snackbar.make(mainRoot.findViewById(R.id.database_import_export_container), getString(R.string.snackbar_permission_ext_storage_denied), Snackbar.LENGTH_SHORT).show();
-            }
-        } else {
-            Snackbar.make(mainRoot.findViewById(idSnackbarContainer), getString(R.string.snackbar_no_external_storage), Snackbar.LENGTH_SHORT).show();
-        }
+            });
     }
 
     private void initRecyclerView() {
         List<DatabaseBackup> backupList = getBackupFiles();
 
-        recyclerView = mainRoot.findViewById(R.id.recv_database_backup);
+        RecyclerView recyclerView = mainRoot.findViewById(R.id.recv_database_backup);
         adapter = new DatabaseBackupListAdapter(getContext(), backupList);
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
         recyclerView.setAdapter(adapter);
-
-        updateRecyclerView();
     }
 
     private void updateRecyclerView() {
@@ -188,9 +164,9 @@ public class DatabaseBackupFragment extends Fragment {
         // create snackbar text depending on the result of the delete process
         String snackbarText = "";
         if (fileDeleted)
-            snackbarText = "Datei gelöscht";
+            snackbarText = "Datensicherung gelöscht";
         else
-            snackbarText = "Fehler beim Löschen der Datei";
+            snackbarText = "Fehler beim Löschen der Datensicherung";
 
         // show a snackbar to inform the user about the delete progress
         Snackbar.make(mainRoot.findViewById(idSnackbarContainer), snackbarText, Snackbar.LENGTH_SHORT).show();
@@ -208,10 +184,10 @@ public class DatabaseBackupFragment extends Fragment {
 
         // read the content of the file
         File file = new File(publicDataDir, filename);
-        String content = readFile(file);
+        String content = FileUtil.readFile(file);
 
         // convert String to JSONObject
-        JSONArray jsonArray = getJSONObject(content);
+        JSONArray jsonArray = JSONUtil.getJSONObject(content);
 
         // check if data was loaded
         if (jsonArray == null || jsonArray.length() == 0) {
@@ -261,52 +237,6 @@ public class DatabaseBackupFragment extends Fragment {
     }
 
     /**
-     * parse a String to a JSONObject
-     * @param content String in JSON notation
-     * @return JSONArray
-     */
-    private JSONArray getJSONObject(String content) {
-
-        // create a new JSONObject
-        JSONArray jsonObject = new JSONArray();
-
-        // convert Stirng to JSONObject
-        try {
-            jsonObject = new JSONArray(content);
-        } catch (JSONException e) {
-            Log.e(LOG_TAG, "getJSONObject::error when converting String to JSONObject");
-        }
-        return jsonObject;
-    }
-
-    /**
-     * read the content of a File on the device
-     * @param file File to be read
-     * @return String containing the content of the file
-     */
-    private String readFile(File file) {
-
-        StringBuilder builder = new StringBuilder();
-        Log.e(LOG_TAG, "readFile::start to read file " + file.getAbsolutePath());
-
-        try {
-            BufferedReader br = new BufferedReader(new FileReader(file));
-            String line;
-            while ((line = br.readLine()) != null) {
-                builder.append(line);
-                builder.append("\n");
-            }
-            br.close();
-        } catch (Exception e) {
-            Log.e(LOG_TAG, "readFile::error while reading file..");
-            e.printStackTrace();
-        }
-
-        return builder.toString();
-    }
-
-
-    /**
      * check if the permission to write to the external storage is given
      * @return flag, if the permission is granted
      */
@@ -352,39 +282,13 @@ public class DatabaseBackupFragment extends Fragment {
 
         for (int i = 0; i < dailyBalanceList.size(); i++) {
             try {
-                jsonArray.put(i, createJsonFromDailyBalance(dailyBalanceList.get(i)));
+                jsonArray.put(i, dailyBalanceList.get(i).toJSON());
             } catch (JSONException e) {
                 e.printStackTrace();
-                Log.e(LOG_TAG, "createJsonArrayFromDailyBalance::Error occurred while creating JSONArray");
+                Log.e(LOG_TAG, "createJsonArrayFromDailyBalance(): Error encountered while creating JSONArray");
             }
         }
         return jsonArray;
-    }
-
-    /**
-     * create a JSONObject from a DailyBalance obejct
-     * @param dailyBalance DailyBalance object
-     * @return JSONObject representing the DailyBalance object in JSON notation
-     */
-    private JSONObject createJsonFromDailyBalance(@NonNull DailyBalance dailyBalance) {
-
-        // new JSONObject
-        JSONObject jsonObject = new JSONObject();
-
-        try {
-            jsonObject.put(DailyBalance.COL_DATE_PRIMARY_KEY, dailyBalance.getDateKey());
-            jsonObject.put(DailyBalance.COL_EGGS_COLLECTED_NAME, dailyBalance.getEggsCollected());
-            jsonObject.put(DailyBalance.COL_EGGS_SOLD_NAME, dailyBalance.getEggsSold());
-            jsonObject.put(DailyBalance.COL_PRICE_PER_EGG, dailyBalance.getPricePerEgg());
-            jsonObject.put(DailyBalance.COL_MONEY_EARNED, dailyBalance.getMoneyEarned());
-            jsonObject.put(DailyBalance.COL_NUMBER_HENS, dailyBalance.getNumHens());
-
-        } catch (JSONException e) {
-            e.printStackTrace();
-            Log.d(LOG_TAG, "Error when adding fields to JSONObject");
-        }
-
-        return jsonObject;
     }
 
     /**
@@ -404,33 +308,31 @@ public class DatabaseBackupFragment extends Fragment {
                 Environment.MEDIA_MOUNTED_READ_ONLY.equals(state));
     }
 
-    /**
-     * create a file on the external storage of the device and add content to the file
-     * @param fileName Name of the file to be stored. The file will be created on the external storage of the device
-     * @param content String containing the content of the file
-     */
-    private void exportDataToFile(String fileName, String content) {
 
-        // get path
-        String publicDataDir = Environment.getExternalStorageDirectory().getPath();
+    private void createNewBackup() {
+        requestWritePermission();
 
-        // create a new file
-        File newFile = new File(publicDataDir, fileName);
+        if (isExternalStorageWritable()) {
 
-        // save content to the file
-        try {
-            FileWriter fw = new FileWriter(newFile);
-            fw.write(content);
-            fw.flush();
-            fw.close();
-            Log.d(LOG_TAG, "Created file " + newFile.getAbsolutePath() + " successfully");
-            Snackbar.make(mainRoot.findViewById(R.id.database_import_export_container), getString(R.string.snackbar_data_exported_successfully), Snackbar.LENGTH_SHORT).show();
-        }
-        // inform the user, if the creation of the file failed
-        catch (IOException e) {
-            e.printStackTrace();
-            Log.e(LOG_TAG, "exportDataToFile::creating the file " + fileName + " failed");
-            Snackbar.make(mainRoot.findViewById(idSnackbarContainer), "Fehler beim Erstellen der Datei. Bitte den Entwickler kontaktieren", Snackbar.LENGTH_LONG).show();
+            if (isWritePermissionGranted()) {
+
+                // if data was not loaded, the list == null
+                if (allDailyBalances == null)
+                    Snackbar.make(mainRoot.findViewById(idSnackbarContainer), getString(R.string.snackbar_error_loading_data_from_database), Snackbar.LENGTH_LONG).show();
+                else {
+                    // create a JSONArray
+                    JSONArray jsonArray = createJsonArrayFromDailyBalance(allDailyBalances);
+
+                    // save the JSONArray to file as a String
+                    DatabaseBackup backup = new DatabaseBackup();
+                    new createBackupAsyncTask((MainNavigationActivity) getActivity()).execute(backup.getFilename(), jsonArray.toString());
+                }
+            } else {
+                // inform the user, that no write persmission is granted
+                Snackbar.make(mainRoot.findViewById(R.id.database_import_export_container), getString(R.string.snackbar_permission_ext_storage_denied), Snackbar.LENGTH_SHORT).show();
+            }
+        } else {
+            Snackbar.make(mainRoot.findViewById(idSnackbarContainer), getString(R.string.snackbar_no_external_storage), Snackbar.LENGTH_SHORT).show();
         }
     }
 
@@ -458,29 +360,11 @@ public class DatabaseBackupFragment extends Fragment {
                 // check if the file is a EggManager backup file
                 if (DatabaseBackup.isEggManagerBackupFile(fileName)) {
 
-                    // remove prefix and extension of the filename. The rest of the filename is just the name and the  date
-                    String backupName = fileName.replace(exportFilePrefix, "").replace(exportFileDataType, "");
+                    SimpleDateFormat simpleDateFormat = new SimpleDateFormat("dd.MM.yyyy HH:mm", stringFormatLocale);
+                    Log.d(LOG_TAG,"backup file: " + fileName + ", last modified: " + simpleDateFormat.format(file.lastModified()) + ", size: " + file.length() + " bytes");
 
-                    // create a new DataBase object
-                    DatabaseBackup newBackupFile = new DatabaseBackup(backupName);
-                    newBackupFile.setFilename(fileName);
-
-                    // try to parse the date
-                    try {
-                        // parse the date
-                        Calendar saveDate = Calendar.getInstance();
-                        saveDate.setTime(DatabaseBackup.getDateFromFilename(fileName));
-                        newBackupFile.setSaveDate(saveDate);
-
-                        // add the date to the list
-                        backupFiles.add(newBackupFile);
-                    }
-                    // handle Exception
-                    catch (ParseException e) {
-                        e.printStackTrace();
-                        Snackbar.make(mainRoot.findViewById(idSnackbarContainer), "Es können nicht alle Backups angezeigt werden", Snackbar.LENGTH_SHORT).show();
-                        Log.e(LOG_TAG, "getBackupFiles(): Fehler beim Parsen des Datums aus dem Dateinamen \"" + fileName + "\"");
-                    }
+                    // add the date to the list
+                    backupFiles.add(new DatabaseBackup(fileName, file.lastModified()));
                 }
             }
 
@@ -496,6 +380,7 @@ public class DatabaseBackupFragment extends Fragment {
         return backupFiles;
     }
 
+
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
@@ -509,6 +394,7 @@ public class DatabaseBackupFragment extends Fragment {
             }
         }
     }
+
 
     /**
      * Initialize the Floating Action Button for creating new backups
@@ -527,5 +413,46 @@ public class DatabaseBackupFragment extends Fragment {
      */
     private void initObservers() {
         viewModel.getAllDailyBalances().observe(getViewLifecycleOwner(), dailyBalanceList -> allDailyBalances = dailyBalanceList);
+    }
+
+
+    private static class createBackupAsyncTask extends AsyncTask<String, Void, String> {
+
+        private WeakReference<MainNavigationActivity> weakReference;
+        private final String LOG_TAG = "createBackupAsyncTask";
+
+        createBackupAsyncTask(MainNavigationActivity context) {
+            weakReference = new WeakReference<>(context);
+        }
+
+        @Override
+        protected String doInBackground(String... strings) {
+            String filename = strings[0];
+            String content = strings[1];
+            int status = FileUtil.writeContentToFile(filename, content);
+
+            MainNavigationActivity activity = weakReference.get();
+            if (activity == null || activity.isFinishing()) {
+                Log.e(LOG_TAG, "activity == null or activity is finishing");
+                return "";
+            }
+
+            if (status == 0)
+                return filename;
+            else
+                return "";
+        }
+
+        @Override
+        protected void onPostExecute(String filename) {
+            super.onPostExecute(filename);
+
+            MainNavigationActivity activity = weakReference.get();
+            if (activity == null || activity.isFinishing())
+                return;
+
+            Log.d(LOG_TAG,"sending name of the created file \"" + filename + "\" to the main activity");
+            activity.abc(filename);
+        }
     }
 }

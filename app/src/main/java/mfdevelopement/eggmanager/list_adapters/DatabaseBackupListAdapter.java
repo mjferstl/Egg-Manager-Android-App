@@ -37,9 +37,9 @@ public class DatabaseBackupListAdapter extends RecyclerView.Adapter<DatabaseBack
         @Override
         public void onCreateContextMenu(ContextMenu contextMenu, View v, ContextMenu.ContextMenuInfo menuInfo) {
             Log.d(LOG_TAG,"onCreateContextMenu(): creating context menu for item at position " + getAdapterPosition());
-            contextMenu.setHeaderTitle(data.get(getAdapterPosition()).getName());
-            contextMenu.add(0, v.getId(), getAdapterPosition(), context.getString(R.string.txt_option_delete));
+            contextMenu.setHeaderTitle(data.get(getAdapterPosition()).getBackupName());
             contextMenu.add(0, v.getId(), getAdapterPosition(), context.getString(R.string.txt_option_import));
+            contextMenu.add(0, v.getId(), getAdapterPosition(), context.getString(R.string.txt_option_delete));
         }
     }
 
@@ -61,7 +61,7 @@ public class DatabaseBackupListAdapter extends RecyclerView.Adapter<DatabaseBack
     public void onBindViewHolder(@NonNull final DatabaseBackupViewHolder holder, final int position) {
         DatabaseBackup backup = data.get(position);
 
-        holder.txtv_name.setText(backup.getName());
+        holder.txtv_name.setText(backup.getBackupName());
         holder.txtv_date.setText(backup.getFormattedSaveDate());
     }
 

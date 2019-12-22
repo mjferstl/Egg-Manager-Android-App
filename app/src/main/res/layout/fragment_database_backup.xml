@@ -47,7 +47,7 @@
                 android:id="@+id/txtv_recyclerview_heading"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="Vorhandene Datensicherungen"
+                android:text="@string/heading_found_backups"
                 android:textSize="@dimen/textAppearanceHeadline6"
                 android:textColor="@color/white"
                 android:padding="@dimen/small_padding"
@@ -83,14 +83,13 @@
                 android:background="@drawable/txtv_recv_empty_background"
                 android:text="@string/txt_no_backup_files"
                 android:gravity="center"
+                android:layout_margin="@dimen/large_padding"
                 android:paddingStart="@dimen/large_padding"
                 android:paddingEnd="@dimen/large_padding"
                 android:paddingTop="@dimen/LARGE_padding"
                 android:paddingBottom="@dimen/LARGE_padding"/>
 
         </LinearLayout>
-
-
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 

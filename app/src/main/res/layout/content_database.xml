@@ -7,7 +7,7 @@
     android:layout_height="match_parent"
     app:layout_behavior="@string/appbar_scrolling_view_behavior"
     tools:context=".fragments.DatabaseFragment"
-    tools:showIn="@layout/activity_database"
+    tools:showIn="@layout/fragment_main_database"
     android:id="@+id/main_container">
 
     <androidx.constraintlayout.widget.ConstraintLayout

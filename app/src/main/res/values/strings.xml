@@ -3,30 +3,21 @@
     <string name="app_name">EggManager</string>
 
     <!-- activity names -->
-    <string name="title_activity_settings">Settings</string>
     <string name="title_activity_about">\u00DCber EggManager</string> <!-- \u00DC = Ü -->
     <string name="title_activity_new_entity">Tagesbilanz</string>
     <string name="title_activity_database_import_export">Datensicherung</string>
     <string name="title_activity_filter">Daten filtern</string>
 
     <!-- action bars -->
-    <string name="action_settings">Einstellungen</string>
-    <string name="action_about">App-Info</string>
     <string name="action_filter">Filtern</string>
     <string name="action_save">Speichern</string>
-    <string name="action_backup">Datensicherung</string>
 
     <!-- Snackbars -->
-    <string name="snackbar_no_data">Keine Daten zum Filtern vorhanden. Erstellen Sie einen neuen Eintrag.</string>
-    <string name="snackbar_no_settings">Noch keine App-Einstellungen verfügbar</string>
     <string name="snackbar_error_loading_data_from_database">Fehler beim Lesen der Daten aus der Datenbank. Bitte den Fehler an den Entwickler melden.</string>
     <string name="snackbar_no_external_storage">Kein externer Speicher im Gerät verfügbar. Bitte legen Sie einen externen Speicher in das Gerät ein.</string>
     <string name="snackbar_permission_ext_storage_granted">Zugriff auf externen Speicher gewährt. Sie können die Daten jetzt auf dem Gerät sichern.</string>
     <string name="snackbar_permission_ext_storage_denied">Zugriff auf externen Speicher verweigert. Backup kann nicht durchgeführt werden.</string>
-    <string name="snackbar_data_exported_successfully">Daten erfolgreich exportiert</string>
     <string name="snackbar_data_imported_successfully">Daten für %d Tage erfolgreich importiert.</string>
-    <string name="snackbar_data_filter_canceled">Filter-Einstellungen nicht geändert</string>
-    <string name="snackbar_data_not_filtered">Daten nicht gefiltert</string>
 
     <!-- line chart activty -->
     <string name="txt_title_eggs_collected">Abgenommene Eier</string>
@@ -41,17 +32,13 @@
     <string name="number_eggs_collected_empty">Anzahl abgenommener Eier fehlt</string>
     <string name="selected_filter_part1">Daten nach\u0020</string>
     <string name="selected_filter_part2">\u0020gefiltert</string>
-    <string name="filter_removed">Filter entfernt</string>
     <string name="text_empty_recyclerview">Keine Daten vorhanden.\nLegen Sie einen Datensatz an.\nKlicken Sie dazu auf das +</string>
     <string name="text_recyclerview_not_visible">Die Daten wurden ausgeblendet</string>
 
-    <!-- import export activity -->
-    <string name="txt_save_database">Sichern der Daten in einer Datei auf dem Gerät.</string>
-    <string name="btn_txt_export_data">Daten exportieren</string>
-    <string name="txt_import_data">Einlesen der Daten aus einer Sicherungsdatei. Durch den Import werden alle vorhandenen Daten überschrieben. Wählen Sie das Datum der Sicherung aus</string>
-    <string name="btn_txt_import_data">Daten importieren</string>
+    <!-- database backup activity -->
     <string name="txt_backup">Sichern Sie Ihre Daten in einer Datei auf dem Gerät. Gespeicherte Daten können Sie bei Bedarf wieder laden.</string>
-    <string name="txt_no_backup_files">Es wurde noch keine Datensicherung erstellt. Klicken Sie auf dieses Feld oder das + um eine neue Datensicherung auf dem Gerät zu erstellen.</string>
+    <string name="txt_no_backup_files">Es wurde noch keine Datensicherung erstellt.\nKlicken Sie auf dieses Feld oder das + um eine neue Datensicherung auf dem Gerät zu erstellen.</string>
+    <string name="heading_found_backups">Vorhandene Datensicherungen</string>
 
     <!-- filter activity -->
     <string name="menu_action_apply">Anwenden</string>
@@ -71,14 +58,8 @@
     <string name="hint_eggs_sold">verkauft</string>
     <string name="hint_price_per_egg">Preis pro Ei</string>
 
-    <!-- dialogs -->
-    <string name="entry_delete_request">Eintrag löschen?</string>
-    <string name="choose_a_year">Wählen Sie ein Jahr aus</string>
-    <string name="choose_a_month_of_this_year">Wählen Sie einen Monat des Jahres aus</string>
-
     <!-- symbols -->
     <string name="euro_symbol" translatable="false">&#8364;</string>
-    <string name="egg_symbol">&#xf7fb;</string>
 
     <!-- strings for use in transitions -->
     <string name="transition_txtv_eggs_collected" translatable="false">textEggsCollected</string>
@@ -91,13 +72,7 @@
     <string name="icon_creadits_flaticon">Icons made by Freepik from www.flaticon.com</string>
     <string name="app_developer">Entwickler: Mathias Ferstl</string>
 
-    <!-- whitespace -->
-    <string name="whitespace">\u0020</string>
 
-
-    <string name="title_activity_main2" translatable="false">MainActivity</string>
-    <string name="navigation_drawer_open" translatable="false">Open navigation drawer</string>
-    <string name="navigation_drawer_close" translatable="false">Close navigation drawer</string>
     <string name="nav_header_title" translatable="false">EggManager</string>
     <string name="nav_header_subtitle" translatable="false">https://mjferstl.github.io/</string>
     <string name="nav_header_desc" translatable="false">Navigation header</string>
@@ -106,5 +81,4 @@
     <string name="menu_diagrams" translatable="false">Statistik</string>
     <string name="menu_about" translatable="false">Über EggManager</string>
     <string name="menu_backup_data" translatable="false">Datensicherung</string>
-    <string name="menu_settings" translatable="false">Einstellungen</string>
 </resources>

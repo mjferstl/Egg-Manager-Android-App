@@ -2,7 +2,7 @@ package mfdevelopement.eggmanager.data_models;
 
 import android.util.Log;
 
-import java.text.ParseException;
+import java.io.File;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
@@ -20,7 +20,7 @@ public class DatabaseBackup implements Comparable<DatabaseBackup> {
     private static final String exportFilePrefix = "EggManager_backup_";
     private static final String exportFileDataType = ".emb"; // EggManagerBackup
 
-    private String name, filename;
+    private String backupName, filename;
     private Calendar saveDate;
 
     public DatabaseBackup() {
@@ -32,9 +32,9 @@ public class DatabaseBackup implements Comparable<DatabaseBackup> {
     }
 
     public DatabaseBackup(String backupName, Calendar saveDate) {
-        this.name = backupName;
+        this.backupName = backupName;
         this.saveDate = saveDate;
-        this.filename = getBackupFilename();
+        this.filename = createBackupFilename();
     }
 
     public DatabaseBackup(String backupName, Date date) {
@@ -44,12 +44,32 @@ public class DatabaseBackup implements Comparable<DatabaseBackup> {
         this.setSaveDate(cal);
     }
 
-    public String getName() {
-        return name;
+    public DatabaseBackup(String filename, long timestamp) {
+        this.filename = filename;
+        this.backupName = getBackupNameFromFilename(this.filename);
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTimeInMillis(timestamp);
+        this.saveDate = calendar;
     }
 
-    public void setName(String name) {
-        this.name = name;
+    public DatabaseBackup(File file) {
+        this.filename = file.getName();
+        this.backupName = getBackupNameFromFilename(this.filename);
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTimeInMillis(file.lastModified());
+        this.saveDate = calendar;
+    }
+
+    public String getBackupName() {
+        if (this.backupName == null)
+            return "unnamed";
+        else
+            return this.backupName;
+    }
+
+    public void setBackupName(String backupName) {
+        this.backupName = backupName;
+        this.filename = createBackupFilename();
     }
 
     public Calendar getSaveDate() {
@@ -72,20 +92,24 @@ public class DatabaseBackup implements Comparable<DatabaseBackup> {
 
     public void setFilename(String filename) {
         this.filename = filename;
+        this.backupName = getBackupNameFromFilename(this.filename);
     }
 
     public String getFormattedSaveDate() {
-        SimpleDateFormat sdf = new SimpleDateFormat("dd.MM.yyyy HH:mm", Locale.getDefault());
+        SimpleDateFormat sdf = new SimpleDateFormat("dd.MM.yyyy HH:mm:ss", Locale.getDefault());
         return sdf.format(this.saveDate.getTimeInMillis());
     }
 
-    private String getBackupFilename() {
-        return exportFilePrefix + this.getName() + "_" + sdf.format(new Date(System.currentTimeMillis())) + exportFileDataType;
+    /**
+     * create the filename for the backup file
+     * @return
+     */
+    private String createBackupFilename() {
+        return exportFilePrefix + this.getBackupName() + "_" + sdf.format(this.saveDate.getTimeInMillis()) + exportFileDataType;
     }
 
-    public static Date getDateFromFilename(String filename) throws ParseException{
-
-        String nameAndDate = filename.replace(exportFilePrefix, "").replace(exportFileDataType, "");
+    private String getBackupNameFromFilename(String filename) {
+        String nameAndDate = filename.replace(exportFilePrefix,"").replace(exportFileDataType,"");
 
         // Create a Pattern object
         final Pattern r = Pattern.compile("\\d+_\\d+");
@@ -93,19 +117,26 @@ public class DatabaseBackup implements Comparable<DatabaseBackup> {
         // Now create matcher object.
         Matcher m = r.matcher(nameAndDate);
         if (m.find( )) {
-            return sdf.parse(m.group(0));
+            String date = m.group(0);
+            return nameAndDate.replace("_" + date,"");
         }else {
-            Log.d(LOG_TAG,"getDateFromFilename(): could not find the date included in the name \"" + nameAndDate + "\"");
+            Log.d(LOG_TAG,"getBackupNameFromFilename(): could not find the date included in the name \"" + nameAndDate + "\"");
         }
 
-        return new Date();
+        return nameAndDate;
     }
 
+    /**
+     * checks if a file is a backup file of EggManager depending on the filename
+     * @param filename Name of the file to check
+     * @return status wheather the file is an EggManager backup file or not
+     */
     public static boolean isEggManagerBackupFile(String filename) {
         return (filename.length() > (exportFilePrefix.length() + exportFileDataType.length()) &&
                 filename.substring(0, exportFilePrefix.length()).equals(exportFilePrefix) &&
                 filename.substring(filename.length()-exportFileDataType.length()).equals(exportFileDataType));
     }
+
 
     @Override
     public int compareTo(DatabaseBackup otherBackup) {
