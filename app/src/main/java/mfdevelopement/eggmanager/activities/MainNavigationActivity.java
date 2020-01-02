@@ -17,8 +17,12 @@ import androidx.navigation.ui.NavigationUI;
 import com.google.android.material.navigation.NavigationView;
 
 import mfdevelopement.eggmanager.R;
+import mfdevelopement.eggmanager.data_models.DailyBalance;
 import mfdevelopement.eggmanager.dialog_fragments.SortingDialogFragment;
 import mfdevelopement.eggmanager.viewmodels.SharedViewModel;
+
+import static mfdevelopement.eggmanager.utils.AppNotificationManager.INTENT_ACTION_OPEN_BACKUP;
+import static mfdevelopement.eggmanager.utils.AppNotificationManager.INTENT_ACTION_OPEN_DATABASE;
 
 public class MainNavigationActivity extends AppCompatActivity
         implements SortingDialogFragment.OnSortingItemClickListener{
@@ -87,9 +91,21 @@ public class MainNavigationActivity extends AppCompatActivity
                 R.id.nav_backup)
                 .setDrawerLayout(drawer)
                 .build();
+
         navController = Navigation.findNavController(this, R.id.nav_host_fragment);
         NavigationUI.setupActionBarWithNavController(this, navController, mAppBarConfiguration);
         NavigationUI.setupWithNavController(navigationView, navController);
+
+        // switch to a specific fragment if defined in the intent
+        if (getIntent() != null && getIntent().getAction() != null) {
+            String requestedFragment = getIntent().getAction();
+
+            if (requestedFragment.equals(INTENT_ACTION_OPEN_DATABASE))
+                navController.navigate(R.id.nav_main_database);
+            else if (requestedFragment.equals(INTENT_ACTION_OPEN_BACKUP))
+                navController.navigate(R.id.nav_backup);
+        }
+
     }
 
     @Override
@@ -136,7 +152,12 @@ public class MainNavigationActivity extends AppCompatActivity
             return super.onContextItemSelected(item);
     }
 
-    public void abc(String filename) {
+    public void onBackupCreated(String filename) {
         getBackupListener().onBackupCreated(filename);
+    }
+
+    public void updateDailyBalance(DailyBalance dailyBalance) {
+        Log.d(LOG_TAG,"updateDailyBalance() called with DailyBalance for " + dailyBalance.getDateKey());
+        viewModel.insert(dailyBalance);
     }
 }

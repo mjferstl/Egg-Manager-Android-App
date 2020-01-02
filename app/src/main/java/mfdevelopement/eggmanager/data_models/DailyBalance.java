@@ -8,13 +8,16 @@ import androidx.room.Entity;
 import androidx.room.Ignore;
 import androidx.room.PrimaryKey;
 
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.Serializable;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 import java.util.Locale;
 
 @Entity(tableName = "dailyBalanceTable")
@@ -167,6 +170,38 @@ public class DailyBalance implements Serializable, Comparable<DailyBalance> {
 
         return jsonObject;
     }
+
+
+    /**
+     * parse a JSONArray to a list of DailyBalance objects
+     * @param jsonArray JSONArray containing data for a DailyBalance
+     * @return List<DailyBalance> list of DailyBalance objects
+     */
+    public static List<DailyBalance> getDailyBalanceFromJSON(JSONArray jsonArray) {
+
+        List<DailyBalance> dailyBalanceList = new ArrayList<>();
+
+        JSONObject item;
+
+        for (int i = 0; i < jsonArray.length(); i++) {
+            try {
+                item = jsonArray.getJSONObject(i);
+                String dateKey = item.getString(DailyBalance.COL_DATE_PRIMARY_KEY);
+                int eggsCollected = item.getInt(DailyBalance.COL_EGGS_COLLECTED_NAME);
+                int eggsSold = item.getInt(DailyBalance.COL_EGGS_SOLD_NAME);
+                double pricePerEgg = item.getDouble(DailyBalance.COL_PRICE_PER_EGG);
+                int numHens = item.getInt(DailyBalance.COL_NUMBER_HENS);
+
+                dailyBalanceList.add(new DailyBalance(dateKey, eggsCollected, eggsSold, pricePerEgg, numHens));
+            } catch (JSONException e) {
+                e.printStackTrace();
+                return dailyBalanceList;
+            }
+        }
+
+        return dailyBalanceList;
+    }
+
 
     @Override
     public int compareTo(DailyBalance otherDailyBalance) {

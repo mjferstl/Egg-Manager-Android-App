@@ -26,7 +26,6 @@ import com.google.android.material.snackbar.Snackbar;
 
 import org.json.JSONArray;
 import org.json.JSONException;
-import org.json.JSONObject;
 
 import java.io.File;
 import java.lang.ref.WeakReference;
@@ -41,6 +40,7 @@ import mfdevelopement.eggmanager.activities.MainNavigationActivity;
 import mfdevelopement.eggmanager.data_models.DailyBalance;
 import mfdevelopement.eggmanager.data_models.DatabaseBackup;
 import mfdevelopement.eggmanager.list_adapters.DatabaseBackupListAdapter;
+import mfdevelopement.eggmanager.utils.AppNotificationManager;
 import mfdevelopement.eggmanager.utils.FileUtil;
 import mfdevelopement.eggmanager.utils.JSONUtil;
 import mfdevelopement.eggmanager.viewmodels.SharedViewModel;
@@ -55,7 +55,7 @@ public class DatabaseBackupFragment extends Fragment {
     private final SimpleDateFormat sdf_date = new SimpleDateFormat("dd.MM.yyyy", stringFormatLocale);
 
     // get path to the directory, where the EggManager backup files are stored
-    private final String publicDataDir = Environment.getExternalStorageDirectory().getPath();
+    private static final String publicDataDir = Environment.getExternalStorageDirectory().getPath();
 
     // View Model
     private SharedViewModel viewModel;
@@ -71,6 +71,8 @@ public class DatabaseBackupFragment extends Fragment {
 
     private List<DailyBalance> allDailyBalances;
 
+    private AppNotificationManager appNotificationManager;
+
 
     @Nullable
     @Override
@@ -78,6 +80,9 @@ public class DatabaseBackupFragment extends Fragment {
 
         View root = inflater.inflate(R.layout.fragment_database_backup, container,false);
         mainRoot = root;
+
+        appNotificationManager = new AppNotificationManager(getActivity());
+        appNotificationManager.createNotificationChannel();
 
         // get the view model
         viewModel = new ViewModelProvider(this).get(SharedViewModel.class);
@@ -169,7 +174,7 @@ public class DatabaseBackupFragment extends Fragment {
             snackbarText = "Fehler beim Löschen der Datensicherung";
 
         // show a snackbar to inform the user about the delete progress
-        Snackbar.make(mainRoot.findViewById(idSnackbarContainer), snackbarText, Snackbar.LENGTH_SHORT).show();
+        //Snackbar.make(mainRoot.findViewById(idSnackbarContainer), snackbarText, Snackbar.LENGTH_SHORT).show();
 
         // update the entries in the recycler view
         updateRecyclerView();
@@ -180,61 +185,12 @@ public class DatabaseBackupFragment extends Fragment {
      * @param backup DatabaseBackup
      */
     private void importBackup(DatabaseBackup backup) {
-        String filename = backup.getFilename();
+        Log.d(LOG_TAG,"importBackup()");
 
-        // read the content of the file
-        File file = new File(publicDataDir, filename);
-        String content = FileUtil.readFile(file);
-
-        // convert String to JSONObject
-        JSONArray jsonArray = JSONUtil.getJSONObject(content);
-
-        // check if data was loaded
-        if (jsonArray == null || jsonArray.length() == 0) {
-            Snackbar.make(mainRoot.findViewById(idSnackbarContainer), getString(R.string.snackbar_error_loading_data_from_database), Snackbar.LENGTH_SHORT).show();
-            return;
-        }
-
-        // import data to the database. If data exists, it gets overwritten
-        List<DailyBalance> dailyBalances = getDailyBalancFromJSON(jsonArray);
-        for (int i = 0; i < dailyBalances.size(); i++) {
-            Log.d(LOG_TAG, "Date of loaded data: " + sdf_date.format(dailyBalances.get(i).getDate()));
-            viewModel.insert(dailyBalances.get(i));
-        }
-
-        // inform the user about the process
-        Snackbar.make(mainRoot.findViewById(idSnackbarContainer), String.format(getString(R.string.snackbar_data_imported_successfully), dailyBalances.size()), Snackbar.LENGTH_SHORT).show();
+        // load the backup in an async task
+        new importBackupAsyncTask((MainNavigationActivity) getActivity()).execute(backup.getFilename());
     }
 
-    /**
-     * parse a JSONArray to a list of DailyBalance objects
-     * @param jsonArray JSONArray containing data for a DailyBalance
-     * @return List<DailyBalance> list of DailyBalance objects
-     */
-    private List<DailyBalance> getDailyBalancFromJSON(JSONArray jsonArray) {
-
-        List<DailyBalance> dailyBalanceList = new ArrayList<>();
-
-        JSONObject item;
-
-        for (int i = 0; i < jsonArray.length(); i++) {
-            try {
-                item = jsonArray.getJSONObject(i);
-                String dateKey = item.getString(DailyBalance.COL_DATE_PRIMARY_KEY);
-                int eggsCollected = item.getInt(DailyBalance.COL_EGGS_COLLECTED_NAME);
-                int eggsSold = item.getInt(DailyBalance.COL_EGGS_SOLD_NAME);
-                double pricePerEgg = item.getDouble(DailyBalance.COL_PRICE_PER_EGG);
-                int numHens = item.getInt(DailyBalance.COL_NUMBER_HENS);
-
-                dailyBalanceList.add(new DailyBalance(dateKey, eggsCollected, eggsSold, pricePerEgg, numHens));
-            } catch (JSONException e) {
-                e.printStackTrace();
-                return dailyBalanceList;
-            }
-        }
-
-        return dailyBalanceList;
-    }
 
     /**
      * check if the permission to write to the external storage is given
@@ -452,7 +408,72 @@ public class DatabaseBackupFragment extends Fragment {
                 return;
 
             Log.d(LOG_TAG,"sending name of the created file \"" + filename + "\" to the main activity");
-            activity.abc(filename);
+            activity.onBackupCreated(filename);
+        }
+    }
+
+    private static class importBackupAsyncTask extends AsyncTask<String, Void, Integer> {
+
+        private WeakReference<MainNavigationActivity> weakReference;
+        private final String LOG_TAG = "importBackupAsyncTask";
+
+        private AppNotificationManager appNotificationManager;
+
+        private final SimpleDateFormat sdf_date = new SimpleDateFormat("dd.MM.yyyy", Locale.ENGLISH);
+
+        importBackupAsyncTask(MainNavigationActivity context) {
+            weakReference = new WeakReference<>(context);
+            appNotificationManager = new AppNotificationManager(context);
+            appNotificationManager.createNotificationChannel();
+        }
+
+        @Override
+        protected Integer doInBackground(String... strings) {
+            String filename = strings[0];
+
+            MainNavigationActivity activity = weakReference.get();
+
+            // read the content of the file
+            File file = new File(publicDataDir, filename);
+            String content = FileUtil.readFile(file);
+
+            // convert String to JSONObject
+            JSONArray jsonArray = JSONUtil.getJSONObject(content);
+
+            // check if data was loaded
+            if (jsonArray == null || jsonArray.length() == 0)
+                return 0;
+
+            // import data to the database. If data exists, it gets overwritten
+            List<DailyBalance> dailyBalances = DailyBalance.getDailyBalanceFromJSON(jsonArray);
+
+            Log.d(LOG_TAG,"backup contains " + dailyBalances.size() + " entries");
+
+            appNotificationManager.showImportNotification(filename);
+
+            for (int i = 0; i < dailyBalances.size(); i++) {
+                Log.d(LOG_TAG, "Date of loaded data: " + sdf_date.format(dailyBalances.get(i).getDate()));
+                activity.updateDailyBalance(dailyBalances.get(i));
+                appNotificationManager.updateImportNotification(((i+1)*100)/dailyBalances.size());
+
+                try {
+                    Thread.sleep(200);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+            }
+
+            return dailyBalances.size();
+        }
+
+        @Override
+        protected void onPostExecute(Integer numitems) {
+            super.onPostExecute(numitems);
+
+            if (numitems > 0)
+                appNotificationManager.setImportNotificationFinished("Import abgeschlossen.\n" + numitems + " Einträge eingelesen.");
+            else
+                appNotificationManager.setImportNotificationFinished("Fehler beim Einlesen der Daten. Keine neuen Daten importiert.");
         }
     }
 }
