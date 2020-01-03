@@ -62,7 +62,8 @@ public class DatabaseBackupListAdapter extends RecyclerView.Adapter<DatabaseBack
         DatabaseBackup backup = data.get(position);
 
         holder.txtv_name.setText(backup.getBackupName());
-        holder.txtv_date.setText(backup.getFormattedSaveDate());
+        String fileInfo = backup.getFormattedSaveDate() + " - " + backup.getFileSizeFormatted();
+        holder.txtv_date.setText(fileInfo);
     }
 
     public void setDatabaseBackupList(List<DatabaseBackup> backupList){

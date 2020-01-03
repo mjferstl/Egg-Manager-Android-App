@@ -45,7 +45,7 @@ public class NewEntityActivity extends AppCompatActivity implements DatePickerFr
 
     private TextView dateTextView;
     private EditText eggsCollectedEditText, eggsSoldEditText, pricePerEggEditText;
-    private final SimpleDateFormat sdf_key = new SimpleDateFormat(DailyBalance.dateKeyFormat, Locale.getDefault());
+    private final SimpleDateFormat sdf_key = new SimpleDateFormat(DailyBalance.DATE_KEY_FORMAT, Locale.getDefault());
     private final SimpleDateFormat sdf_weekday = new SimpleDateFormat("EE, dd.MM.yyyy", Locale.getDefault());
     private NewEntityViewModel newEntityViewModel;
     private final int NOT_SET = DailyBalance.NOT_SET;

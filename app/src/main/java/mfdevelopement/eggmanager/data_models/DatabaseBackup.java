@@ -23,6 +23,8 @@ public class DatabaseBackup implements Comparable<DatabaseBackup> {
     private String backupName, filename;
     private Calendar saveDate;
 
+    private long fileSize;
+
     public DatabaseBackup() {
         this("unnamed");
     }
@@ -32,24 +34,9 @@ public class DatabaseBackup implements Comparable<DatabaseBackup> {
     }
 
     public DatabaseBackup(String backupName, Calendar saveDate) {
-        this.backupName = backupName;
+        setBackupName(backupName);
         this.saveDate = saveDate;
         this.filename = createBackupFilename();
-    }
-
-    public DatabaseBackup(String backupName, Date date) {
-        this(backupName);
-        Calendar cal = Calendar.getInstance();
-        cal.setTime(date);
-        this.setSaveDate(cal);
-    }
-
-    public DatabaseBackup(String filename, long timestamp) {
-        this.filename = filename;
-        this.backupName = getBackupNameFromFilename(this.filename);
-        Calendar calendar = Calendar.getInstance();
-        calendar.setTimeInMillis(timestamp);
-        this.saveDate = calendar;
     }
 
     public DatabaseBackup(File file) {
@@ -58,6 +45,7 @@ public class DatabaseBackup implements Comparable<DatabaseBackup> {
         Calendar calendar = Calendar.getInstance();
         calendar.setTimeInMillis(file.lastModified());
         this.saveDate = calendar;
+        this.fileSize = file.length();
     }
 
     public String getBackupName() {
@@ -68,12 +56,19 @@ public class DatabaseBackup implements Comparable<DatabaseBackup> {
     }
 
     public void setBackupName(String backupName) {
-        this.backupName = backupName;
+        if (backupName.equals(""))
+            this.backupName = "unnamed";
+        else
+            this.backupName = backupName;
+
         this.filename = createBackupFilename();
     }
 
     public Calendar getSaveDate() {
-        return saveDate;
+        if (this.saveDate != null)
+            return this.saveDate;
+        else
+            return Calendar.getInstance();
     }
 
     public void setSaveDate(Calendar saveDate) {
@@ -95,8 +90,29 @@ public class DatabaseBackup implements Comparable<DatabaseBackup> {
         this.backupName = getBackupNameFromFilename(this.filename);
     }
 
+    public long getFileSize() {
+        return fileSize;
+    }
+
+    public String getFileSizeFormatted() {
+        if (this.fileSize < 1_000)
+            return this.fileSize + " Bytes";
+        else if (this.fileSize > 1_000 && this.fileSize <= 1_000_000)
+            return String.format(Locale.getDefault(), "%.1f KB", this.fileSize/1e3);
+        else if (this.fileSize > 1_000_000 && this.fileSize <= 1_000_000_000)
+            return String.format(Locale.getDefault(), "%.1f MB", this.fileSize/1e6);
+        else if (this.fileSize > 1_000_000_000)
+            return String.format(Locale.getDefault(), "%.1f GB", this.fileSize/1e9);
+        else
+            return "";
+    }
+
+    public void setFileSize(long fileSize) {
+        this.fileSize = fileSize;
+    }
+
     public String getFormattedSaveDate() {
-        SimpleDateFormat sdf = new SimpleDateFormat("dd.MM.yyyy HH:mm:ss", Locale.getDefault());
+        SimpleDateFormat sdf = new SimpleDateFormat("dd.MM.yyyy HH:mm", Locale.getDefault());
         return sdf.format(this.saveDate.getTimeInMillis());
     }
 
@@ -105,7 +121,7 @@ public class DatabaseBackup implements Comparable<DatabaseBackup> {
      * @return
      */
     private String createBackupFilename() {
-        return exportFilePrefix + this.getBackupName() + "_" + sdf.format(this.saveDate.getTimeInMillis()) + exportFileDataType;
+        return exportFilePrefix + this.getBackupName() + "_" + sdf.format(this.getSaveDate().getTimeInMillis()) + exportFileDataType;
     }
 
     private String getBackupNameFromFilename(String filename) {

@@ -70,8 +70,8 @@ public class AppNotificationManager {
 
         importNotificationBuilder = new NotificationCompat.Builder(this.context, NOTIFICATION_CHANNEL_ID)
                 .setSmallIcon(R.drawable.ic_import_export_black_24dp)
-                .setContentTitle("Import des Backups \"" + backupName + "\"")
-                .setContentText("Backup wird eingelesen")
+                .setContentTitle(this.context.getString(R.string.notification_import_title_prefix) + " \"" + backupName + "\"")
+                .setContentText(this.context.getString(R.string.notification_importing_backup))
                 .setPriority(NotificationCompat.PRIORITY_LOW)
                 // Set the intent that will fire when the user taps the notification
                 .setContentIntent(pendingIntent)
@@ -112,7 +112,7 @@ public class AppNotificationManager {
     }
 
     public void setImportNotificationFinished() {
-        setImportNotificationFinished("Import abgeschlossen");
+        setImportNotificationFinished(this.context.getString(R.string.notification_import_finished));
     }
 
     public void setImportNotificationFinished(String notificationText) {

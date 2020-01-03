@@ -7,6 +7,7 @@
     <string name="title_activity_new_entity">Tagesbilanz</string>
     <string name="title_activity_database_import_export">Datensicherung</string>
     <string name="title_activity_filter">Daten filtern</string>
+    <string name="title_activity_data_check">Datenprüfung</string>
 
     <!-- action bars -->
     <string name="action_filter">Filtern</string>
@@ -39,6 +40,11 @@
     <string name="txt_backup">Sichern Sie Ihre Daten in einer Datei auf dem Gerät. Gespeicherte Daten können Sie bei Bedarf wieder laden.</string>
     <string name="txt_no_backup_files">Es wurde noch keine Datensicherung erstellt.\nKlicken Sie auf dieses Feld oder das + um eine neue Datensicherung auf dem Gerät zu erstellen.</string>
     <string name="heading_found_backups">Vorhandene Datensicherungen</string>
+    <string name="dialog_button_backup_create">Erstellen</string>
+    <string name="dialog_button_cancel">Abbruch</string>
+    <string name="notification_import_title_prefix">Import des Backups</string>
+    <string name="notification_import_finished">Import abgeschlossen</string>
+    <string name="notification_importing_backup">Backup wird eingelesen</string>
 
     <!-- filter activity -->
     <string name="menu_action_apply">Anwenden</string>

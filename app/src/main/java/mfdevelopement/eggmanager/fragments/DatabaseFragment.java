@@ -31,6 +31,7 @@ import java.util.List;
 import java.util.Locale;
 
 import mfdevelopement.eggmanager.R;
+import mfdevelopement.eggmanager.activities.DataCompletenessCheckActivity;
 import mfdevelopement.eggmanager.activities.FilterActivity;
 import mfdevelopement.eggmanager.activities.MainNavigationActivity;
 import mfdevelopement.eggmanager.activities.NewEntityActivity;
@@ -188,8 +189,8 @@ public class DatabaseFragment extends Fragment {
     }
 
     /**
-     * action when the user clicks a item on the action bar
-     * @param item MenuItem of the ation bar
+     * action when the user clicks on an item at the action bar
+     * @param item selected MenuItem of the Action Bar
      * @return
      */
     @Override
@@ -205,6 +206,8 @@ public class DatabaseFragment extends Fragment {
                 break;
             case R.id.action_data_sort:
                 showSortingDialog();
+            case R.id.action_completeness_check:
+                openCompletenessCheckActivity();
         }
         return super.onOptionsItemSelected(item);
     }
@@ -245,6 +248,11 @@ public class DatabaseFragment extends Fragment {
         intent.putExtra(EXTRA_REQUEST_CODE_NAME, EDIT_FILTER_STRING_REQUEST_CODE);
         //setupExitSlideAnimation();
         startActivityForResult(intent, EDIT_FILTER_STRING_REQUEST_CODE);
+    }
+
+    private void openCompletenessCheckActivity() {
+        Intent intent = new Intent(mainContext, DataCompletenessCheckActivity.class);
+        startActivity(intent);
     }
 
     private void setupExitSlideAnimation() {

@@ -29,7 +29,7 @@ public class DailyBalance implements Serializable, Comparable<DailyBalance> {
     public static final String COL_PRICE_PER_EGG = "pricePerEgg";
     public static final String COL_NUMBER_HENS = "numberOfHens";
     public static final String COL_MONEY_EARNED = "moneyEarned";
-    public static final String dateKeyFormat = "yyyyMMdd";
+    public static final String DATE_KEY_FORMAT = "yyyyMMdd";
     public static final int NOT_SET = 0;
 
     private static final String LOG_TAG = "DailyBalance";
@@ -74,7 +74,7 @@ public class DailyBalance implements Serializable, Comparable<DailyBalance> {
     }
 
     private String getDateKey(Date date) {
-        SimpleDateFormat sdf = new SimpleDateFormat(dateKeyFormat, Locale.getDefault());
+        SimpleDateFormat sdf = new SimpleDateFormat(DATE_KEY_FORMAT, Locale.getDefault());
         return sdf.format(date);
     }
 
@@ -98,7 +98,7 @@ public class DailyBalance implements Serializable, Comparable<DailyBalance> {
     public double getPricePerEgg() { return this.pricePerEgg; }
 
     public Date getDate() {
-        SimpleDateFormat sdf = new SimpleDateFormat(dateKeyFormat, Locale.getDefault());
+        SimpleDateFormat sdf = new SimpleDateFormat(DATE_KEY_FORMAT, Locale.getDefault());
         Date date;
 
         try {

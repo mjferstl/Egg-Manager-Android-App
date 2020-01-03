@@ -1,6 +1,7 @@
 package mfdevelopement.eggmanager.fragments;
 
 import android.Manifest;
+import android.content.DialogInterface;
 import android.content.pm.PackageManager;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -9,11 +10,13 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.appcompat.app.AlertDialog;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
@@ -52,7 +55,6 @@ public class DatabaseBackupFragment extends Fragment {
 
     // Locale is ENGLISH for importing and exporting data
     private final Locale stringFormatLocale = Locale.ENGLISH;
-    private final SimpleDateFormat sdf_date = new SimpleDateFormat("dd.MM.yyyy", stringFormatLocale);
 
     // get path to the directory, where the EggManager backup files are stored
     private static final String publicDataDir = Environment.getExternalStorageDirectory().getPath();
@@ -71,8 +73,6 @@ public class DatabaseBackupFragment extends Fragment {
 
     private List<DailyBalance> allDailyBalances;
 
-    private AppNotificationManager appNotificationManager;
-
 
     @Nullable
     @Override
@@ -80,9 +80,6 @@ public class DatabaseBackupFragment extends Fragment {
 
         View root = inflater.inflate(R.layout.fragment_database_backup, container,false);
         mainRoot = root;
-
-        appNotificationManager = new AppNotificationManager(getActivity());
-        appNotificationManager.createNotificationChannel();
 
         // get the view model
         viewModel = new ViewModelProvider(this).get(SharedViewModel.class);
@@ -153,7 +150,7 @@ public class DatabaseBackupFragment extends Fragment {
         if (adapter.getItemCount() == 0) {
             linearLayoutRecyclerView.setVisibility(View.GONE);
             linearLayoutRecyclerViewEmpty.setVisibility(View.VISIBLE);
-            txtv_recv_empty.setOnClickListener(v -> createNewBackup());
+            txtv_recv_empty.setOnClickListener(v -> showDialogCreateBackup());
         } else {
             linearLayoutRecyclerView.setVisibility(View.VISIBLE);
             linearLayoutRecyclerViewEmpty.setVisibility(View.GONE);
@@ -166,15 +163,9 @@ public class DatabaseBackupFragment extends Fragment {
         File file = new File(publicDataDir, filename);
         boolean fileDeleted = file.delete();
 
-        // create snackbar text depending on the result of the delete process
-        String snackbarText = "";
-        if (fileDeleted)
-            snackbarText = "Datensicherung gelöscht";
-        else
-            snackbarText = "Fehler beim Löschen der Datensicherung";
-
-        // show a snackbar to inform the user about the delete progress
-        //Snackbar.make(mainRoot.findViewById(idSnackbarContainer), snackbarText, Snackbar.LENGTH_SHORT).show();
+        // show a snackbar to inform the user if deleting the file was not finished successfully
+        if (!fileDeleted)
+            Snackbar.make(mainRoot.findViewById(idSnackbarContainer), "Fehler beim Löschen der Datensicherung", Snackbar.LENGTH_SHORT).show();
 
         // update the entries in the recycler view
         updateRecyclerView();
@@ -264,8 +255,44 @@ public class DatabaseBackupFragment extends Fragment {
                 Environment.MEDIA_MOUNTED_READ_ONLY.equals(state));
     }
 
+    /**
+     * show an Alert Dialog containing a EditText field for entering the name of the backup
+     */
+    private void showDialogCreateBackup() {
 
-    private void createNewBackup() {
+        if (getActivity() == null)
+            return;
+
+        // create an EditText field for entering a backup name
+        float factor = getActivity().getResources().getDisplayMetrics().density;
+        final EditText input = new EditText(getActivity());
+        input.setHint("Names des Backups");
+        int small_margin = (int) (getActivity().getResources().getDimension(R.dimen.small_padding) * factor);
+        int large_margin = (int) (getActivity().getResources().getDimension(R.dimen.large_padding) * factor);
+        int medium_margin = (small_margin + large_margin) / 2;
+
+        // create a new AlertDialog, which contains the EditText field
+        final AlertDialog alertDialog = new AlertDialog.Builder(getActivity()).create();
+        alertDialog.setTitle("Neue Datensicherung");
+        alertDialog.setMessage("Geben Sie einen Namen für das Backup ein");
+        alertDialog.setView(input, medium_margin, 0, medium_margin, 0);
+        alertDialog.setButton(DialogInterface.BUTTON_POSITIVE, "Erstellen", (dialog, which) -> {
+            String newBackupName = input.getText().toString().trim();
+            Log.d(LOG_TAG,"create new Backup with title: \"" + newBackupName + "\"");
+            createNewBackup(newBackupName);
+        });
+        alertDialog.setButton(DialogInterface.BUTTON_NEUTRAL,"Abbruch", (dialog, which) -> alertDialog.dismiss());
+
+        alertDialog.show();
+    }
+
+
+    /**
+     * Create a new backup file in JSON-Format containing all Entries of the database
+     * @param backupName Name of the backup used for the filename and for displaying in the GUI
+     */
+    private void createNewBackup(String backupName) {
+
         requestWritePermission();
 
         if (isExternalStorageWritable()) {
@@ -281,6 +308,7 @@ public class DatabaseBackupFragment extends Fragment {
 
                     // save the JSONArray to file as a String
                     DatabaseBackup backup = new DatabaseBackup();
+                    backup.setBackupName(backupName);
                     new createBackupAsyncTask((MainNavigationActivity) getActivity()).execute(backup.getFilename(), jsonArray.toString());
                 }
             } else {
@@ -292,6 +320,10 @@ public class DatabaseBackupFragment extends Fragment {
         }
     }
 
+    /**
+     * Get all EggManager backup files on the device
+     * @return List<DatabaseBackup> containing all backups found
+     */
     private List<DatabaseBackup> getBackupFiles() {
 
         String fileName;
@@ -320,7 +352,7 @@ public class DatabaseBackupFragment extends Fragment {
                     Log.d(LOG_TAG,"backup file: " + fileName + ", last modified: " + simpleDateFormat.format(file.lastModified()) + ", size: " + file.length() + " bytes");
 
                     // add the date to the list
-                    backupFiles.add(new DatabaseBackup(fileName, file.lastModified()));
+                    backupFiles.add(new DatabaseBackup(file));
                 }
             }
 
@@ -353,13 +385,13 @@ public class DatabaseBackupFragment extends Fragment {
 
 
     /**
-     * Initialize the Floating Action Button for creating new backups
+     * Initialize the Floating Action Button
      */
     private void initFab() {
         FloatingActionButton fab = mainRoot.findViewById(R.id.fab_database_content);
         fab.setOnClickListener(v -> {
             Log.d(LOG_TAG,"user wants to create a new backup");
-            createNewBackup();
+            showDialogCreateBackup();
         });
     }
 
@@ -467,11 +499,11 @@ public class DatabaseBackupFragment extends Fragment {
         }
 
         @Override
-        protected void onPostExecute(Integer numitems) {
-            super.onPostExecute(numitems);
+        protected void onPostExecute(Integer numItems) {
+            super.onPostExecute(numItems);
 
-            if (numitems > 0)
-                appNotificationManager.setImportNotificationFinished("Import abgeschlossen.\n" + numitems + " Einträge eingelesen.");
+            if (numItems > 0)
+                appNotificationManager.setImportNotificationFinished("Import abgeschlossen.\n" + numItems + " Einträge eingelesen.");
             else
                 appNotificationManager.setImportNotificationFinished("Fehler beim Einlesen der Daten. Keine neuen Daten importiert.");
         }
