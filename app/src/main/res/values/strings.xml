@@ -51,6 +51,10 @@
     <string name="subheading_years">Jahr</string>
     <string name="subheading_month">Monat</string>
 
+    <!-- data check activity -->
+    <string name="from">von</string>
+    <string name="to">bis</string>
+
     <!-- dialogs -->
     <!-- sorting dialog -->
     <string name="title_sorting_dialog">Daten sortieren</string>

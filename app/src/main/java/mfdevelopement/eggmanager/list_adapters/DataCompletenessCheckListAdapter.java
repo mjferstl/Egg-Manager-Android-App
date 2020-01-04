@@ -1,11 +1,12 @@
 package mfdevelopement.eggmanager.list_adapters;
 
 import android.content.Context;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageButton;
 import android.widget.ImageView;
+import android.widget.ListView;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -28,14 +29,21 @@ public class DataCompletenessCheckListAdapter extends RecyclerView.Adapter<DataC
 
     public class DataCompletenessCheckViewHolder extends RecyclerView.ViewHolder{
 
-        private TextView txtv_month_name;
+        private TextView txtv_month_name, txtv_extra_info;
         private ImageView imgv_icon;
+        private ImageButton imgbtn_expand;
+        private ListView lv_details;
 
         private DataCompletenessCheckViewHolder(View itemView) {
             super(itemView);
 
             txtv_month_name = itemView.findViewById(R.id.txtv_recycler_item_completeness_check_name);
             imgv_icon = itemView.findViewById(R.id.imgv_recycler_item_completeness_check_icon);
+            imgbtn_expand = itemView.findViewById(R.id.imgbtn_recycler_item_completeness_check_expand);
+            txtv_extra_info = itemView.findViewById(R.id.txtv_recycler_item_completeness_check_extra_info);
+            lv_details = itemView.findViewById(R.id.lv_recycler_item_completeness_check_details);
+
+            imgbtn_expand.setTag(R.drawable.ic_expand_more_black_24dp);
         }
     }
 
@@ -57,11 +65,41 @@ public class DataCompletenessCheckListAdapter extends RecyclerView.Adapter<DataC
         DataCheckMonthly monthyCheck = data.get(position);
 
         holder.txtv_month_name.setText(getFormattedMonthName(monthyCheck.getDateKeyMonth()));
-        if (monthyCheck.isComplete())
-            holder.imgv_icon.setImageDrawable(this.context.getDrawable(R.drawable.ic_check_black_24dp));
-        else {
-            holder.imgv_icon.setImageDrawable(this.context.getDrawable(R.drawable.ic_delete_black_24dp));
+        if (monthyCheck.isComplete()) {
+            holder.imgv_icon.setImageDrawable(this.context.getDrawable(R.drawable.ic_success));
+            holder.imgbtn_expand.setVisibility(View.GONE);
+        } else {
+            holder.imgv_icon.setImageDrawable(this.context.getDrawable(R.drawable.ic_error));
+            holder.imgbtn_expand.setVisibility(View.VISIBLE);
         }
+
+        holder.imgbtn_expand.setOnClickListener(v -> {
+            ImageButton imgbtn = (ImageButton) v;
+
+            switch((int)imgbtn.getTag()) {
+                case R.drawable.ic_expand_more_black_24dp:
+                    imgbtn.setImageDrawable(this.context.getDrawable(R.drawable.ic_expand_less_black_24dp));
+                    imgbtn.setTag(R.drawable.ic_expand_less_black_24dp);
+                    // TODO: expand list view
+                    //holder.lv_details.setVisibility(View.VISIBLE);
+                    List<String> missingDates = monthyCheck.getMissingDates();
+                    break;
+                case R.drawable.ic_expand_less_black_24dp:
+                    imgbtn.setImageDrawable(this.context.getDrawable(R.drawable.ic_expand_more_black_24dp));
+                    imgbtn.setTag(R.drawable.ic_expand_more_black_24dp);
+                    // TODO: collapse list view
+                    //holder.lv_details.setVisibility(View.GONE);
+                    break;
+            }
+        });
+
+        int daysOfMonth = monthyCheck.getFoundDates().size() + monthyCheck.getMissingDates().size();
+        String extraInfo = monthyCheck.getFoundDates().size() + "/" + daysOfMonth;
+        holder.txtv_extra_info.setText(extraInfo);
+    }
+
+    private void showListView() {
+
     }
 
     /**
@@ -71,7 +109,6 @@ public class DataCompletenessCheckListAdapter extends RecyclerView.Adapter<DataC
      * @return
      */
     private String getFormattedMonthName(String dateKeyYearMonth) {
-        Log.d(LOG_TAG,"curr date key to be formatted: " + dateKeyYearMonth);
         SimpleDateFormat sdf = new SimpleDateFormat("yyyyMM", Locale.getDefault());
         SimpleDateFormat sdf_result = new SimpleDateFormat("MMMM yyyy", Locale.getDefault());
 

@@ -203,11 +203,13 @@ public class DatabaseFragment extends Fragment {
         switch (id) {
             case R.id.action_data_filter:
                 openFilterActivity();
-                break;
+                return true;
             case R.id.action_data_sort:
                 showSortingDialog();
+                return true;
             case R.id.action_completeness_check:
                 openCompletenessCheckActivity();
+                return true;
         }
         return super.onOptionsItemSelected(item);
     }

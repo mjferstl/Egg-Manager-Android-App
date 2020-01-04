@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <item >
+        <shape android:shape="oval"
+            android:tint="@color/colorPrimary">
+            <corners android:radius="8dp"/>
+        </shape>
+    </item>
+
+    <item
+        android:drawable="@drawable/ic_check_white_24dp"
+        android:top="@dimen/small_padding"
+        android:left="@dimen/small_padding"
+        android:right="@dimen/small_padding"
+        android:bottom="@dimen/small_padding">
+    </item>
+
+</layer-list>
