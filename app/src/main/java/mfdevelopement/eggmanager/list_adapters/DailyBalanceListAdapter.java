@@ -62,7 +62,7 @@ public class DailyBalanceListAdapter extends RecyclerView.Adapter<DailyBalanceLi
     @Override
     @NonNull
     public DailyBalanceViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        View itemView = mInflater.inflate(R.layout.recyclerview_item, parent, false);
+        View itemView = mInflater.inflate(R.layout.recyclerview_item_database_item, parent, false);
         return new DailyBalanceViewHolder(itemView);
     }
 

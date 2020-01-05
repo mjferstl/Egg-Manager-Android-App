@@ -69,23 +69,17 @@ public class DatePickerFragment extends DialogFragment {
         }
 
         Button btn_cancel = v.findViewById(R.id.btn_cancel);
-        btn_cancel.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Log.d(LOG_TAG,"Dialog canceled");
-                dismiss();
-            }
+        btn_cancel.setOnClickListener(v12 -> {
+            Log.d(LOG_TAG,"Dialog canceled");
+            dismiss();
         });
 
         Button btn_ok = v.findViewById(R.id.btn_ok);
-        btn_ok.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Calendar cal = getDatePickerDate(datePicker);
-                listener.onAddDateSubmit(cal);
-                Log.d(LOG_TAG,"Date selected");
-                dismiss();
-            }
+        btn_ok.setOnClickListener(v1 -> {
+            Calendar cal = getDatePickerDate(datePicker);
+            listener.onAddDateSubmit(cal);
+            Log.d(LOG_TAG,"Date selected");
+            dismiss();
         });
         return v;
     }

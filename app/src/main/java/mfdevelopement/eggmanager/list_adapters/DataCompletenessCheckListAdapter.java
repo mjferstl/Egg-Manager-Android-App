@@ -1,6 +1,7 @@
 package mfdevelopement.eggmanager.list_adapters;
 
 import android.content.Context;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -14,11 +15,14 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 
 import mfdevelopement.eggmanager.R;
 import mfdevelopement.eggmanager.data_models.DataCheckMonthly;
+
+import static mfdevelopement.eggmanager.data_models.DailyBalance.DATE_KEY_FORMAT;
 
 public class DataCompletenessCheckListAdapter extends RecyclerView.Adapter<DataCompletenessCheckListAdapter.DataCompletenessCheckViewHolder> {
 
@@ -71,7 +75,17 @@ public class DataCompletenessCheckListAdapter extends RecyclerView.Adapter<DataC
         } else {
             holder.imgv_icon.setImageDrawable(this.context.getDrawable(R.drawable.ic_error));
             holder.imgbtn_expand.setVisibility(View.VISIBLE);
+
+            // fill in the list view
+            List<String> missingDates = getFormattedDateKey(monthyCheck.getMissingDates());
+            MissingDateListAdapter adapter = new MissingDateListAdapter(missingDates);
+            holder.lv_details.setAdapter(adapter);
+            Log.d(LOG_TAG,"adapter contains " + adapter.getCount() + " items");
         }
+        
+        // list view is hidden until the user wants to display it
+        holder.lv_details.setVisibility(View.GONE);
+        holder.imgbtn_expand.setTag(R.drawable.ic_expand_more_black_24dp);
 
         holder.imgbtn_expand.setOnClickListener(v -> {
             ImageButton imgbtn = (ImageButton) v;
@@ -80,33 +94,27 @@ public class DataCompletenessCheckListAdapter extends RecyclerView.Adapter<DataC
                 case R.drawable.ic_expand_more_black_24dp:
                     imgbtn.setImageDrawable(this.context.getDrawable(R.drawable.ic_expand_less_black_24dp));
                     imgbtn.setTag(R.drawable.ic_expand_less_black_24dp);
-                    // TODO: expand list view
-                    //holder.lv_details.setVisibility(View.VISIBLE);
-                    List<String> missingDates = monthyCheck.getMissingDates();
+                    holder.lv_details.setVisibility(View.VISIBLE);
                     break;
                 case R.drawable.ic_expand_less_black_24dp:
                     imgbtn.setImageDrawable(this.context.getDrawable(R.drawable.ic_expand_more_black_24dp));
                     imgbtn.setTag(R.drawable.ic_expand_more_black_24dp);
-                    // TODO: collapse list view
-                    //holder.lv_details.setVisibility(View.GONE);
+                    holder.lv_details.setVisibility(View.GONE);
                     break;
             }
         });
 
+        // create an extra info showing how many days of the month within the time period are in the database
         int daysOfMonth = monthyCheck.getFoundDates().size() + monthyCheck.getMissingDates().size();
         String extraInfo = monthyCheck.getFoundDates().size() + "/" + daysOfMonth;
         holder.txtv_extra_info.setText(extraInfo);
-    }
-
-    private void showListView() {
-
     }
 
     /**
      * Format a date in the syntax of "yyyyMM" to a date in the format "MMMM yyyy"
      * Example: "201910" gets formatted to "October 2019"
      * @param dateKeyYearMonth date in the format: yyyyMM
-     * @return
+     * @return String containing the formatted date
      */
     private String getFormattedMonthName(String dateKeyYearMonth) {
         SimpleDateFormat sdf = new SimpleDateFormat("yyyyMM", Locale.getDefault());
@@ -122,11 +130,32 @@ public class DataCompletenessCheckListAdapter extends RecyclerView.Adapter<DataC
         return formattedDate;
     }
 
+    private List<String> getFormattedDateKey(List<String> dateKeyList) {
+
+        List<String> formattedDates = new ArrayList<>();
+        SimpleDateFormat sdf = new SimpleDateFormat("dd.MM.yyyy", Locale.getDefault());
+        SimpleDateFormat sdf_date_keys = new SimpleDateFormat(DATE_KEY_FORMAT, Locale.getDefault());
+
+        for (String dateKey : dateKeyList) {
+            String formattedDate;
+
+            try {
+                formattedDate = sdf.format(sdf_date_keys.parse(dateKey));
+            } catch (ParseException e) {
+                e.printStackTrace();
+                formattedDate = "error";
+            }
+            formattedDates.add(formattedDate);
+        }
+
+        return formattedDates;
+    }
+
     /**
      * Set the tobe shown in the Recycler View
      * @param dataCheckMonthlyList List<DataCheckMonthly>
      */
-    public void setData(List<DataCheckMonthly> dataCheckMonthlyList) {
+    public void setData(@NonNull List<DataCheckMonthly> dataCheckMonthlyList) {
         this.data = dataCheckMonthlyList;
         notifyDataSetChanged();
     }

@@ -26,8 +26,6 @@
 
     <style name="AppTheme.PopupOverlay" parent="ThemeOverlay.AppCompat.Light" />
 
-    <!-- The default font for RecyclerView items is too small.
-    The margin is a simple delimiter between the words. -->
     <style name="date_style">
         <item name="android:layout_width">wrap_content</item>
         <item name="android:layout_marginBottom">@dimen/small_padding</item>
@@ -38,7 +36,31 @@
         <item name="android:textSize">@dimen/main_text_size</item>
     </style>
 
-    <style name="button_minmal">
+    <style name="basic_text">
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:textColor">@color/main_text_color</item>
+        <item name="android:textSize">@dimen/main_text_size</item>
+        <item name="android:paddingTop">@dimen/small_padding</item>
+        <item name="android:paddingBottom">@dimen/small_padding</item>
+        <item name="android:paddingStart">@dimen/small_padding</item>
+        <item name="android:paddingEnd">@dimen/small_padding</item>
+        <item name="android:layout_gravity">center_vertical</item>
+    </style>
+
+    <style name="basic_icon">
+        <item name="android:tint">@color/main_text_color</item>
+        <item name="android:background">@color/transparent</item>
+        <item name="android:paddingTop">@dimen/small_padding</item>
+        <item name="android:paddingStart">@dimen/small_padding</item>
+        <item name="android:paddingEnd">@dimen/small_padding</item>
+        <item name="android:paddingBottom">@dimen/small_padding</item>
+        <item name="android:layout_height">36dp</item>
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:gravity">center</item>
+    </style>
+
+    <style name="basic_button">
         <item name="android:layout_width">wrap_content</item>
         <item name="android:layout_height">wrap_content</item>
         <item name="android:background">@color/transparent</item>
@@ -51,9 +73,7 @@
         <item name="android:paddingTop">@dimen/small_padding</item>
     </style>
 
-    <style name="button_colored">
-        <item name="android:layout_width">wrap_content</item>
-        <item name="android:layout_height">wrap_content</item>
+    <style name="button_colored" parent="basic_button">
         <item name="android:background">@drawable/button_colored_background</item>
         <item name="android:textColor">@color/white</item>
         <item name="android:paddingLeft">@dimen/large_padding</item>
@@ -94,30 +114,19 @@
         <item name="android:layout_marginEnd">@dimen/large_padding</item>
     </style>
 
-    <style name="recycler_item_icon">
-        <item name="android:layout_width">wrap_content</item>
+    <style name="recycler_item_icon" parent="basic_icon">
         <item name="android:layout_height">30dp</item>
         <item name="android:maxHeight">10dp</item>
-        <item name="android:tint">@color/main_text_color</item>
         <item name="android:layout_gravity">center_vertical</item>
         <item name="android:layout_marginStart">@dimen/small_padding</item>
         <item name="android:layout_marginEnd">@dimen/small_padding</item>
+        <item name="android:padding">0dp</item>
+        <item name="android:paddingStart">0dp</item>
+        <item name="android:paddingEnd">0dp</item>
     </style>
 
     <style name="recycler_item_small_icon" parent="recycler_item_icon">
         <item name="android:layout_height">20dp</item>
-    </style>
-
-    <style name="basic_text">
-        <item name="android:layout_width">wrap_content</item>
-        <item name="android:layout_height">wrap_content</item>
-        <item name="android:textColor">@color/main_text_color</item>
-        <item name="android:textSize">@dimen/main_text_size</item>
-        <item name="android:paddingTop">@dimen/small_padding</item>
-        <item name="android:paddingBottom">@dimen/small_padding</item>
-        <item name="android:paddingStart">@dimen/small_padding</item>
-        <item name="android:paddingEnd">@dimen/small_padding</item>
-        <item name="android:layout_gravity">center_vertical</item>
     </style>
 
     <style name="recycler_item_filter_dialog_button" parent="@style/Widget.AppCompat.Button.Colored">

@@ -27,7 +27,7 @@
             android:layout_width="0dp"
             android:layout_height="0dp"
             android:background="@color/main_background"
-            tools:listitem="@layout/recyclerview_item"
+            tools:listitem="@layout/recyclerview_item_database_item"
             android:paddingTop="@dimen/small_padding"
             android:paddingBottom="@dimen/recycler_view_padding_bottom_for_fab"
             android:clipToPadding="false"
