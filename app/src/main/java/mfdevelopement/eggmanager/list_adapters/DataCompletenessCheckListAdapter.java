@@ -78,11 +78,11 @@ public class DataCompletenessCheckListAdapter extends RecyclerView.Adapter<DataC
 
             // fill in the list view
             List<String> missingDates = getFormattedDateKey(monthyCheck.getMissingDates());
-            MissingDateListAdapter adapter = new MissingDateListAdapter(missingDates);
+            MissingDateListAdapter adapter = new MissingDateListAdapter(this.context, missingDates);
             holder.lv_details.setAdapter(adapter);
             Log.d(LOG_TAG,"adapter contains " + adapter.getCount() + " items");
         }
-        
+
         // list view is hidden until the user wants to display it
         holder.lv_details.setVisibility(View.GONE);
         holder.imgbtn_expand.setTag(R.drawable.ic_expand_more_black_24dp);

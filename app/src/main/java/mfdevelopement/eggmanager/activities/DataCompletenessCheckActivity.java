@@ -1,5 +1,6 @@
 package mfdevelopement.eggmanager.activities;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.widget.TextView;
@@ -28,12 +29,14 @@ import mfdevelopement.eggmanager.R;
 import mfdevelopement.eggmanager.data_models.DailyBalance;
 import mfdevelopement.eggmanager.data_models.DataCheckMonthly;
 import mfdevelopement.eggmanager.dialog_fragments.DatePickerFragment;
+import mfdevelopement.eggmanager.fragments.DatabaseFragment;
 import mfdevelopement.eggmanager.list_adapters.DataCompletenessCheckListAdapter;
+import mfdevelopement.eggmanager.list_adapters.MissingDateListAdapter;
 import mfdevelopement.eggmanager.viewmodels.DataCheckViewModel;
 
 import static mfdevelopement.eggmanager.data_models.DailyBalance.DATE_KEY_FORMAT;
 
-public class DataCompletenessCheckActivity extends AppCompatActivity implements DatePickerFragment.OnAddDateListener {
+public class DataCompletenessCheckActivity extends AppCompatActivity implements DatePickerFragment.OnAddDateListener, MissingDateListAdapter.OnCreateEntityClickListener {
 
     private DataCheckViewModel viewModel;
 
@@ -43,12 +46,13 @@ public class DataCompletenessCheckActivity extends AppCompatActivity implements 
 
     // date formatter for the date keys
     private SimpleDateFormat sdf_date_keys = new SimpleDateFormat(DATE_KEY_FORMAT, Locale.getDefault());
-    private SimpleDateFormat sdf_human_readable = new SimpleDateFormat("dd.MM.yyyy", Locale.getDefault());
+    public static SimpleDateFormat sdf_human_readable = new SimpleDateFormat("dd.MM.yyyy", Locale.getDefault());
 
     private List<String> allDateKeys;
 
     private final String LOG_TAG = "DataCompletenessCheckAc";
 
+    // Constants to determine the date, which the user wants to change
     private final int START_DATE_PICKER_ID = 1;
     private final int END_DATE_PICKER_ID = 2;
 
@@ -84,6 +88,12 @@ public class DataCompletenessCheckActivity extends AppCompatActivity implements 
         initObservers();
     }
 
+    @Override
+    protected void onResume() {
+        super.onResume();
+        updateList();
+    }
+
     private void initRecyclerView() {
         RecyclerView recyclerView = findViewById(R.id.recv_data_completeness_check);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
@@ -92,6 +102,9 @@ public class DataCompletenessCheckActivity extends AppCompatActivity implements 
     }
 
     private void updateList() {
+
+        if (this.allDateKeys == null || adapter == null)
+            return;
 
         List<DataCheckMonthly> dataCheckMonthlyList;
 
@@ -245,5 +258,19 @@ public class DataCompletenessCheckActivity extends AppCompatActivity implements 
             updateList();
         } else
             Log.e(LOG_TAG,"onAddDateSubmit(): datePickerId is not START_DATE_PICKER_ID or END_DATE_PICKER_ID ");
+    }
+
+    @Override
+    public void onCreateEntityClicked(Calendar newDate) {
+        String dateString = sdf_human_readable.format(newDate.getTimeInMillis());
+        Log.d(LOG_TAG,"user wants to create a new entity for the date \"" + dateString + "\"");
+        createNewEntity(dateString);
+    }
+
+    private void createNewEntity(String dateString) {
+        Intent intent = new Intent(this, NewEntityActivity.class);
+        intent.putExtra(DatabaseFragment.EXTRA_REQUEST_CODE_NAME, DatabaseFragment.NEW_ENTITY_REQUEST_CODE);
+        intent.putExtra(DatabaseFragment.EXTRA_ENTITY_DATE, dateString);
+        startActivityForResult(intent, DatabaseFragment.NEW_ENTITY_REQUEST_CODE);
     }
 }

@@ -61,6 +61,7 @@ public class DatabaseFragment extends Fragment {
 
     public static final String EXTRA_REQUEST_CODE_NAME = "requestCode";
     public static final String EXTRA_DAILY_BALANCE = "extraDailyBalance";
+    public static final String EXTRA_ENTITY_DATE = "dailyBalanceDate";
     private final String LOG_TAG = "DatabaseFragment";
 
     private TextView txtv_summary_eggs_collected, txtv_summary_eggs_sold, txtv_summary_money_earned;

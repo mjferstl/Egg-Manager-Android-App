@@ -59,11 +59,7 @@
         <activity
             android:name=".activities.NewEntityActivity"
             android:label="@string/title_activity_new_entity"
-            android:parentActivityName=".fragments.DatabaseFragment"
             android:theme="@style/AppTheme.NoActionBar">
-            <meta-data
-                android:name="android.support.PARENT_ACTIVITY"
-                android:value="mfdevelopement.eggmanager.fragments.DatabaseFragment" />
         </activity>
         <activity
             android:name=".fragments.DatabaseFragment"

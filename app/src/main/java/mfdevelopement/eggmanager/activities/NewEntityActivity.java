@@ -19,7 +19,6 @@ import androidx.fragment.app.DialogFragment;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentActivity;
 import androidx.fragment.app.FragmentTransaction;
-import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
 
 import com.google.android.material.snackbar.Snackbar;
@@ -37,6 +36,8 @@ import mfdevelopement.eggmanager.dialog_fragments.DatePickerFragment;
 import mfdevelopement.eggmanager.fragments.DatabaseFragment;
 import mfdevelopement.eggmanager.utils.InputManager;
 import mfdevelopement.eggmanager.viewmodels.NewEntityViewModel;
+
+import static mfdevelopement.eggmanager.activities.DataCompletenessCheckActivity.sdf_human_readable;
 
 public class NewEntityActivity extends AppCompatActivity implements DatePickerFragment.OnAddDateListener {
 
@@ -87,13 +88,8 @@ public class NewEntityActivity extends AppCompatActivity implements DatePickerFr
         // get view model
         newEntityViewModel = new ViewModelProvider(this).get(NewEntityViewModel.class);
 
-        // set observer for datekeys
-        newEntityViewModel.getDateKeys().observe(this, new Observer<List<String>>() {
-            @Override
-            public void onChanged(List<String> strings) {
-                listDateKeys = strings;
-            }
-        });
+        // set observer for date keys
+        newEntityViewModel.getDateKeys().observe(this, strings -> listDateKeys = strings);
 
         double pricePerEgg = newEntityViewModel.getPricePerEgg();
         pricePerEggEditText.setText(String.format(Locale.getDefault(), PRICE_FORMAT, pricePerEgg));
@@ -121,6 +117,20 @@ public class NewEntityActivity extends AppCompatActivity implements DatePickerFr
                 loadedDate = Calendar.getInstance().getTime();
             }
             updateDate(loadedDate);
+        }
+        // the user wants to create a new entity
+        else if (requestCode == DatabaseFragment.NEW_ENTITY_REQUEST_CODE) {
+
+            // update the date, if the user wants to create an entity for a special date
+            String date = getIntent().getStringExtra(DatabaseFragment.EXTRA_ENTITY_DATE);
+            Log.d(LOG_TAG,"starting activity with date: \"" + date + "\"");
+            if (date != null) {
+                try {
+                    updateDate(sdf_human_readable.parse(date));
+                } catch (ParseException e) {
+                    e.printStackTrace();
+                }
+            }
         }
     }
 
