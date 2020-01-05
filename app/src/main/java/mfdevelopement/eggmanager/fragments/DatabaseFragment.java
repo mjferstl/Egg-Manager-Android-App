@@ -125,6 +125,13 @@ public class DatabaseFragment extends Fragment {
         return root;
     }
 
+    @Override
+    public void onResume() {
+        super.onResume();
+        if (adapter != null)
+            adapter.setItemsUnselected();
+    }
+
     private void updateEggsCollected(int numEggs) {
         Log.d(LOG_TAG,"updateEggsCollected(): updating number of collected eggs");
         txtv_summary_eggs_collected.setText(String.format(Locale.getDefault(), "%d" , numEggs));
