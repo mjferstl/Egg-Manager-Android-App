@@ -305,7 +305,7 @@ public class DatabaseFragment extends Fragment {
         String snackbarText = "";
 
         if (resultCode == RESULT_CANCELED) {
-            snackbarText = getString(R.string.entry_not_added);
+            //snackbarText = getString(R.string.entry_not_added);
         }
         else if (requestCode == NEW_ENTITY_REQUEST_CODE && resultCode == NEW_ENTITY_RESULT_CODE) {
             snackbarText = getString(R.string.new_entity_saved);

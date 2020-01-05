@@ -9,6 +9,7 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.widget.EditText;
+import android.widget.ImageButton;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -46,6 +47,7 @@ public class NewEntityActivity extends AppCompatActivity implements DatePickerFr
 
     private TextView dateTextView;
     private EditText eggsCollectedEditText, eggsSoldEditText, pricePerEggEditText;
+    private ImageButton btn_date_foreward, btn_date_backward;
     private final SimpleDateFormat sdf_key = new SimpleDateFormat(DailyBalance.DATE_KEY_FORMAT, Locale.getDefault());
     private final SimpleDateFormat sdf_weekday = new SimpleDateFormat("EE, dd.MM.yyyy", Locale.getDefault());
     private NewEntityViewModel newEntityViewModel;
@@ -76,8 +78,11 @@ public class NewEntityActivity extends AppCompatActivity implements DatePickerFr
         eggsSoldEditText = findViewById(R.id.etxt_sold_eggs);
         pricePerEggEditText = findViewById(R.id.etxt_egg_price);
 
+        btn_date_foreward = findViewById(R.id.imgbtn_date_foreward);
+        btn_date_backward = findViewById(R.id.imgbtn_date_backward);
+
         // create snackbar
-        snackbarEggsCollectedEmpty = Snackbar.make(findViewById(R.id.new_entity_container),getString(R.string.number_eggs_collected_empty),Snackbar.LENGTH_INDEFINITE);
+        snackbarEggsCollectedEmpty = Snackbar.make(findViewById(R.id.new_entity_container), getString(R.string.number_eggs_collected_empty), Snackbar.LENGTH_INDEFINITE);
 
         // set the current date as default user selection
         updateDate(Calendar.getInstance().getTime());
@@ -96,13 +101,13 @@ public class NewEntityActivity extends AppCompatActivity implements DatePickerFr
 
         // fill in fields, if a item is edited
         requestCode = getIntent().getIntExtra(DatabaseFragment.EXTRA_REQUEST_CODE_NAME, DatabaseFragment.NEW_ENTITY_REQUEST_CODE);
-        Log.d(LOG_TAG,"activity startet with request code " + requestCode);
+        Log.d(LOG_TAG, "activity startet with request code " + requestCode);
         if (requestCode == DatabaseFragment.EDIT_ENTITY_REQUEST_CODE) {
-            loadedDailyBalance = (DailyBalance)getIntent().getSerializableExtra(DatabaseFragment.EXTRA_DAILY_BALANCE);
+            loadedDailyBalance = (DailyBalance) getIntent().getSerializableExtra(DatabaseFragment.EXTRA_DAILY_BALANCE);
             String dateKey = loadedDailyBalance.getDateKey();
 
             eggsCollectedEditText.setText(String.valueOf(loadedDailyBalance.getEggsCollected()));
-            pricePerEggEditText.setText(String.format(Locale.getDefault(),PRICE_FORMAT,loadedDailyBalance.getPricePerEgg()));
+            pricePerEggEditText.setText(String.format(Locale.getDefault(), PRICE_FORMAT, loadedDailyBalance.getPricePerEgg()));
             if (loadedDailyBalance.getEggsSold() != NOT_SET)
                 eggsSoldEditText.setText(String.valueOf(loadedDailyBalance.getEggsSold()));
 
@@ -112,8 +117,8 @@ public class NewEntityActivity extends AppCompatActivity implements DatePickerFr
                 loadedDate = getDateFromDateKey(dateKey);
             } catch (ParseException e) {
                 e.printStackTrace();
-                Log.e(LOG_TAG,"Error while parsing dateKey " + dateKey + " to Date");
-                Log.e(LOG_TAG,"Using current date instead");
+                Log.e(LOG_TAG, "Error while parsing dateKey " + dateKey + " to Date");
+                Log.e(LOG_TAG, "Using current date instead");
                 loadedDate = Calendar.getInstance().getTime();
             }
             updateDate(loadedDate);
@@ -123,7 +128,7 @@ public class NewEntityActivity extends AppCompatActivity implements DatePickerFr
 
             // update the date, if the user wants to create an entity for a special date
             String date = getIntent().getStringExtra(DatabaseFragment.EXTRA_ENTITY_DATE);
-            Log.d(LOG_TAG,"starting activity with date: \"" + date + "\"");
+            Log.d(LOG_TAG, "starting activity with date: \"" + date + "\"");
             if (date != null) {
                 try {
                     updateDate(sdf_human_readable.parse(date));
@@ -349,6 +354,32 @@ public class NewEntityActivity extends AppCompatActivity implements DatePickerFr
             }
 
             newFragment.show(fragmentActivity.getSupportFragmentManager(), "datePicker");
+        });
+
+        btn_date_foreward.setOnClickListener(v -> {
+            Log.d(LOG_TAG,"switch date to the next day");
+            try {
+                Calendar cal = Calendar.getInstance();
+                cal.setTime(sdf_weekday.parse(dateTextView.getText().toString()));
+                cal.add(Calendar.DAY_OF_MONTH, 1);
+                dateTextView.setText(sdf_weekday.format(cal.getTimeInMillis()));
+            } catch (ParseException e) {
+                e.printStackTrace();
+            }
+
+        });
+
+        btn_date_backward.setOnClickListener(v -> {
+            Log.d(LOG_TAG,"switch date to the previous day");
+
+            try {
+                Calendar cal = Calendar.getInstance();
+                cal.setTime(sdf_weekday.parse(dateTextView.getText().toString()));
+                cal.add(Calendar.DAY_OF_MONTH, -1);
+                dateTextView.setText(sdf_weekday.format(cal.getTimeInMillis()));
+            } catch (ParseException e) {
+                e.printStackTrace();
+            }
         });
     }
 
