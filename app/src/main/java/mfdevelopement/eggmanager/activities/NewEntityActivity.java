@@ -43,7 +43,6 @@ import static mfdevelopement.eggmanager.activities.DataCompletenessCheckActivity
 public class NewEntityActivity extends AppCompatActivity implements DatePickerFragment.OnAddDateListener {
 
     private static final String LOG_TAG = "NewEntityActivity";
-    private Date selectedDate;
 
     private TextView dateTextView;
     private EditText eggsCollectedEditText, eggsSoldEditText, pricePerEggEditText;
@@ -140,7 +139,6 @@ public class NewEntityActivity extends AppCompatActivity implements DatePickerFr
     }
 
     private void updateDate(Date date) {
-        selectedDate = date;
         dateTextView.setText(dateToStringWeekDay(date));
     }
 
@@ -189,6 +187,12 @@ public class NewEntityActivity extends AppCompatActivity implements DatePickerFr
         String eggsCollectedString = eggsCollectedEditText.getText().toString();
         String eggsSoldString = eggsSoldEditText.getText().toString();
         String pricePerEggString = pricePerEggEditText.getText().toString();
+        Date selectedDate = null;
+        try {
+            selectedDate = sdf_weekday.parse(dateTextView.getText().toString());
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
 
         int eggsCollected = parseInt(eggsCollectedString);
         int eggsSold = parseInt(eggsSoldString);
@@ -223,7 +227,10 @@ public class NewEntityActivity extends AppCompatActivity implements DatePickerFr
      * @return String containing the formatted date
      */
     private String dateToString(Date date) {
-        return sdf_key.format(date);
+        if (date == null)
+            return null;
+        else
+            return sdf_key.format(date);
     }
 
     /**

@@ -56,8 +56,9 @@ public class DatabaseFragment extends Fragment {
 
     public static final int NEW_ENTITY_RESULT_CODE = 2;
     public static final int EDITED_ENTITY_RESULT_CODE = 3;
-    public static final int FILTER_ACTIVITY_OK_RESULT_CODE = 4;
-    public static final int FILTER_ACTIVITY_CANCEL_RESULT_CODE = 5;
+    public static final int FILTER_OK_RESULT_CODE = 4;
+    public static final int FILTER_CANCEL_RESULT_CODE = 5;
+    public static final int FILTER_REMOVED_RESULT_CODE = 6;
 
     public static final String EXTRA_REQUEST_CODE_NAME = "requestCode";
     public static final String EXTRA_DAILY_BALANCE = "extraDailyBalance";
@@ -130,6 +131,9 @@ public class DatabaseFragment extends Fragment {
         super.onResume();
         if (adapter != null)
             adapter.setItemsUnselected();
+
+        // update the data filter string
+        updateDataFilter();
     }
 
     private void updateEggsCollected(int numEggs) {
@@ -154,7 +158,6 @@ public class DatabaseFragment extends Fragment {
         // hide summary and show text field if the recycler view is not visible or contains less than 2 items
         // show summary if the recycler view contains 2 or more items
         boolean recyclerViewNotVisibile = (recyclerView.getVisibility() == View.GONE) || (recyclerView.getVisibility() == View.INVISIBLE);
-        Log.d(LOG_TAG,"updateSummary(): recycler view is not visible = " + recyclerViewNotVisibile);
         showTextEmptyRecyclerview(false);
 
         if (adapter != null) {
@@ -179,13 +182,11 @@ public class DatabaseFragment extends Fragment {
     }
 
     private void hideSummary() {
-        Log.d(LOG_TAG,"hideSummary");
         if (linLay_summary != null)
             linLay_summary.setVisibility(View.GONE);
     }
 
     private void showSummary() {
-        Log.d(LOG_TAG,"showSummary");
         if (linLay_summary != null)
             linLay_summary.setVisibility(View.VISIBLE);
     }
@@ -324,10 +325,10 @@ public class DatabaseFragment extends Fragment {
         else if (requestCode == EDIT_FILTER_STRING_REQUEST_CODE) {
             handleFilterActivityResult(resultCode, data);
 
-            if (resultCode == FILTER_ACTIVITY_OK_RESULT_CODE) {
+            if (resultCode == FILTER_OK_RESULT_CODE) {
 
                 Log.d(LOG_TAG, "filtered list of daily balanced with filter key \"" + viewModel.loadDateFilter() + "\"");
-                viewModel.setDateFilter(viewModel.loadDateFilter());
+                updateDataFilter();
 
                 // get the new filter string
                 String newFilterString = viewModel.getDateFilter();
@@ -352,6 +353,9 @@ public class DatabaseFragment extends Fragment {
                     if (!filterName.isEmpty())
                         snackbarText = "Daten nach " + filterName + " gefiltert";
                 }
+            } else if (resultCode == FILTER_REMOVED_RESULT_CODE) {
+                updateDataFilter();
+                Log.d(LOG_TAG,"user removed the filter");
             }
             if (getActivity() != null)
                 getActivity().invalidateOptionsMenu();
@@ -360,6 +364,14 @@ public class DatabaseFragment extends Fragment {
         // create a snackbar and display it
         if (!snackbarText.isEmpty())
             Snackbar.make(rootView.findViewById(R.id.main_container), snackbarText, Snackbar.LENGTH_SHORT).show();
+    }
+
+    /**
+     * update the filter string for the displayed data in the view model
+     * load the filter string from the repository to update the filter string in the view model
+     */
+    private void updateDataFilter() {
+        viewModel.setDateFilter(viewModel.loadDateFilter());
     }
 
     private void initFab() {

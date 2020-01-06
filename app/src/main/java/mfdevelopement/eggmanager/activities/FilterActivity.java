@@ -170,15 +170,19 @@ public class FilterActivity extends AppCompatActivity implements DateFilterListA
                 viewModel.setFilterString(newFiterString);
 
                 // finish the activity with a result code
-                endActivity(DatabaseFragment.FILTER_ACTIVITY_OK_RESULT_CODE, new Intent().setData(Uri.parse(newFiterString)));
-                break;
+                endActivity(DatabaseFragment.FILTER_OK_RESULT_CODE, new Intent().setData(Uri.parse(newFiterString)));
+                return true;
+            case R.id.action_remove_filter:
+                viewModel.setFilterString("");
+                endActivity(DatabaseFragment.FILTER_REMOVED_RESULT_CODE, null);
+                return true;
             case android.R.id.home:
                 // action when clicking on the home up button
-                endActivity(DatabaseFragment.FILTER_ACTIVITY_CANCEL_RESULT_CODE, null);
-                break;
+                endActivity(DatabaseFragment.FILTER_CANCEL_RESULT_CODE, null);
+                return true;
+            default:
+                return false;
         }
-        return true;
-        //return super.onOptionsItemSelected(item);
     }
 
     private void endActivity(int resultCode, @Nullable Intent data) {
@@ -191,7 +195,7 @@ public class FilterActivity extends AppCompatActivity implements DateFilterListA
 
     @Override
     public void onBackPressed() {
-        endActivity(DatabaseFragment.FILTER_ACTIVITY_CANCEL_RESULT_CODE, null);
+        endActivity(DatabaseFragment.FILTER_CANCEL_RESULT_CODE, null);
     }
 
     private String parseSelectedFilter() {

@@ -18,8 +18,6 @@
     <color name="main_text_color">#242424</color>
     <color name="secondary_text_color">#575757</color>
 
-    <color name="buttonLabel">#d3d3d3</color>
-
     <color name="transparent">#00FFFFFF</color>
     <color name="white">#ffffff</color>
     <color name="error">#B00020</color>

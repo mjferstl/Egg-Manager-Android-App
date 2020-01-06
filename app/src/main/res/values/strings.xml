@@ -50,6 +50,7 @@
     <string name="menu_action_apply">Anwenden</string>
     <string name="subheading_years">Jahr</string>
     <string name="subheading_month">Monat</string>
+    <string name="menu_action_remove_filter">Filter entfernen</string>
 
     <!-- data check activity -->
     <string name="from">von</string>

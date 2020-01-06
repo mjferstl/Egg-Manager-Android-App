@@ -204,6 +204,7 @@ public class DailyBalanceListAdapter extends RecyclerView.Adapter<DailyBalanceLi
 
     public void setDailyBalances(List<DailyBalance> dailyBalances){
         mDailyBalances = dailyBalances;
+        initSelectedItemPositions();
         notifyDataSetChanged();
     }
 

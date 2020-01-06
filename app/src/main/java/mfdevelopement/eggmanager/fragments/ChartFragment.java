@@ -266,7 +266,7 @@ public class ChartFragment extends Fragment {
             // handle the return value from the FilterActivity
             handleFilterActivityResult(resultCode, data);
 
-            if (resultCode == DatabaseFragment.FILTER_ACTIVITY_OK_RESULT_CODE) {
+            if (resultCode == DatabaseFragment.FILTER_OK_RESULT_CODE) {
                 // update the new filter string in the view model
                 viewModel.setDateFilter(viewModel.loadDateFilter());
             }

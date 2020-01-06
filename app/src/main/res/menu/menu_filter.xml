@@ -3,9 +3,16 @@
     xmlns:tools="http://schemas.android.com/tools"
     tools:context="mfdevelopement.eggmanager.fragments.DatabaseFragment">
     <item
+        android:id="@+id/action_remove_filter"
+        android:orderInCategory="98"
+        android:icon="@drawable/ic_filter_remove_white_24dp"
+        android:title="@string/menu_action_remove_filter"
+        app:showAsAction="ifRoom"/>
+    <item
         android:id="@+id/action_apply"
         android:orderInCategory="99"
         android:title="@string/menu_action_apply"
         app:showAsAction="ifRoom"
-        app:iconTint="@color/white"/>
+        app:iconTint="@color/white"
+        android:icon="@drawable/ic_check_white_24dp"/>
 </menu>

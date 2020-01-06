@@ -16,6 +16,7 @@ import java.io.Serializable;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
@@ -54,8 +55,8 @@ public class DailyBalance implements Serializable, Comparable<DailyBalance> {
     @ColumnInfo(name = COL_NUMBER_HENS)
     private int numHens;
 
-    public DailyBalance(@NonNull String dateKey, int eggsCollected, int eggsSold, double pricePerEgg) {
-        this.dateKey = dateKey;
+    public DailyBalance(String dateKey, int eggsCollected, int eggsSold, double pricePerEgg) {
+        setDateKey(dateKey);
         this.eggsCollected = eggsCollected;
         this.eggsSold = eggsSold;
         this.pricePerEgg = pricePerEgg;
@@ -64,18 +65,13 @@ public class DailyBalance implements Serializable, Comparable<DailyBalance> {
     }
 
     @Ignore
-    public DailyBalance(@NonNull String dateKey, int eggsCollected, int eggsSold, double pricePerEgg, int numHens) {
-        this.dateKey = dateKey;
+    public DailyBalance(String dateKey, int eggsCollected, int eggsSold, double pricePerEgg, int numHens) {
+        setDateKey(dateKey);
         this.eggsCollected = eggsCollected;
         this.eggsSold = eggsSold;
         this.pricePerEgg = pricePerEgg;
         this.numHens = numHens;
         this.moneyEarned = calcMoneyEarned(eggsSold,pricePerEgg);
-    }
-
-    private String getDateKey(Date date) {
-        SimpleDateFormat sdf = new SimpleDateFormat(DATE_KEY_FORMAT, Locale.getDefault());
-        return sdf.format(date);
     }
 
     private double calcMoneyEarned(int eggsSold, double pricePerEgg) {
@@ -89,6 +85,16 @@ public class DailyBalance implements Serializable, Comparable<DailyBalance> {
     @NonNull
     public String getDateKey(){
         return this.dateKey;
+    }
+
+    private void setDateKey(String dateKey) {
+        if (dateKey == null || dateKey.length() != DATE_KEY_FORMAT.length()) {
+            Calendar cal = Calendar.getInstance();
+            SimpleDateFormat sdf = new SimpleDateFormat(DATE_KEY_FORMAT, Locale.getDefault());
+            this.dateKey = sdf.format(cal.getTimeInMillis());
+        } else {
+            this.dateKey = dateKey;
+        }
     }
 
     public int getEggsCollected() { return  this.eggsCollected; }
@@ -132,14 +138,6 @@ public class DailyBalance implements Serializable, Comparable<DailyBalance> {
     public static String getMonthByDateKey(String dateKey) {
         if (dateKey.length() >= 6) {
             return dateKey.substring(4, 6).trim();
-        } else {
-            return "";
-        }
-    }
-
-    public static String getDayByDateKey(String dateKey) {
-        if (dateKey.length() >= 8) {
-            return dateKey.substring(6, 8).trim();
         } else {
             return "";
         }

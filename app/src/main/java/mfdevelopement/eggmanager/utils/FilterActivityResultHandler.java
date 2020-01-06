@@ -5,8 +5,8 @@ import android.util.Log;
 
 import androidx.annotation.Nullable;
 
-import static mfdevelopement.eggmanager.fragments.DatabaseFragment.FILTER_ACTIVITY_CANCEL_RESULT_CODE;
-import static mfdevelopement.eggmanager.fragments.DatabaseFragment.FILTER_ACTIVITY_OK_RESULT_CODE;
+import static mfdevelopement.eggmanager.fragments.DatabaseFragment.FILTER_CANCEL_RESULT_CODE;
+import static mfdevelopement.eggmanager.fragments.DatabaseFragment.FILTER_OK_RESULT_CODE;
 
 public class FilterActivityResultHandler {
 
@@ -14,7 +14,7 @@ public class FilterActivityResultHandler {
 
     public static void handleFilterActivityResult(int resultCode, @Nullable Intent data) {
 
-        if (resultCode == FILTER_ACTIVITY_OK_RESULT_CODE) {
+        if (resultCode == FILTER_OK_RESULT_CODE) {
             Log.d(LOG_TAG, "FilterActivity finished. User changed filter string");
 
             // try to get the filter string from the FilterActivity
@@ -29,7 +29,7 @@ public class FilterActivityResultHandler {
             } else {
                 Log.e(LOG_TAG, "Error when receiving new filter string from FilterActivity");
             }
-        } else if (resultCode == FILTER_ACTIVITY_CANCEL_RESULT_CODE) {
+        } else if (resultCode == FILTER_CANCEL_RESULT_CODE) {
             Log.d(LOG_TAG,"FilterActivity finished because user canceled the activity");
         }
     }
