@@ -19,6 +19,7 @@
         android:layout_height="wrap_content"
         style="@style/dialog_title"
         android:text="@string/title_sorting_dialog"
+        android:paddingStart="@dimen/large_padding"
         android:paddingEnd="@dimen/HUGE_padding"
         android:layout_marginEnd="@dimen/HUGE_padding"/>
 

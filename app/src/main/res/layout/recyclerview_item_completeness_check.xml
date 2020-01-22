@@ -28,7 +28,7 @@
         android:src="@drawable/ic_expand_more_black_24dp"
         android:tint="@color/gray"
         android:layout_marginStart="@dimen/large_padding"
-        android:contentDescription="Button to expand the list showing the missing dates"
+        android:contentDescription="@string/content_description_button_expand_collapse"
         app:layout_constraintTop_toTopOf="@id/txtv_recycler_item_completeness_check_name"
         app:layout_constraintEnd_toStartOf="@+id/txtv_recycler_item_completeness_check_extra_info"
         app:layout_constraintStart_toEndOf="@+id/txtv_recycler_item_completeness_check_name"
@@ -57,18 +57,19 @@
         android:paddingStart="@dimen/tiny_padding"
         android:paddingEnd="@dimen/tiny_padding"
         android:paddingBottom="@dimen/tiny_padding"
-        android:contentDescription="Image for showing success or error"
+        android:contentDescription="@string/content_description_icon_error_success"
         android:src="@drawable/ic_error"
         app:layout_constraintTop_toTopOf="@+id/txtv_recycler_item_completeness_check_name"
         app:layout_constraintStart_toEndOf="@+id/txtv_recycler_item_completeness_check_extra_info"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintBottom_toBottomOf="@+id/txtv_recycler_item_completeness_check_name"/>
 
-    <mfdevelopement.eggmanager.NonScrollListView
+    <mfdevelopement.eggmanager.UI_elements.NonScrollListView
         android:id="@+id/lv_recycler_item_completeness_check_details"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:paddingStart="@dimen/large_padding"
+        android:paddingEnd="@dimen/large_padding"
         tools:listitem="@layout/listview_item_missing_date_item"
         app:layout_constraintTop_toBottomOf="@+id/txtv_recycler_item_completeness_check_name"
         app:layout_constraintStart_toStartOf="@+id/txtv_recycler_item_completeness_check_name"

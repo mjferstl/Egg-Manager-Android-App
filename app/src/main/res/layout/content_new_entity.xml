@@ -27,7 +27,8 @@
             android:id="@+id/imgv_calendar"
             style="@style/basic_icon"
             android:layout_gravity="center_vertical"
-            android:src="@drawable/ic_date_range_black_24dp"/>
+            android:src="@drawable/ic_date_range_black_24dp"
+            android:contentDescription="@string/content_description_icon_calendar"/>
 
         <TextView
             android:id="@+id/txtv_new_entity_date"
@@ -49,14 +50,16 @@
             style="@style/basic_button"
             android:paddingStart="@dimen/large_padding"
             android:paddingEnd="@dimen/large_padding"
-            android:src="@drawable/ic_arrow_left_black_24dp"/>
+            android:src="@drawable/ic_arrow_left_black_24dp"
+            android:contentDescription="@string/content_description_button_previous_day"/>
 
         <ImageButton
             android:id="@+id/imgbtn_date_foreward"
             style="@style/basic_button"
             android:paddingStart="@dimen/large_padding"
             android:paddingEnd="@dimen/large_padding"
-            android:src="@drawable/ic_arrow_right_black_24dp"/>
+            android:src="@drawable/ic_arrow_right_black_24dp"
+            android:contentDescription="@string/content_description_button_next_day"/>
 
     </LinearLayout>
 
@@ -86,14 +89,16 @@
                 android:layout_gravity="center_horizontal"
                 android:layout_marginBottom="@dimen/large_padding"
                 android:src="@drawable/ic_egg_nest"
-                android:transitionName="imageEggsCollected"/>
+                android:transitionName="imageEggsCollected"
+                android:contentDescription="@string/content_description_icon_eggs_collected"/>
 
             <EditText
                 android:id="@+id/etxt_fetched_eggs"
                 style="@style/new_entity_edit_text"
                 android:hint="@string/hint_eggs_collected"
                 android:singleLine="true"
-                android:transitionName="@string/transition_txtv_eggs_collected"/>
+                android:transitionName="@string/transition_txtv_eggs_collected"
+                android:importantForAutofill="no"/>
 
         </LinearLayout>
 
@@ -109,13 +114,15 @@
                 android:layout_gravity="center_horizontal"
                 android:layout_marginBottom="@dimen/large_padding"
                 android:src="@drawable/ic_eggs_black"
-                android:transitionName="@string/transition_imgv_eggs_sold"/>
+                android:transitionName="@string/transition_imgv_eggs_sold"
+                android:contentDescription="@string/content_description_icon_eggs_sold"/>
 
             <EditText
                 android:id="@+id/etxt_sold_eggs"
                 style="@style/new_entity_edit_text"
                 android:hint="@string/hint_eggs_sold"
-                android:transitionName="@string/transition_txtv_eggs_sold"/>
+                android:transitionName="@string/transition_txtv_eggs_sold"
+                android:importantForAutofill="no"/>
 
         </LinearLayout>
 
@@ -136,10 +143,11 @@
             android:id="@+id/imgv_egg_price"
             style="@style/new_entity_icon"
             android:src="@drawable/ic_egg_price_48dp"
+            android:contentDescription="@string/content_description_icon_price_per_egg"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toStartOf="@id/etxt_egg_price"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent"/>
+            app:layout_constraintTop_toTopOf="parent" />
 
         <EditText
             android:id="@+id/etxt_egg_price"
@@ -148,6 +156,7 @@
             android:hint="@string/hint_price_per_egg"
             android:inputType="numberDecimal"
             android:maxLength="4"
+            android:importantForAutofill="no"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toStartOf="@id/txtv_new_entity_currency"
             app:layout_constraintStart_toEndOf="@+id/imgv_egg_price"

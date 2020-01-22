@@ -14,11 +14,15 @@ import androidx.viewpager2.widget.ViewPager2;
 import com.google.android.material.tabs.TabLayout;
 import com.google.android.material.tabs.TabLayoutMediator;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+
 import mfdevelopement.eggmanager.R;
 
 public class DiagramFragment extends Fragment {
 
-    private final String[] tabNames = {"abgenommen", "verkauft"};
+    private List<String> tabNames = new ArrayList<>();
     private final String LOG_TAG = "DiagramFragment";
 
     @Nullable
@@ -26,6 +30,10 @@ public class DiagramFragment extends Fragment {
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container,
                              @Nullable Bundle savedInstanceState) {
         Log.d(LOG_TAG,"running onCreateView()");
+
+        // load tab names
+        tabNames = Arrays.asList(getResources().getStringArray(R.array.tab_names_charts));
+
         return inflater.inflate(R.layout.fragment_diagrams, container, false);
     }
 
@@ -38,7 +46,7 @@ public class DiagramFragment extends Fragment {
         viewPager.setAdapter(collectedEggsChartFragment);
 
         TabLayout tabLayout = view.findViewById(R.id.charts_tabs);
-        new TabLayoutMediator(tabLayout, viewPager, (tab, position) -> tab.setText(tabNames[position])).attach();
+        new TabLayoutMediator(tabLayout, viewPager, (tab, position) -> tab.setText(tabNames.get(position))).attach();
 
         Log.d(LOG_TAG,"finished onViewCreated()");
     }

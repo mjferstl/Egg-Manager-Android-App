@@ -22,7 +22,7 @@
         android:id="@+id/imgv_sorting_dialog_item"
         android:layout_width="30dp"
         android:layout_height="30dp"
-        android:contentDescription="checkmark"
+        android:contentDescription="@string/content_description_empty"
         android:src="@drawable/ic_check_black_24dp"
         android:scaleType="fitCenter"
         android:tint="@color/gray"

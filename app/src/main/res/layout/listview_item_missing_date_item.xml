@@ -23,6 +23,7 @@
         android:tint="@color/main_text_color"
         android:paddingStart="@dimen/large_padding"
         android:paddingEnd="@dimen/large_padding"
+        android:contentDescription="@string/content_description_button_add"
         app:layout_constraintTop_toTopOf="@+id/txtv_recycler_item_missing_date"
         app:layout_constraintStart_toEndOf="@+id/txtv_recycler_item_missing_date"
         app:layout_constraintEnd_toEndOf="parent"

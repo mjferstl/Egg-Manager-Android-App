@@ -38,7 +38,8 @@
             style="@style/recycler_item_icon"
             android:src="@drawable/ic_egg_nest"
             android:layout_marginStart="0dp"
-            android:transitionName="@string/transition_imgv_eggs_collected">
+            android:transitionName="@string/transition_imgv_eggs_collected"
+            android:contentDescription="@string/content_description_icon_eggs_collected">
         </ImageView>
 
         <TextView
@@ -51,7 +52,8 @@
             android:id="@+id/imgv_eggs_sold"
             style="@style/recycler_item_icon"
             android:src="@drawable/ic_eggs_black"
-            android:transitionName="@string/transition_imgv_eggs_sold">
+            android:transitionName="@string/transition_imgv_eggs_sold"
+            android:contentDescription="@string/content_description_icon_eggs_sold">
         </ImageView>
 
         <TextView
@@ -62,7 +64,7 @@
 
         <TextView
             android:id="@+id/txtv_earned_money"
-            android:width="0dp"
+            android:layout_width="0dp"
             android:layout_weight="1"
             android:layout_height="wrap_content"
             style="@style/recycler_item_text"
@@ -82,6 +84,5 @@
         </TextView>
 
     </LinearLayout>
-
 
 </LinearLayout>

@@ -16,10 +16,11 @@
         android:id="@+id/img_sd_card"
         style="@style/basic_icon"
         android:src="@drawable/ic_sd_storage_black_24dp"
+        android:contentDescription="@string/content_description_icon_sd_card"
         app:layout_constraintTop_toTopOf="@+id/txtv_backup_item_name"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toStartOf="@+id/txtv_backup_item_name"
-        app:layout_constraintBottom_toBottomOf="@+id/txtv_backup_item_name"/>
+        app:layout_constraintBottom_toBottomOf="@+id/txtv_backup_item_name" />
 
     <TextView
         android:id="@+id/txtv_backup_item_name"
@@ -41,7 +42,7 @@
         style="@style/basic_text"
         android:paddingTop="0dp"
         android:text="backup time"
-        android:textSize="12dp"
+        android:textSize="@dimen/textAppearanceCaption"
         android:gravity="top|end"
         app:layout_constraintTop_toBottomOf="@+id/txtv_backup_item_name"
         app:layout_constraintStart_toStartOf="parent"

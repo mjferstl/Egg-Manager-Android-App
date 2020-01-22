@@ -1,4 +1,4 @@
-package mfdevelopement.eggmanager;
+package mfdevelopement.eggmanager.UI_elements;
 
 import android.content.Context;
 import android.util.AttributeSet;

@@ -17,12 +17,11 @@ import java.util.Calendar;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
-import mfdevelopement.eggmanager.FilterStringHandle;
 import mfdevelopement.eggmanager.R;
 import mfdevelopement.eggmanager.data_models.DailyBalance;
 import mfdevelopement.eggmanager.database.EggManagerRepository;
 
-public class SharedViewModel extends AndroidViewModel implements FilterStringHandle {
+public class SharedViewModel extends AndroidViewModel {
 
     // String for assignment when printing out logs
     private final String LOG_TAG = "DatabaseActivityViewMod";

@@ -50,7 +50,8 @@
             style="@style/recycler_item_icon"
             android:layout_marginStart="0dp"
             android:layout_marginEnd="0dp"
-            android:src="@drawable/ic_egg_nest"/>
+            android:src="@drawable/ic_egg_nest"
+            android:contentDescription="@string/content_description_icon_eggs_collected"/>
 
         <TextView
             android:id="@+id/txtv_summary_eggsCollected"
@@ -62,7 +63,8 @@
         <ImageView
             style="@style/recycler_item_icon"
             android:layout_marginEnd="0dp"
-            android:src="@drawable/ic_eggs_black"/>
+            android:src="@drawable/ic_eggs_black"
+            android:contentDescription="@string/content_description_icon_eggs_sold"/>
 
         <TextView
             android:id="@+id/txtv_summary_eggsSold"
