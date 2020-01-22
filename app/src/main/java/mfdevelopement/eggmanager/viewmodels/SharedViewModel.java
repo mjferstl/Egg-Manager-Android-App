@@ -8,6 +8,7 @@ import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.Transformations;
 
+import com.github.mikephil.charting.data.BarEntry;
 import com.github.mikephil.charting.data.Entry;
 
 import java.util.ArrayList;
@@ -156,6 +157,40 @@ public class SharedViewModel extends AndroidViewModel implements FilterStringHan
         return entries;
     }
 
+    public List<BarEntry> getDataEggsSold(List<DailyBalance> dailyBalanceList) {
+
+        List<BarEntry> entries = new ArrayList<>();
+
+        List<Integer> soldEggs = new ArrayList<>();
+        List<String> uniqueDateKeys = new ArrayList<>();
+        List<Calendar> firstDayOfTheMonths = new ArrayList<>();
+        for (DailyBalance db : dailyBalanceList) {
+            String currentDateKey = db.getDateKey();
+            String yearMonthKey = DailyBalance.getYearByDateKey(currentDateKey) + DailyBalance.getMonthByDateKey(currentDateKey);
+
+            if (!uniqueDateKeys.contains(yearMonthKey)) {
+                uniqueDateKeys.add(yearMonthKey);
+
+                Calendar calendar = Calendar.getInstance();
+                int year = Integer.parseInt(DailyBalance.getYearByDateKey(currentDateKey));
+                int month = Integer.parseInt(DailyBalance.getMonthByDateKey(currentDateKey));
+                calendar.set(year, month-1, 1, 0, 0, 0);
+                firstDayOfTheMonths.add(calendar);
+
+                soldEggs.add(db.getEggsSold());
+            } else {
+                int index = uniqueDateKeys.indexOf(yearMonthKey);
+                soldEggs.set(index, soldEggs.get(index) + db.getEggsSold());
+            }
+        }
+
+        for (int i=0; i<firstDayOfTheMonths.size(); i++) {
+            long days_iterator = getDifferenceInMonths(firstDayOfTheMonths.get(i).getTimeInMillis(),referenceDate.getTimeInMillis())+1;
+            entries.add(new BarEntry((float)days_iterator, soldEggs.get(i)));
+            Log.d(LOG_TAG,"BarEntry: sold eggs = " + soldEggs.get(i));
+        }
+        return entries;
+    }
     /**
      * Calculates the difference in days between two timestamps in milliseconds
      * result = timestamp_first - timestamp_second
@@ -166,6 +201,21 @@ public class SharedViewModel extends AndroidViewModel implements FilterStringHan
     private long getDifferenceInDays(long timestamp_first, long timestamp_second) {
         long difference = timestamp_first-timestamp_second;
         return TimeUnit.DAYS.convert(difference, TimeUnit.MILLISECONDS);
+    }
+
+    private long getDifferenceInMonths(long timestamp_first, long timestamp_second) {
+
+        Calendar startCalendar = Calendar.getInstance();
+        startCalendar.setTimeInMillis(timestamp_second);
+
+        Calendar endCalendar = Calendar.getInstance();
+        endCalendar.setTimeInMillis(timestamp_first);
+
+        int diffYear = endCalendar.get(Calendar.YEAR) - startCalendar.get(Calendar.YEAR);
+        int diffMonth = endCalendar.get(Calendar.MONTH) - startCalendar.get(Calendar.MONTH);
+        int diffMonths = diffYear * 12 + diffMonth;
+
+        return diffMonths;
     }
 
     public Calendar getReferenceDate() {

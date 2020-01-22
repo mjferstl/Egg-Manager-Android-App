@@ -16,11 +16,16 @@ import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 
+import com.github.mikephil.charting.charts.BarChart;
+import com.github.mikephil.charting.charts.Chart;
 import com.github.mikephil.charting.charts.LineChart;
 import com.github.mikephil.charting.components.AxisBase;
 import com.github.mikephil.charting.components.Description;
 import com.github.mikephil.charting.components.XAxis;
 import com.github.mikephil.charting.components.YAxis;
+import com.github.mikephil.charting.data.BarData;
+import com.github.mikephil.charting.data.BarDataSet;
+import com.github.mikephil.charting.data.BarEntry;
 import com.github.mikephil.charting.data.Entry;
 import com.github.mikephil.charting.data.LineData;
 import com.github.mikephil.charting.data.LineDataSet;
@@ -51,13 +56,36 @@ public class ChartFragment extends Fragment {
     private SharedViewModel viewModel;
 
     private LineChart lineChart;
-    private TextView txtv_title;
+    private BarChart barChart;
+    private TextView txtv_title, txtv_title_extra;
 
     public final static String NAME_EGGS_COLLECTED = "Abgenommene Eier";
+    public final static String NAME_EGGS_SOLD = "Verkaufte Eier";
+    public final static String ARG_DATA = "chartData";
+
+    private int chartSwitch = 1; // inital view is "Abgenommene Eier"
+    private final int chartSwitchCollectedEggs = 1;
+    private final int chartSwitchSoldEggs = 2;
+
+    private String chartTitle = "Abgenommene Eier";
 
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
-        View root = inflater.inflate(R.layout.fragment_diagrams, container, false);
+
+        Bundle args = getArguments();
+        if (args != null) {
+            String extraArgument = args.getString(ARG_DATA);
+            Log.d(LOG_TAG, "starting onCreateView() with extra argument \"" + extraArgument + "\"");
+            if (extraArgument != null) {
+                if (extraArgument.equals(NAME_EGGS_COLLECTED))
+                    chartSwitch = chartSwitchCollectedEggs;
+                else if (extraArgument.equals(NAME_EGGS_SOLD))
+                    chartSwitch = chartSwitchSoldEggs;
+            }
+            setChartVariables();
+        }
+
+        View root = inflater.inflate(R.layout.content_line_chart, container, false);
 
         // get reference to view model
         viewModel = new ViewModelProvider(this).get(SharedViewModel.class);
@@ -70,20 +98,31 @@ public class ChartFragment extends Fragment {
 
         // get references to GUI elements
         txtv_title = root.findViewById(R.id.txtv_chart_title);
-        txtv_title.setText(getString(R.string.txt_title_eggs_collected));
+        txtv_title.setText(chartTitle);
+        txtv_title_extra = root.findViewById(R.id.txtv_chart_title_extra);
+        txtv_title_extra.setText("");
+        txtv_title_extra.setVisibility(View.GONE);
 
+        // line chart
         lineChart = root.findViewById(R.id.line_chart);
-
         // modify chart layout
         lineChart.setBackgroundColor(getResources().getColor(R.color.transparent));     // transparent background
         lineChart.setBorderColor(getResources().getColor(R.color.main_text_color));     // color of the chart borders
         lineChart.getLegend().setEnabled(false);                                        // hide the legend
-
         // Description
         Description description = lineChart.getDescription();   // get description
-        String desc = "";
-        description.setText(desc);                          // text for description
+        description.setText("");                          // text for description
         description.setEnabled(false);                      // hide description
+
+        // bar chart
+        barChart = root.findViewById(R.id.bar_chart);
+        barChart.setBackgroundColor(getResources().getColor(R.color.transparent));     // transparent background
+        barChart.getLegend().setEnabled(false);                                        // hide the legend
+        // Description
+        Description barChartDescription = barChart.getDescription();
+        barChartDescription.setText("");
+        barChartDescription.setEnabled(false);
+
 
         // init observers
         initObservers();
@@ -91,28 +130,47 @@ public class ChartFragment extends Fragment {
         return root;
     }
 
-    private void modifyAxes(LineChart chart, float xMin, float xMax, float yMin, float yMax) {
+    @Override
+    public void onResume() {
+        super.onResume();
+        Log.d(LOG_TAG,"onResume()");
+        viewModel.setDateFilter(viewModel.loadDateFilter());
+    }
+
+    private void modifyAxes(Chart chart, float xMin, float xMax, float yMin, float yMax) {
         modifyXAxis(chart, xMin, xMax);
         modifyYAxis(chart, yMin, yMax);
     }
 
-    private void modifyAxes(LineChart lineChart, ChartAxisLimits chartAxisLimits) {
+    private void modifyAxes(Chart lineChart, ChartAxisLimits chartAxisLimits) {
         modifyAxes(lineChart, chartAxisLimits.getxMin(), chartAxisLimits.getxMax(), chartAxisLimits.getyMin(), chartAxisLimits.getyMax());
     }
 
     private ChartAxisLimits calcAxisLimits(LineDataSet lineDataSet) {
-        List<Entry> eggsCollectedList = getEntriesOfLineDataSet(lineDataSet);
+        List<Entry> entriesList = getEntriesOfLineDataSet(lineDataSet);
 
         // modify both axes
-        float xMin = (int)eggsCollectedList.get(0).getX();
-        float xMax = eggsCollectedList.get(eggsCollectedList.size()-1).getX();
+        float xMin = getMinX(entriesList);
+        float xMax = getMaxX(entriesList);
         float yMin = 0f;
-        float yMax = roundToNextFive(getMax(eggsCollectedList));
+        float yMax = roundToNextFive(getMaxY(entriesList));
 
         return new ChartAxisLimits(xMin, xMax, yMin, yMax);
     }
 
-    private void modifyXAxis(LineChart chart, float min, float max) {
+    private ChartAxisLimits calcAxisLimits(BarDataSet barDataSet) {
+        List<Entry> entriesList = getEntriesOfLineDataSet(barDataSet);
+
+        // modify both axes
+        float xMin = getMinX(entriesList)-1;
+        float xMax = getMaxX(entriesList)+1;
+        float yMin = 0f;
+        float yMax = roundToNextFive(getMaxY(entriesList));
+
+        return new ChartAxisLimits(xMin, xMax, yMin, yMax);
+    }
+
+    private void modifyXAxis(Chart chart, float min, float max) {
 
         SimpleDateFormat sdf = new SimpleDateFormat("dd.MM.yyyy", Locale.getDefault());
 
@@ -133,35 +191,55 @@ public class ChartFragment extends Fragment {
         endDate.add(Calendar.DAY_OF_MONTH,(int)max);
 
         // If all dates are of the same year, then no year information is shown in the x labels
-        String titlePrefix = getString(R.string.txt_title_eggs_collected);
-        String title = titlePrefix;
-        if (startDate.get(Calendar.YEAR) == endDate.get(Calendar.YEAR)) {
-            xAxis.setValueFormatter(new AxisDateFormatterWithOutYear());
-
-            if (startDate.get(Calendar.MONTH) == endDate.get(Calendar.MONTH)) {
-                String monthName = viewModel.getMonthNameByIndex(startDate.get(Calendar.MONTH)+1);
-                title = titlePrefix + String.format(Locale.getDefault(), "\nim %s %d", monthName, startDate.get(Calendar.YEAR));
-            } else {
-                title = titlePrefix + String.format(Locale.getDefault(), "\nim Jahr %d", startDate.get(Calendar.YEAR));
-            }
+        if (chartSwitch == chartSwitchSoldEggs) {
+            xAxis.setValueFormatter(new AxisMonthYearFormatter());
         } else {
-            xAxis.setValueFormatter(new AxisDateFormatterWithYear());
-        }
+            String extraTitle = "";
+            if (startDate.get(Calendar.YEAR) == endDate.get(Calendar.YEAR)) {
+                xAxis.setValueFormatter(new AxisDateFormatterWithOutYear());
 
-        txtv_title.setText(title);
+                if (startDate.get(Calendar.MONTH) == endDate.get(Calendar.MONTH)) {
+                    String monthName = viewModel.getMonthNameByIndex(startDate.get(Calendar.MONTH) + 1);
+                    extraTitle = String.format(Locale.getDefault(), "\nim %s %d", monthName, startDate.get(Calendar.YEAR));
+                } else {
+                    extraTitle = String.format(Locale.getDefault(), "\nim Jahr %d", startDate.get(Calendar.YEAR));
+                }
+            } else {
+                xAxis.setValueFormatter(new AxisDateFormatterWithYear());
+            }
+
+            txtv_title_extra.setText(extraTitle);
+        }
 
         // set minimum and maximum value of the axis
         xAxis.setAxisMinimum(min);
         xAxis.setAxisMaximum(max);
     }
 
-    private void modifyYAxis(LineChart chart, float min, float max) {
-        // // Y-Axis Style // //
-        YAxis yAxis;
-        yAxis = chart.getAxisLeft();                    // get the y axis
-        chart.getAxisRight().setEnabled(false);         // disable dual axis (only use LEFT axis)
+    private void modifyYAxis(Chart chart, float min, float max) {
 
-        yAxis.setAxisMaximum(max);
+        YAxis yAxis;
+
+        if (chartSwitch == chartSwitchSoldEggs) {
+            BarChart barChart = (BarChart) chart;
+            yAxis = barChart.getAxisLeft();
+            barChart.getAxisRight().setEnabled(false);
+        } else {
+            LineChart lineChart = (LineChart) chart;
+            yAxis = lineChart.getAxisLeft();                    // get the y axis
+            lineChart.getAxisRight().setEnabled(false);         // disable dual axis (only use LEFT axis)
+        }
+
+        // // Y-Axis Style // //
+        if (max < 100) {
+            yAxis.setAxisMaximum((((int)max/10)+1)*10);
+        } else if (max < 1000) {
+            yAxis.setAxisMaximum((((int)max/100)+1)*100);
+        } else {
+            yAxis.setAxisMaximum(max);
+        }
+        Log.d(LOG_TAG,"yAxis max value: " + yAxis.getAxisMaximum());
+
         yAxis.setAxisMinimum(min);
         yAxis.setGranularity(1f);
         yAxis.setTextColor(getResources().getColor(R.color.main_text_color));
@@ -169,7 +247,13 @@ public class ChartFragment extends Fragment {
         yAxis.setCenterAxisLabels(true);
         yAxis.setDrawLabels(true);
         yAxis.setDrawGridLinesBehindData(true);
-        yAxis.setLabelCount((int)max/5+1);
+
+        if (max/5 < 8) {
+            yAxis.setLabelCount((int)max/5);
+        } else {
+            yAxis.setLabelCount(8);
+        }
+
         Log.d(LOG_TAG,"yAxis label count: " + yAxis.getLabelCount());
     }
 
@@ -188,21 +272,81 @@ public class ChartFragment extends Fragment {
         return dataSet;
     }
 
-    private List<Entry> getEntriesOfLineDataSet(LineDataSet lineDataSet) {
+    private BarDataSet createBarDataSet(List<BarEntry> entries, String dataSetName) {
+        BarDataSet dataSet = new BarDataSet(entries, dataSetName);
+        dataSet.setColor(getResources().getColor(R.color.colorAccent));
+        dataSet.setValueTextColor(getResources().getColor(R.color.main_text_color));
+        dataSet.setValueTextSize(TEXT_SIZE);            // text size of the text for each data point
+        if (entries.size() > 5) {
+            dataSet.setDrawValues(false);                   // do not show the value of each data point
+        } else {
+            dataSet.setDrawValues(true);
+        }
+        return dataSet;
+    }
+
+    private List<Entry> getEntriesOfLineDataSet(LineDataSet dataSet) {
         List<Entry> entries = new ArrayList<>();
-        for (int i=0; i<lineDataSet.getEntryCount(); i++)
-            entries.add(lineDataSet.getEntryForIndex(i));
+        for (int i=0; i<dataSet.getEntryCount(); i++)
+            entries.add(dataSet.getEntryForIndex(i));
         return entries;
     }
 
-    private float getMax(List<Entry> entryList) {
-        float maxValue = entryList.get(0).getY();
-        for (Entry e: entryList) {
-            if (e.getY() > maxValue) {
-                maxValue = e.getY();
+    private List<Entry> getEntriesOfLineDataSet(BarDataSet dataSet) {
+        List<Entry> entries = new ArrayList<>();
+        for (int i=0; i<dataSet.getEntryCount(); i++)
+            entries.add(dataSet.getEntryForIndex(i));
+        return entries;
+    }
+
+    private float getMinX(List<Entry> entryList) {
+        return getMin(getXValues(entryList));
+    }
+
+    private float getMaxX(List<Entry> entryList) {
+        return getMax(getXValues(entryList));
+    }
+
+    private float getMinY(List<Entry> entryList) {
+        return getMin(getYValues(entryList));
+    }
+
+    private float getMaxY(List<Entry> entryList) {
+        return getMax(getYValues(entryList));
+    }
+
+    private List<Float> getXValues(List<Entry> entryList) {
+        List<Float> xValues = new ArrayList<>();
+        for (Entry entry : entryList)
+            xValues.add(entry.getX());
+        return xValues;
+    }
+
+    private List<Float> getYValues(List<Entry> entryList) {
+        List<Float> yValues = new ArrayList<>();
+        for (Entry entry : entryList)
+            yValues.add(entry.getY());
+        return yValues;
+    }
+
+    private float getMax(List<Float> values) {
+        float maxValue = values.get(0);
+        for (float f: values) {
+            if (f > maxValue) {
+                maxValue = f;
             }
         }
         return maxValue;
+    }
+
+    private float getMin(List<Float> values) {
+        float minValue = values.get(0);
+        for (float f: values) {
+            if (f < minValue) {
+                minValue = f;
+            }
+        }
+        return minValue;
     }
 
     private LineData createLineData(LineDataSet lineDataSet) {
@@ -212,11 +356,20 @@ public class ChartFragment extends Fragment {
         return lineData;
     }
 
-    private void refreshChart(LineChart lineChart) {
-        lineChart.invalidate();
+    private BarData createBarData(BarDataSet barDataSet) {
+        BarData barData = new BarData();
+        barData.addDataSet(barDataSet);
+        return barData;
     }
 
-    private void updateChart(LineChart lineChart, LineDataSet lineDataSet) {
+    private void refreshChart(Chart chart) {
+        chart.invalidate();
+    }
+
+    private void updateLineChart(LineChart lineChart, LineDataSet lineDataSet) {
+
+        barChart.setVisibility(View.GONE);
+        this.lineChart.setVisibility(View.VISIBLE);
 
         // modify both axes
         ChartAxisLimits axisLimits = calcAxisLimits(lineDataSet);
@@ -225,6 +378,20 @@ public class ChartFragment extends Fragment {
         // add line data to the chart
         lineChart.setData(createLineData(lineDataSet));
         refreshChart(lineChart);
+    }
+
+    private void updateBarChart(BarChart barChart, BarDataSet barDataSet) {
+
+        this.barChart.setVisibility(View.VISIBLE);
+        lineChart.setVisibility(View.GONE);
+
+        ChartAxisLimits axisLimits = calcAxisLimits(barDataSet);
+        Log.d(LOG_TAG,"axis limits: xMin: " + axisLimits.getxMin() + ", xMax: " + axisLimits.getxMax() + ", yMin: " + axisLimits.getyMin() + ", yMax: " + axisLimits.getyMax());
+        modifyAxes(barChart, axisLimits);
+
+        // add line data to the chart
+        barChart.setData(createBarData(barDataSet));
+        refreshChart(barChart);
     }
 
     private int roundToNextFive(float value) {
@@ -273,14 +440,30 @@ public class ChartFragment extends Fragment {
         }
     }
 
+    private void setChartVariables() {
+        if (chartSwitch == chartSwitchCollectedEggs) {
+            chartTitle = getString(R.string.txt_title_eggs_collected);
+        }
+        else if (chartSwitch == chartSwitchSoldEggs) {
+            chartTitle = "Verkaufte Eier";
+        }
+    }
+
     private void initObservers() {
         if (getActivity() ==  null)
             Log.e(LOG_TAG,"initObservers(): observers cannot be initialized, because getActivity = null");
         else {
             viewModel.getFilteredDailyBalance().observe(getActivity(), dailyBalanceList -> {
-                List<Entry> entries = viewModel.getDataEggsCollected(dailyBalanceList);
-                LineDataSet lineDataSet = createLineDataSet(entries, NAME_EGGS_COLLECTED);
-                updateChart(lineChart, lineDataSet);
+
+                if (chartSwitch == chartSwitchCollectedEggs) {
+                    List<Entry> entries = viewModel.getDataEggsCollected(dailyBalanceList);
+                    LineDataSet lineDataSet = createLineDataSet(entries, NAME_EGGS_COLLECTED);
+                    updateLineChart(lineChart, lineDataSet);
+                } else if (chartSwitch == chartSwitchSoldEggs) {
+                    List<BarEntry> entries = viewModel.getDataEggsSold(dailyBalanceList);
+                    BarDataSet barDataSet = createBarDataSet(entries, NAME_EGGS_SOLD);
+                    updateBarChart(barChart, barDataSet);
+                }
             });
         }
     }
@@ -308,6 +491,19 @@ public class ChartFragment extends Fragment {
         public String getAxisLabel(float value, AxisBase axis) {
             Calendar cal = viewModel.getReferenceDate();
             cal.add(Calendar.DAY_OF_MONTH,(int)value);
+            return sdf.format(cal.getTimeInMillis());
+        }
+    }
+
+    private class AxisMonthYearFormatter extends ValueFormatter {
+
+        private SimpleDateFormat sdf = new SimpleDateFormat("MM/yyyy", Locale.getDefault());
+
+        @Override
+        public String getAxisLabel(float value, AxisBase axis) {
+            Calendar cal = viewModel.getReferenceDate();
+            cal.add(Calendar.MONTH,(int)value-1);
+            Log.d(LOG_TAG,"formatting " + value + " to " + sdf.format(cal.getTimeInMillis()));
             return sdf.format(cal.getTimeInMillis());
         }
     }

@@ -13,7 +13,7 @@
 
     <fragment
         android:id="@+id/nav_diagrams"
-        android:name="mfdevelopement.eggmanager.fragments.ChartFragment"
+        android:name="mfdevelopement.eggmanager.fragments.DiagramFragment"
         android:label="@string/menu_diagrams"
         tools:layout="@layout/fragment_diagrams" />
 
