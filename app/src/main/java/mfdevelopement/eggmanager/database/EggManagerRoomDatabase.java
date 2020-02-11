@@ -7,12 +7,13 @@ import androidx.annotation.NonNull;
 import androidx.room.Database;
 import androidx.room.Room;
 import androidx.room.RoomDatabase;
+import androidx.room.migration.Migration;
 import androidx.sqlite.db.SupportSQLiteDatabase;
 
 import mfdevelopement.eggmanager.data_models.DailyBalance;
 import mfdevelopement.eggmanager.data_models.DailyBalanceDao;
 
-@Database(entities = {DailyBalance.class}, version = 1, exportSchema = false)
+@Database(entities = {DailyBalance.class}, version = 2, exportSchema = false)
 public abstract class EggManagerRoomDatabase extends RoomDatabase {
 
     public abstract DailyBalanceDao dailyBalanceDao();
@@ -26,7 +27,9 @@ public abstract class EggManagerRoomDatabase extends RoomDatabase {
                 if (INSTANCE == null) {
                     // Create database here
                     INSTANCE = Room.databaseBuilder(context.getApplicationContext(),
-                            EggManagerRoomDatabase.class, dataBaseName).addCallback(sRoomDatabaseCallback).build();
+                            EggManagerRoomDatabase.class, dataBaseName)
+                                .addMigrations(MIGRATION_1_2)
+                                .addCallback(sRoomDatabaseCallback).build();
                 }
             }
         }
@@ -57,4 +60,12 @@ public abstract class EggManagerRoomDatabase extends RoomDatabase {
             return null;
         }
     }
+
+
+    static final Migration MIGRATION_1_2 = new Migration(1, 2) {
+        @Override
+        public void migrate(SupportSQLiteDatabase database) {
+            database.execSQL("ALTER TABLE dailyBalanceTable ADD COLUMN dateCreated BIGINT");
+        }
+    };
 }

@@ -7,6 +7,7 @@ import androidx.room.ColumnInfo;
 import androidx.room.Entity;
 import androidx.room.Ignore;
 import androidx.room.PrimaryKey;
+import androidx.room.TypeConverters;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -21,6 +22,8 @@ import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 
+import mfdevelopement.eggmanager.utils.DateTypeConverter;
+
 @Entity(tableName = "dailyBalanceTable")
 public class DailyBalance implements Serializable, Comparable<DailyBalance> {
 
@@ -30,6 +33,7 @@ public class DailyBalance implements Serializable, Comparable<DailyBalance> {
     public static final String COL_PRICE_PER_EGG = "pricePerEgg";
     public static final String COL_NUMBER_HENS = "numberOfHens";
     public static final String COL_MONEY_EARNED = "moneyEarned";
+    public static final String COL_DATE_CREATED = "dateCreated";
     public static final String DATE_KEY_FORMAT = "yyyyMMdd";
     public static final int NOT_SET = 0;
 
@@ -55,6 +59,10 @@ public class DailyBalance implements Serializable, Comparable<DailyBalance> {
     @ColumnInfo(name = COL_NUMBER_HENS)
     private int numHens;
 
+    @TypeConverters(DateTypeConverter.class)
+    @ColumnInfo(name = COL_DATE_CREATED)
+    private Date dateCreated;
+
     public DailyBalance(String dateKey, int eggsCollected, int eggsSold, double pricePerEgg) {
         setDateKey(dateKey);
         this.eggsCollected = eggsCollected;
@@ -62,6 +70,7 @@ public class DailyBalance implements Serializable, Comparable<DailyBalance> {
         this.pricePerEgg = pricePerEgg;
         this.numHens = 0;
         this.moneyEarned = calcMoneyEarned(eggsSold,pricePerEgg);
+        this.dateCreated = getCurrentDate();
     }
 
     @Ignore
@@ -72,6 +81,18 @@ public class DailyBalance implements Serializable, Comparable<DailyBalance> {
         this.pricePerEgg = pricePerEgg;
         this.numHens = numHens;
         this.moneyEarned = calcMoneyEarned(eggsSold,pricePerEgg);
+        this.dateCreated = getCurrentDate();
+    }
+
+    @Ignore
+    public DailyBalance(String dateKey, int eggsCollected, int eggsSold, double pricePerEgg, int numHens, Date dateCreated) {
+        setDateKey(dateKey);
+        this.eggsCollected = eggsCollected;
+        this.eggsSold = eggsSold;
+        this.pricePerEgg = pricePerEgg;
+        this.numHens = numHens;
+        this.moneyEarned = calcMoneyEarned(eggsSold,pricePerEgg);
+        this.dateCreated = dateCreated;
     }
 
     private double calcMoneyEarned(int eggsSold, double pricePerEgg) {
@@ -125,6 +146,18 @@ public class DailyBalance implements Serializable, Comparable<DailyBalance> {
 
     public void setMoneyEarned(double money) {
         this.moneyEarned = money;
+    }
+
+    public Date getDateCreated() {
+        return this.dateCreated;
+    }
+
+    public void setDateCreated(Date dateCreated) {
+        this.dateCreated = dateCreated;
+    }
+
+    public Date getCurrentDate() {
+        return new Date(System.currentTimeMillis());
     }
 
     public static String getYearByDateKey(String dateKey) {

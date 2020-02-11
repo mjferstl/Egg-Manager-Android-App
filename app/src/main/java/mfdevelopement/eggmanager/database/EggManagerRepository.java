@@ -30,7 +30,7 @@ public class EggManagerRepository {
 
     private DailyBalanceDao dailyBalanceDao;
     private LiveData<List<DailyBalance>> mAllData, ldFilteredDailyBalance;
-    private LiveData<Integer> ldFilteredEggsSold, ldFilteredEggsCollected;
+    private LiveData<Integer> ldFilteredEggsSold, ldFilteredEggsCollected, ldEntriesCount;
     private LiveData<Double> ldFilteredMoneyEarned;
     private LiveData<List<String>> ldDateKeys;
 
@@ -42,6 +42,7 @@ public class EggManagerRepository {
         dailyBalanceDao = db.dailyBalanceDao();
         mAllData = dailyBalanceDao.getAscendingItems();
         ldDateKeys = dailyBalanceDao.getDateKeysLiveData();
+        ldEntriesCount = dailyBalanceDao.getRowCount();
 
         dateFilter.setValue(getDataFilter());
         ldFilteredDailyBalance = Transformations.switchMap(dateFilter, filter -> dailyBalanceDao.getFilteredDailyBalance(filter));
@@ -52,6 +53,10 @@ public class EggManagerRepository {
 
     public LiveData<List<DailyBalance>> getAllDailyBalances() {
         return mAllData;
+    }
+
+    public LiveData<Integer> getEntriesCount() {
+        return ldEntriesCount;
     }
 
     public List<DailyBalance> getAllDataList() {
