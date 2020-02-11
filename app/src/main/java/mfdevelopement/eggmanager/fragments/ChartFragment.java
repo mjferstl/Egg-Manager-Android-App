@@ -1,6 +1,7 @@
 package mfdevelopement.eggmanager.fragments;
 
 import android.content.Intent;
+import android.graphics.Paint;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -30,6 +31,7 @@ import com.github.mikephil.charting.data.Entry;
 import com.github.mikephil.charting.data.LineData;
 import com.github.mikephil.charting.data.LineDataSet;
 import com.github.mikephil.charting.formatter.ValueFormatter;
+import com.google.android.material.snackbar.Snackbar;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -58,6 +60,7 @@ public class ChartFragment extends Fragment {
     private LineChart lineChart;
     private BarChart barChart;
     private TextView txtv_title, txtv_title_extra;
+    private View rootView;
 
     public final static String NAME_EGGS_COLLECTED = "Abgenommene Eier";
     public final static String NAME_EGGS_SOLD = "Verkaufte Eier";
@@ -66,8 +69,11 @@ public class ChartFragment extends Fragment {
     private int chartSwitch = 1; // inital view is "Abgenommene Eier"
     private final int chartSwitchCollectedEggs = 1;
     private final int chartSwitchSoldEggs = 2;
+    private int databaseEntryCount = 0;
 
     private String chartTitle = "Abgenommene Eier";
+
+
 
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
@@ -85,7 +91,7 @@ public class ChartFragment extends Fragment {
             setChartVariables();
         }
 
-        View root = inflater.inflate(R.layout.content_line_chart, container, false);
+        rootView = inflater.inflate(R.layout.content_chart, container, false);
 
         // get reference to view model
         viewModel = new ViewModelProvider(this).get(SharedViewModel.class);
@@ -97,37 +103,46 @@ public class ChartFragment extends Fragment {
         setHasOptionsMenu(true);
 
         // get references to GUI elements
-        txtv_title = root.findViewById(R.id.txtv_chart_title);
+        txtv_title = rootView.findViewById(R.id.txtv_chart_title);
         txtv_title.setText(chartTitle);
-        txtv_title_extra = root.findViewById(R.id.txtv_chart_title_extra);
+        txtv_title_extra = rootView.findViewById(R.id.txtv_chart_title_extra);
         txtv_title_extra.setText("");
         txtv_title_extra.setVisibility(View.GONE);
 
         // line chart
-        lineChart = root.findViewById(R.id.line_chart);
+        lineChart = rootView.findViewById(R.id.line_chart);
         // modify chart layout
         lineChart.setBackgroundColor(getResources().getColor(R.color.transparent));     // transparent background
         lineChart.setBorderColor(getResources().getColor(R.color.main_text_color));     // color of the chart borders
         lineChart.getLegend().setEnabled(false);                                        // hide the legend
+        lineChart.setNoDataText(getString(R.string.chart_no_data_text));
+        // Change text size of the no-data text
+        Paint pLine = lineChart.getPaint(Chart.PAINT_INFO);
+        pLine.setTextSize(getResources().getDimension(R.dimen.textAppearanceSubtitle2));
+
         // Description
         Description description = lineChart.getDescription();   // get description
         description.setText("");                          // text for description
         description.setEnabled(false);                      // hide description
 
         // bar chart
-        barChart = root.findViewById(R.id.bar_chart);
+        barChart = rootView.findViewById(R.id.bar_chart);
         barChart.setBackgroundColor(getResources().getColor(R.color.transparent));     // transparent background
         barChart.getLegend().setEnabled(false);                                        // hide the legend
+        barChart.setNoDataText(getString(R.string.chart_no_data_text));
+        // Change text size of the no-data text
+        Paint pBar = barChart.getPaint(Chart.PAINT_INFO);
+        pBar.setTextSize(getResources().getDimension(R.dimen.textAppearanceSubtitle2));
+
         // Description
         Description barChartDescription = barChart.getDescription();
         barChartDescription.setText("");
         barChartDescription.setEnabled(false);
 
-
         // init observers
         initObservers();
 
-        return root;
+        return rootView;
     }
 
     @Override
@@ -198,13 +213,16 @@ public class ChartFragment extends Fragment {
 
         SimpleDateFormat sdf = new SimpleDateFormat("dd.MM.yyyy", Locale.getDefault());
 
-        // // X-Axis Style // //
+        // X-Axis Style
         XAxis xAxis;
         xAxis = chart.getXAxis();                       // get the x axis
         xAxis.setPosition(XAxis.XAxisPosition.BOTTOM);  // axis at the bottom of the diagram
         xAxis.setGranularity(GRANULARITY_DAY);          // minimum difference between axis labels
         xAxis.setTextSize(TEXT_SIZE);                   // text size
-        xAxis.setTextColor(getResources().getColor(R.color.main_text_color)); // text color
+
+        if (this.getContext() != null) {
+            xAxis.setTextColor(getResources().getColor(R.color.main_text_color)); // text color
+        }
 
         // get the first and the last day of the x data
         Calendar startDate = viewModel.getReferenceDate();
@@ -257,11 +275,14 @@ public class ChartFragment extends Fragment {
         yAxis.setAxisMaximum(max);
         yAxis.setAxisMinimum(min);
         yAxis.setGranularity(1f);
-        yAxis.setTextColor(getResources().getColor(R.color.main_text_color));
         yAxis.setTextSize(TEXT_SIZE);
         yAxis.setCenterAxisLabels(true);
         yAxis.setDrawLabels(true);
         yAxis.setDrawGridLinesBehindData(true);
+
+        if (this.getContext() != null) {
+            yAxis.setTextColor(getResources().getColor(R.color.main_text_color));
+        }
 
         if (max/5 < 8) {
             yAxis.setLabelCount((int)max/5);
@@ -275,16 +296,23 @@ public class ChartFragment extends Fragment {
 
     private LineDataSet createLineDataSet(List<Entry> entries, String dataSetName) {
         LineDataSet dataSet = new LineDataSet(entries, dataSetName);
-        dataSet.setColor(getResources().getColor(R.color.colorPrimary));
+
+        // sometimes there is no context and the resources cannot be fetched
+        // but then a NullPointerException is thrown
+        if (this.getContext() != null) {
+            dataSet.setColor(getResources().getColor(R.color.colorPrimary));
+            dataSet.setValueTextColor(getResources().getColor(R.color.main_text_color));
+        }
+
         dataSet.setDrawCircles(false);
         dataSet.setLineWidth(DATA_LINE_WIDTH);
-        dataSet.setValueTextColor(getResources().getColor(R.color.main_text_color));
         dataSet.setValueTextSize(TEXT_SIZE);            // text size of the text for each data point
         if (entries.size() > 5) {
             dataSet.setDrawValues(false);                   // do not show the value of each data point
         } else {
             dataSet.setDrawValues(true);
         }
+
         return dataSet;
     }
 
@@ -410,6 +438,15 @@ public class ChartFragment extends Fragment {
         refreshChart(barChart);
     }
 
+    private void hideChart(Chart chart) {
+        Log.d(LOG_TAG,"hiding chart");
+        chart.setVisibility(View.GONE);
+    }
+
+    private void showChart(Chart chart) {
+        chart.setVisibility(View.VISIBLE);
+    }
+
     private int roundToNextNumber(float value, int stepsize) {
         int roundedValue = ((int)value/stepsize)*stepsize+stepsize;
         Log.d(LOG_TAG,"rounding " + value + " to " + roundedValue);
@@ -425,11 +462,14 @@ public class ChartFragment extends Fragment {
     @Override
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
 
-        int id = item.getItemId();
-
-        switch (id) {
+        switch (item.getItemId()) {
             case R.id.action_charts_filter:
-                openFilterActivity();
+                // Show the filter activity if there's some data in the database
+                if (databaseEntryCount > 0) {
+                    openFilterActivity();
+                } else {
+                    Snackbar.make(rootView.findViewById(R.id.main_chart_container), getString(R.string.snackbar_no_data_to_filter), Snackbar.LENGTH_SHORT).show();
+                }
                 break;
         }
 
@@ -473,14 +513,44 @@ public class ChartFragment extends Fragment {
         else {
             viewModel.getFilteredDailyBalance().observe(getActivity(), dailyBalanceList -> {
 
-                if (chartSwitch == chartSwitchCollectedEggs) {
-                    List<Entry> entries = viewModel.getDataEggsCollected(dailyBalanceList);
-                    LineDataSet lineDataSet = createLineDataSet(entries, NAME_EGGS_COLLECTED);
-                    updateLineChart(lineChart, lineDataSet);
-                } else if (chartSwitch == chartSwitchSoldEggs) {
-                    List<BarEntry> entries = viewModel.getDataEggsSold(dailyBalanceList);
-                    BarDataSet barDataSet = createBarDataSet(entries, NAME_EGGS_SOLD);
-                    updateBarChart(barChart, barDataSet);
+                if (dailyBalanceList != null && !dailyBalanceList.isEmpty()) {
+                    if (chartSwitch == chartSwitchCollectedEggs) {
+                        List<Entry> entries = viewModel.getDataEggsCollected(dailyBalanceList);
+
+                        // create a new LineDataSet containing the received data
+                        LineDataSet lineDataSet = createLineDataSet(entries, NAME_EGGS_COLLECTED);
+
+                        // show chart (to make it visible if it's hidden)
+                        showChart(lineChart);
+
+                        // update the content of the chart
+                        updateLineChart(lineChart, lineDataSet);
+
+                    } else if (chartSwitch == chartSwitchSoldEggs) {
+                        List<BarEntry> entries = viewModel.getDataEggsSold(dailyBalanceList);
+
+                        // create a new BarDataSet containing the received data
+                        BarDataSet barDataSet = createBarDataSet(entries, NAME_EGGS_SOLD);
+
+                        // show chart (to make it visible if it's hidden)
+                        showChart(barChart);
+
+                        // update the content of the chart
+                        updateBarChart(barChart, barDataSet);
+                    }
+                } else {
+                    // Hide the charts as there's nothing to show in the chart
+                    if (chartSwitch == chartSwitchCollectedEggs) {
+                        hideChart(lineChart);
+                    } else {
+                        hideChart(barChart);
+                    }
+                }
+            });
+
+            viewModel.getEntriesCount().observe(getViewLifecycleOwner(), count -> {
+                if (count != null) {
+                    databaseEntryCount = count;
                 }
             });
         }

@@ -73,6 +73,8 @@ public class DatabaseFragment extends Fragment {
     private View rootView;
     private Context mainContext;
 
+    private int entriesCount;
+
     private RecyclerView recyclerView;
 
     @Override
@@ -211,13 +213,28 @@ public class DatabaseFragment extends Fragment {
 
         switch (id) {
             case R.id.action_data_filter:
-                openFilterActivity();
+                // Open filter activity, if there's some data in the database
+                if (entriesCount > 0) {
+                    openFilterActivity();
+                } else {
+                    Snackbar.make(rootView.findViewById(R.id.main_container), getString(R.string.snackbar_no_data_to_filter), Snackbar.LENGTH_SHORT).show();
+                }
                 return true;
             case R.id.action_data_sort:
-                showSortingDialog();
+                // SHow options for list sorting, if there's some data in the database
+                if (entriesCount > 0) {
+                    showSortingDialog();
+                } else {
+                    Snackbar.make(rootView.findViewById(R.id.main_container), getString(R.string.snackbar_no_data_to_filter), Snackbar.LENGTH_SHORT).show();
+                }
                 return true;
             case R.id.action_completeness_check:
-                openCompletenessCheckActivity();
+                // Show completeness check activity, if there's some data in the database
+                if (entriesCount > 0) {
+                    openCompletenessCheckActivity();
+                } else {
+                    Snackbar.make(rootView.findViewById(R.id.main_container), getString(R.string.snackbar_no_data_to_filter), Snackbar.LENGTH_SHORT).show();
+                }
                 return true;
         }
         return super.onOptionsItemSelected(item);
@@ -409,17 +426,25 @@ public class DatabaseFragment extends Fragment {
 
         viewModel.getFilteredEggsCollected().observe(getViewLifecycleOwner(), eggsCollected -> {
             Log.d(LOG_TAG,"getFilteredEggsCollected() received updated data");
-            updateEggsCollected(eggsCollected);
+            if (eggsCollected != null)
+                updateEggsCollected(eggsCollected);
         });
 
         viewModel.getFilteredEggsSold().observe(getViewLifecycleOwner(), eggsSold -> {
             Log.d(LOG_TAG,"getFilteredEggsSold() received updated data");
-            updateEggsSold(eggsSold);
+            if (eggsSold != null)
+                updateEggsSold(eggsSold);
         });
 
         viewModel.getFilteredMoneyEarned().observe(getViewLifecycleOwner(), moneyEarned -> {
             Log.d(LOG_TAG,"getFilteredMoneyEarned() received updated data");
-            updateMoneyEarned(moneyEarned);
+            if (moneyEarned != null)
+                updateMoneyEarned(moneyEarned);
+        });
+
+        viewModel.getEntriesCount().observe(getViewLifecycleOwner(), count -> {
+            if (count != null)
+                entriesCount = count;
         });
     }
 }

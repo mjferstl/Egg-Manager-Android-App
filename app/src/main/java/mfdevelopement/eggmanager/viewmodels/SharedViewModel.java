@@ -30,7 +30,7 @@ public class SharedViewModel extends AndroidViewModel {
     private EggManagerRepository mRepository;
 
     // LiveData
-    private LiveData<Integer> ldFilteredEggsCollected, ldFilteredEggsSold;
+    private LiveData<Integer> ldFilteredEggsCollected, ldFilteredEggsSold, ldEntriesCount;
     private LiveData<Double> ldFilteredMoneyEarned;
     private List<String> monthNamesReference;
     private LiveData<List<DailyBalance>> filteredDailyBalances, allDailyBalances;
@@ -58,6 +58,7 @@ public class SharedViewModel extends AndroidViewModel {
         referenceDate = getReferenceDate();
 
         allDailyBalances = mRepository.getAllDailyBalances();
+        ldEntriesCount = mRepository.getEntriesCount();
 
         // filtered live data
         dataFilter.setValue(mRepository.getDataFilter());
@@ -89,6 +90,10 @@ public class SharedViewModel extends AndroidViewModel {
 
     public LiveData<Integer> getFilteredEggsSold() {
         return ldFilteredEggsSold;
+    }
+
+    public LiveData<Integer> getEntriesCount() {
+        return ldEntriesCount;
     }
 
     public void setDateFilter(String dateFilter) {

@@ -19,6 +19,7 @@
     <string name="snackbar_permission_ext_storage_granted">Zugriff auf externen Speicher gewährt. Sie können die Daten jetzt auf dem Gerät sichern.</string>
     <string name="snackbar_permission_ext_storage_denied">Zugriff auf externen Speicher verweigert. Backup kann nicht durchgeführt werden.</string>
     <string name="snackbar_data_imported_successfully">Daten für %d Tage erfolgreich importiert.</string>
+    <string name="snackbar_no_data_to_filter">Es sind noch keine Daten vorhanden</string>
 
     <!-- database activity -->
     <string name="button_save">@string/action_save</string>
@@ -30,8 +31,9 @@
     <string name="number_eggs_collected_empty">Anzahl abgenommener Eier fehlt</string>
     <string name="selected_filter_part1">Daten nach\u0020</string>
     <string name="selected_filter_part2">\u0020gefiltert</string>
-    <string name="text_empty_recyclerview">Keine Daten vorhanden.\nLegen Sie einen Datensatz an.\nKlicken Sie dazu auf das +</string>
+    <string name="text_empty_recyclerview">Keine Daten vorhanden.\nKlicken Sie dazu auf das + um Daten einzutragen.</string>
     <string name="text_recyclerview_not_visible">Die Daten wurden ausgeblendet</string>
+
 
     <!-- database backup activity -->
     <string name="txt_backup">Sichern Sie Ihre Daten in einer Datei auf dem Gerät. Gespeicherte Daten können Sie bei Bedarf wieder laden.</string>
@@ -57,6 +59,7 @@
     <string name="txt_title_eggs_collected">Abgenommene Eier</string>
     <string name="tab_name_collected">abgenommen</string>
     <string name="tab_name_sold">verkauft</string>
+    <string name="chart_no_data_text">Keine Daten vorhanden</string>
 
     <!-- dialogs -->
     <!-- sorting dialog -->
@@ -94,7 +97,7 @@
     <string name="nav_header_subtitle" translatable="false">https://mjferstl.github.io/</string>
     <string name="nav_header_desc" translatable="false">Navigation header</string>
 
-    <string name="menu_main_database" translatable="false">Daten</string>
+    <string name="menu_main_database" translatable="false">Übersicht</string>
     <string name="menu_diagrams" translatable="false">Statistik</string>
     <string name="menu_about" translatable="false">Über EggManager</string>
     <string name="menu_backup_data" translatable="false">Datensicherung</string>

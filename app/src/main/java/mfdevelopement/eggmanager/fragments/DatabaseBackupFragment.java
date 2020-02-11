@@ -340,26 +340,30 @@ public class DatabaseBackupFragment extends Fragment {
             File directory = new File(path);
             File[] files = directory.listFiles();
 
-            for (File file : files) {
+            if (files == null) {
+                Log.e(LOG_TAG,"Files[]  is null");
+            } else {
+                for (File file : files) {
 
-                // file name of the current file
-                fileName = file.getName();
+                    // file name of the current file
+                    fileName = file.getName();
 
-                // check if the file is a EggManager backup file
-                if (DatabaseBackup.isEggManagerBackupFile(fileName)) {
+                    // check if the file is a EggManager backup file
+                    if (DatabaseBackup.isEggManagerBackupFile(fileName)) {
 
-                    SimpleDateFormat simpleDateFormat = new SimpleDateFormat("dd.MM.yyyy HH:mm", stringFormatLocale);
-                    Log.d(LOG_TAG,"backup file: " + fileName + ", last modified: " + simpleDateFormat.format(file.lastModified()) + ", size: " + file.length() + " bytes");
+                        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("dd.MM.yyyy HH:mm", stringFormatLocale);
+                        Log.d(LOG_TAG, "backup file: " + fileName + ", last modified: " + simpleDateFormat.format(file.lastModified()) + ", size: " + file.length() + " bytes");
 
-                    // add the date to the list
-                    backupFiles.add(new DatabaseBackup(file));
+                        // add the date to the list
+                        backupFiles.add(new DatabaseBackup(file));
+                    }
                 }
+
+                // sort in descending order
+                Collections.sort(backupFiles);
+
+                Log.d(LOG_TAG, "Found " + backupFiles.size() + " backup files");
             }
-
-            // sort in descending order
-            Collections.sort(backupFiles);
-
-            Log.d(LOG_TAG, "Found " + backupFiles.size() + " backup files");
         } else {
             Log.e(LOG_TAG,"external storage is not readable");
             Snackbar.make(mainRoot.findViewById(idSnackbarContainer),"Berechtigung zum Lesen des Speichers fehlt", Snackbar.LENGTH_LONG).show();

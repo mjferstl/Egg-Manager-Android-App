@@ -30,6 +30,9 @@ public interface DailyBalanceDao {
     @Delete
     void delete(DailyBalance dailyBalance);
 
+    @Query("SELECT COUNT(" + COL_DATE_PRIMARY_KEY + ") FROM " + tableName)
+    LiveData<Integer> getRowCount();
+
     @Query("SELECT * from " + tableName + " ORDER BY " + COL_DATE_PRIMARY_KEY + " ASC")
     LiveData<List<DailyBalance>> getAscendingItems();
 
