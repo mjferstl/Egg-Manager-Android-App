@@ -487,12 +487,6 @@ public class DatabaseBackupFragment extends Fragment {
                 Log.d(LOG_TAG, "Date of loaded data: " + sdf_date.format(dailyBalances.get(i).getDate()));
                 activity.updateDailyBalance(dailyBalances.get(i));
                 appNotificationManager.updateImportNotification(((i+1)*100)/dailyBalances.size());
-
-                try {
-                    Thread.sleep(200);
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
             }
 
             return dailyBalances.size();

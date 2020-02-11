@@ -153,7 +153,19 @@ public class ChartFragment extends Fragment {
         float xMin = getMinX(entriesList);
         float xMax = getMaxX(entriesList);
         float yMin = 0f;
-        float yMax = roundToNextFive(getMaxY(entriesList));
+        float yMax;
+
+        float maxYValue = getMaxY(entriesList);
+
+        if (maxYValue < 50) {
+            yMax = roundToNextNumber(maxYValue,5)+5;
+        } else if (maxYValue < 100) {
+            yMax = roundToNextNumber(maxYValue, 10)+10;
+        } else if (maxYValue < 1000) {
+            yMax = roundToNextNumber(maxYValue, 100)+100;
+        } else {
+            yMax = roundToNextNumber(maxYValue, 1000)+1000;
+        }
 
         return new ChartAxisLimits(xMin, xMax, yMin, yMax);
     }
@@ -165,7 +177,19 @@ public class ChartFragment extends Fragment {
         float xMin = getMinX(entriesList)-1;
         float xMax = getMaxX(entriesList)+1;
         float yMin = 0f;
-        float yMax = roundToNextFive(getMaxY(entriesList));
+        float yMax;
+
+        float maxYValue = getMaxY(entriesList);
+
+        if (maxYValue < 50) {
+            yMax = roundToNextNumber(maxYValue,5)+5;
+        } else if (maxYValue < 100) {
+            yMax = roundToNextNumber(maxYValue, 10)+10;
+        } else if (maxYValue < 1000) {
+            yMax = roundToNextNumber(maxYValue, 100)+100;
+        } else {
+            yMax = roundToNextNumber(maxYValue, 1000)+1000;
+        }
 
         return new ChartAxisLimits(xMin, xMax, yMin, yMax);
     }
@@ -230,16 +254,7 @@ public class ChartFragment extends Fragment {
             lineChart.getAxisRight().setEnabled(false);         // disable dual axis (only use LEFT axis)
         }
 
-        // // Y-Axis Style // //
-        if (max < 100) {
-            yAxis.setAxisMaximum((((int)max/10)+1)*10);
-        } else if (max < 1000) {
-            yAxis.setAxisMaximum((((int)max/100)+1)*100);
-        } else {
-            yAxis.setAxisMaximum(max);
-        }
-        Log.d(LOG_TAG,"yAxis max value: " + yAxis.getAxisMaximum());
-
+        yAxis.setAxisMaximum(max);
         yAxis.setAxisMinimum(min);
         yAxis.setGranularity(1f);
         yAxis.setTextColor(getResources().getColor(R.color.main_text_color));
@@ -254,6 +269,7 @@ public class ChartFragment extends Fragment {
             yAxis.setLabelCount(8);
         }
 
+        Log.d(LOG_TAG,"yAxis max value: " + yAxis.getAxisMaximum());
         Log.d(LOG_TAG,"yAxis label count: " + yAxis.getLabelCount());
     }
 
@@ -394,8 +410,10 @@ public class ChartFragment extends Fragment {
         refreshChart(barChart);
     }
 
-    private int roundToNextFive(float value) {
-        return ((int)value/5)*5+5;
+    private int roundToNextNumber(float value, int stepsize) {
+        int roundedValue = ((int)value/stepsize)*stepsize+stepsize;
+        Log.d(LOG_TAG,"rounding " + value + " to " + roundedValue);
+        return roundedValue;
     }
 
     @Override
@@ -503,7 +521,6 @@ public class ChartFragment extends Fragment {
         public String getAxisLabel(float value, AxisBase axis) {
             Calendar cal = viewModel.getReferenceDate();
             cal.add(Calendar.MONTH,(int)value-1);
-            Log.d(LOG_TAG,"formatting " + value + " to " + sdf.format(cal.getTimeInMillis()));
             return sdf.format(cal.getTimeInMillis());
         }
     }

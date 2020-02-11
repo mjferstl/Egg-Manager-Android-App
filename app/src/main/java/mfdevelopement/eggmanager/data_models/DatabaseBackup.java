@@ -5,7 +5,6 @@ import android.util.Log;
 import java.io.File;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
-import java.util.Date;
 import java.util.Locale;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -71,27 +70,8 @@ public class DatabaseBackup implements Comparable<DatabaseBackup> {
             return Calendar.getInstance();
     }
 
-    public void setSaveDate(Calendar saveDate) {
-        this.saveDate = saveDate;
-    }
-
-    public void setSaveDate(Date date) {
-        Calendar cal = Calendar.getInstance();
-        cal.setTime(date);
-        setSaveDate(cal);
-    }
-
     public String getFilename() {
         return filename;
-    }
-
-    public void setFilename(String filename) {
-        this.filename = filename;
-        this.backupName = getBackupNameFromFilename(this.filename);
-    }
-
-    public long getFileSize() {
-        return fileSize;
     }
 
     public String getFileSizeFormatted() {
@@ -105,10 +85,6 @@ public class DatabaseBackup implements Comparable<DatabaseBackup> {
             return String.format(Locale.getDefault(), "%.1f GB", this.fileSize/1e9);
         else
             return "";
-    }
-
-    public void setFileSize(long fileSize) {
-        this.fileSize = fileSize;
     }
 
     public String getFormattedSaveDate() {
@@ -128,7 +104,7 @@ public class DatabaseBackup implements Comparable<DatabaseBackup> {
         String nameAndDate = filename.replace(exportFilePrefix,"").replace(exportFileDataType,"");
 
         // Create a Pattern object
-        final Pattern r = Pattern.compile("\\d+_\\d+");
+        final Pattern r = Pattern.compile("\\d{8}_\\d{6}$");
 
         // Now create matcher object.
         Matcher m = r.matcher(nameAndDate);
