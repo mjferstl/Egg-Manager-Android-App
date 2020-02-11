@@ -92,6 +92,7 @@ public class DailyBalance implements Serializable, Comparable<DailyBalance> {
         this.pricePerEgg = pricePerEgg;
         this.numHens = numHens;
         this.moneyEarned = calcMoneyEarned(eggsSold,pricePerEgg);
+
         this.dateCreated = dateCreated;
     }
 
@@ -193,7 +194,8 @@ public class DailyBalance implements Serializable, Comparable<DailyBalance> {
             jsonObject.put(DailyBalance.COL_PRICE_PER_EGG, this.getPricePerEgg());
             jsonObject.put(DailyBalance.COL_MONEY_EARNED, this.getMoneyEarned());
             jsonObject.put(DailyBalance.COL_NUMBER_HENS, this.getNumHens());
-
+            DateTypeConverter dtc = new DateTypeConverter();
+            jsonObject.put(DailyBalance.COL_DATE_CREATED, dtc.dateToTimestamp(this.getDateCreated()));
         } catch (JSONException e) {
             e.printStackTrace();
             Log.d(LOG_TAG, "Error when adding fields to JSONObject");
@@ -223,7 +225,14 @@ public class DailyBalance implements Serializable, Comparable<DailyBalance> {
                 double pricePerEgg = item.getDouble(DailyBalance.COL_PRICE_PER_EGG);
                 int numHens = item.getInt(DailyBalance.COL_NUMBER_HENS);
 
-                dailyBalanceList.add(new DailyBalance(dateKey, eggsCollected, eggsSold, pricePerEgg, numHens));
+                try {
+                    long timeInMillis = item.getLong(DailyBalance.COL_DATE_CREATED);
+                    DateTypeConverter dtc = new DateTypeConverter();
+                    dailyBalanceList.add(new DailyBalance(dateKey, eggsCollected, eggsSold, pricePerEgg, numHens, dtc.fromTimestamp(timeInMillis)));
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                    dailyBalanceList.add(new DailyBalance(dateKey, eggsCollected, eggsSold, pricePerEgg, numHens));
+                }
             } catch (JSONException e) {
                 e.printStackTrace();
                 return dailyBalanceList;
