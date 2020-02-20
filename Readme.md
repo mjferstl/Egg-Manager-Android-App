@@ -27,7 +27,7 @@ Alle eingetragenen Daten können einfach auf dem Gerät im JSON-Format gespeiche
   <img src="Screenshots/EggManager_backup.png" width="400" />
 </p>
 
-## Probleme und Fehler
+## Probleme und Verbesserungen
 Wenn Ihnen bei der Nutzung der App ein Fehler auffällt oder Sie Verbesserungsvorschläge haben, dann können Sie diese [hier](https://github.com/mjferstl/Egg-Manager-Android-App/issues) melden.
 
 ## License
