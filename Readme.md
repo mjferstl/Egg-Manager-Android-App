@@ -1,7 +1,7 @@
 # EggManager
-Android App zur Speicherung und Analyse der Daten Ihres Hühnerhofs.
-Mit dieser App speichern Sie ganz einfacht die Anzahl der Eier, die Ihre Hüher an einem Tag gelegt haben sowie die Anzahl der Eier die Sie an diesem Tag zu einem bestimmten Preis verkauft haben.
-Sie können diese Daten nach Jahren oder Monaten filtern und so sehr einfach ein Übersicht über die Produktivität Ihres Hühnerhofs erhalten.
+Diese Android App dient der Speicherung und Analyse der Daten Ihres Hühnerhofs.
+Mit dieser App speichern Sie ganz einfacht die Anzahl der Eier, die Ihre Hüher an einem Tag gelegt haben sowie die Anzahl der Eier, die Sie an diesem Tag zu einem bestimmten Preis verkauft haben.
+Sie können diese Daten individuell nach Jahren oder Monaten filtern und so einfach einen Überblick über die Produktivität Ihres Hühnerhofs erhalten.
 
 ## Download
 Das aktuelle Release v1.0.0 kann [hier](https://github.com/mjferstl/Egg-Manager-Android-App/releases/download/v1.0.0/EggManager_v1_0_0.apk) als APK-Datei heruntergeladen werden.  
@@ -26,6 +26,9 @@ Alle eingetragenen Daten können einfach auf dem Gerät im JSON-Format gespeiche
 <p float="left">
   <img src="Screenshots/EggManager_backup.png" width="400" />
 </p>
+
+## Probleme und Fehler
+Wenn Ihnen bei der Nutzung der App ein Fehler auffällt oder Sie Verbesserungsvorschläge haben, dann können Sie diese [hier](https://github.com/mjferstl/Egg-Manager-Android-App/issues) melden.
 
 ## License
 [MIT](https://github.com/mjferstl/Egg-Manager-Android-App/blob/master/LICENSE)
