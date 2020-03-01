@@ -72,7 +72,7 @@
         android:focusableInTouchMode="true"
         android:orientation="horizontal"
         android:baselineAligned="false"
-        app:layout_constraintBottom_toTopOf="@+id/linLay_new_entity_price"
+        app:layout_constraintBottom_toTopOf="@+id/constrLay_new_entity_price"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/linLay_new_entity_datepicker">
@@ -129,12 +129,12 @@
     </LinearLayout>
 
     <androidx.constraintlayout.widget.ConstraintLayout
-        android:id="@+id/linLay_new_entity_price"
+        android:id="@+id/constrLay_new_entity_price"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="@dimen/large_padding"
         android:orientation="horizontal"
-        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintBottom_toTopOf="@id/constrLay_new_entity_money_earned"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/linLay_new_entity_amount_eggs">
@@ -166,11 +166,57 @@
             android:id="@+id/txtv_new_entity_currency"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="@string/euro_symbol"
+            android:text="@string/symbol_price_per_piece"
             android:textColor="@color/main_text_color"
             android:textSize="@dimen/textAppearanceHeadline6"
             app:layout_constraintBaseline_toBaselineOf="@+id/etxt_egg_price"
             app:layout_constraintStart_toEndOf="@+id/etxt_egg_price"
+            app:layout_constraintTop_toTopOf="parent"/>
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/constrLay_new_entity_money_earned"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/large_padding"
+        android:orientation="horizontal"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="@id/constrLay_new_entity_price"
+        app:layout_constraintTop_toBottomOf="@+id/constrLay_new_entity_price">
+
+        <ImageView
+            android:id="@+id/imgv_egg_money_earned"
+            style="@style/new_entity_icon"
+            android:src="@drawable/ic_money"
+            android:contentDescription="@string/content_description_icon_money"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toStartOf="@id/etxt_egg_money_earned"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <EditText
+            android:id="@+id/etxt_egg_money_earned"
+            style="@style/new_entity_edit_text"
+            android:digits="1234567890,."
+            android:hint="@string/hint_money_earned"
+            android:inputType="numberDecimal"
+            android:maxLength="5"
+            android:importantForAutofill="no"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toStartOf="@id/txtv_new_entity_currency_money_earned"
+            app:layout_constraintStart_toEndOf="@+id/imgv_egg_money_earned"
+            app:layout_constraintTop_toTopOf="parent"/>
+
+        <TextView
+            android:id="@+id/txtv_new_entity_currency_money_earned"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/euro_symbol"
+            android:textColor="@color/main_text_color"
+            android:textSize="@dimen/textAppearanceHeadline6"
+            app:layout_constraintBaseline_toBaselineOf="@+id/etxt_egg_money_earned"
+            app:layout_constraintStart_toEndOf="@+id/etxt_egg_money_earned"
             app:layout_constraintTop_toTopOf="parent"/>
 
     </androidx.constraintlayout.widget.ConstraintLayout>

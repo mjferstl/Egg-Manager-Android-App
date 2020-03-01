@@ -29,6 +29,12 @@ public class NewEntityViewModel extends AndroidViewModel {
         return this.pricePerEgg;
     }
 
+    public void setPricePerEgg(double price) {
+        if (!Double.isNaN(price) && !Double.isInfinite(price)) {
+            repository.setPricePerEgg(price);
+        }
+    }
+
     public void addDailyBalance(DailyBalance dailyBalance) {
         pricePerEgg = dailyBalance.getPricePerEgg();
         repository.insert(dailyBalance);

@@ -45,6 +45,12 @@
     <string name="notification_import_finished">Import abgeschlossen</string>
     <string name="notification_importing_backup">Backup wird eingelesen</string>
 
+    <!-- new entity activity -->
+    <string name="symbol_price_per_piece">&#8364;/St.</string>
+    <string name="alter_title_overwrite_entry">Eintrag überschreiben</string>
+    <string name="alert_msg_overwrite_entry">Für den ausgewählten Tag ist bereits ein Eintrag vorhanden. Soll dieser Eintrag überschrieben werden?</string>
+    <string name="alter_msg_invalid_price_per_egg">Der eingegebene Preis pro Ei ist ungültig</string>
+
     <!-- filter activity -->
     <string name="menu_action_apply">Anwenden</string>
     <string name="subheading_years">Jahr</string>
@@ -73,6 +79,7 @@
     <string name="hint_eggs_collected">gelegt</string>
     <string name="hint_eggs_sold">verkauft</string>
     <string name="hint_price_per_egg">Preis pro Ei</string>
+    <string name="hint_money_earned">Erlös</string>
 
     <!-- buttons -->
     <string name="btn_text_ok">OK</string>
@@ -89,7 +96,7 @@
 
     <!-- About fragment -->
     <string name="icon_credits_header">Credits:</string>
-    <string name="icon_creadits_flaticon">Icons made by Freepik from www.flaticon.com</string>
+    <string name="icon_creadits_flaticon">Icons made by Freepik and Gregor Cresnar from www.flaticon.com</string>
     <string name="app_developer">Entwickler: Mathias Ferstl</string>
 
 
@@ -128,4 +135,5 @@
     <string name="content_description_icon_sd_card">Icon für die Speicherkarte</string>
     <string name="content_description_button_expand_collapse">Button zum Auf- und Zuklappen der fehlenden Einträge</string>
     <string name="content_description_icon_error_success">Icon, welches das Ergebnis der Datenprüfung für einen Monat bewertet</string>
+    <string name="content_description_icon_money">Icon für den Erlös</string>
 </resources>
