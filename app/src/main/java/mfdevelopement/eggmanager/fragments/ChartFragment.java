@@ -585,7 +585,7 @@ public class ChartFragment extends Fragment {
 
     private class AxisMonthYearFormatter extends ValueFormatter {
 
-        private SimpleDateFormat sdf = new SimpleDateFormat("MMM yyyy", Locale.getDefault());
+        private SimpleDateFormat sdf = new SimpleDateFormat("MM/yy", Locale.getDefault());
 
         @Override
         public String getAxisLabel(float value, AxisBase axis) {
