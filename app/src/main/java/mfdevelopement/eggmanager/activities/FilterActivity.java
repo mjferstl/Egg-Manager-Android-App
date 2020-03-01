@@ -227,7 +227,7 @@ public class FilterActivity extends AppCompatActivity implements DateFilterListA
                 adapterMonths.setDatesList(viewModel.getMonthsByYear(buttonText), true);
             } else {
                 linLayMonths.setVisibility(View.GONE);
-                adapterMonths.setDatesList(new ArrayList<String>(), true);
+                adapterMonths.setDatesList(new ArrayList<>(), true);
             }
         }
     }

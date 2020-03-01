@@ -83,21 +83,16 @@ public class DateFilterListAdapter extends RecyclerView.Adapter<DateFilterListAd
         } else {
             holder.btn.setSelected(false);
         }
-        holder.btn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Log.d(LOG_TAG,"user clicked on button \"" + buttonText + "\"");
-                if (holder.btn.isSelected()) {
-                    currentSelection = "";
-                } else {
-                    currentSelection = buttonText;
-                }
-                listener.OnButtonClicked(buttonText, !holder.btn.isSelected());
-                notifyDataSetChanged();
+        holder.btn.setOnClickListener(v -> {
+            Log.d(LOG_TAG,"user clicked on button \"" + buttonText + "\"");
+            if (holder.btn.isSelected()) {
+                currentSelection = "";
+            } else {
+                currentSelection = buttonText;
             }
+            listener.OnButtonClicked(buttonText, !holder.btn.isSelected());
+            notifyDataSetChanged();
         });
-
-//        Log.d(LOG_TAG,"finished onBindViewHolder()");
     }
 
     /**
@@ -106,6 +101,13 @@ public class DateFilterListAdapter extends RecyclerView.Adapter<DateFilterListAd
      * @param clearSelection flag, if the current selected button should be unselected
      */
     public void setDatesList(List<String> datesList, boolean clearSelection) {
+
+        // TODO: remove the following 4 lines of code
+        Log.d(LOG_TAG,"setDatesList(): entry names:");
+        for (String dateString : datesList) {
+            Log.d(LOG_TAG,dateString);
+        }
+
         dateStrings = datesList;
         // delete the last selection
         if (clearSelection) {

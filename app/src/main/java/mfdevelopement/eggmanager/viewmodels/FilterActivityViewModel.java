@@ -60,7 +60,7 @@ public class FilterActivityViewModel extends AndroidViewModel {
         return yearNamesList;
     }
 
-    public List<String> getYearMonthNames() {
+    private List<String> getYearMonthNames() {
         if (uniqueYearMonthList != null) {
             return uniqueYearMonthList;
         } else {
@@ -76,11 +76,14 @@ public class FilterActivityViewModel extends AndroidViewModel {
             }
         }
 
-        // sort in ascending order
-        Collections.sort(months);
+        // use only unique entries
+        List<String> uniqueMonthNumbers = new ArrayList<>(new HashSet<>(months));
 
-        // convert numbers (0-11) to names (January...December)
-        return getMonthNamesByIndex(months);
+        // sort in ascending order
+        Collections.sort(uniqueMonthNumbers);
+
+        // convert numbers (0-11) to names (January...December) and return the List
+        return getMonthNamesByIndex(uniqueMonthNumbers);
     }
 
     /**
@@ -99,8 +102,7 @@ public class FilterActivityViewModel extends AndroidViewModel {
             int index = Integer.parseInt(indexString)-1;
             monthNames.add(monthNamesReference.get(index));
         }
-        // return only unique names
-        return new ArrayList<>(new HashSet<>(monthNames));
+        return monthNames;
     }
 
     public int getMonthIndexByName(String monthName) {
