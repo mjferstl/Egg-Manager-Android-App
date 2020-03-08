@@ -13,7 +13,7 @@ import androidx.sqlite.db.SupportSQLiteDatabase;
 import mfdevelopement.eggmanager.data_models.DailyBalance;
 import mfdevelopement.eggmanager.data_models.DailyBalanceDao;
 
-@Database(entities = {DailyBalance.class}, version = 2, exportSchema = false)
+@Database(entities = {DailyBalance.class}, version = 3)
 public abstract class EggManagerRoomDatabase extends RoomDatabase {
 
     public abstract DailyBalanceDao dailyBalanceDao();
@@ -28,8 +28,9 @@ public abstract class EggManagerRoomDatabase extends RoomDatabase {
                     // Create database here
                     INSTANCE = Room.databaseBuilder(context.getApplicationContext(),
                             EggManagerRoomDatabase.class, dataBaseName)
-                                .addMigrations(MIGRATION_1_2)
-                                .addCallback(sRoomDatabaseCallback).build();
+                            .fallbackToDestructiveMigration()
+                            .addMigrations(MIGRATION_1_2, MIGRATION_2_3)
+                            .addCallback(sRoomDatabaseCallback).build();
                 }
             }
         }
@@ -60,12 +61,32 @@ public abstract class EggManagerRoomDatabase extends RoomDatabase {
             return null;
         }
     }
-
-
-    static final Migration MIGRATION_1_2 = new Migration(1, 2) {
+    
+    private static final Migration MIGRATION_1_2 = new Migration(1, 2) {
         @Override
         public void migrate(SupportSQLiteDatabase database) {
-            database.execSQL("ALTER TABLE dailyBalanceTable ADD COLUMN dateCreated BIGINT");
+            database.execSQL("ALTER TABLE dailyBalanceTable ADD COLUMN dateCreated INTEGER");
+        }
+    };
+
+    // Renaming columns and adding a new column containing the name of the user who created the entry
+    private static final Migration MIGRATION_2_3 = new Migration(2, 3) {
+        @Override
+        public void migrate(SupportSQLiteDatabase database) {
+            database.execSQL("CREATE TABLE new_dailyBalanceTable (" +
+                    "dateKey TEXT PRIMARY KEY NOT NULL," +
+                    "eggsCollected INTEGER NOT NULL DEFAULT 0," +
+                    "eggsSold INTEGER NOT NULL DEFAULT 0," +
+                    "pricePerEgg REAL NOT NULL DEFAULT 1.0," +
+                    "moneyEarned REAL NOT NULL DEFAULT 0.0," +
+                    "numberOfHens INTEGER NOT NULL DEFAULT 0," +
+                    "dateCreated INTEGER," +
+                    "userCreated TEXT DEFAULT ' '" +
+                    ")");
+            database.execSQL("INSERT INTO new_dailyBalanceTable (dateKey, eggsCollected, eggsSold, pricePerEgg, moneyEarned, numberOfHens, dateCreated) " +
+                    "SELECT dateKey, eggsFetched, eggsSold, pricePerEgg, moneyEarned, numberOfHens, dateCreated FROM dailyBalanceTable");
+            database.execSQL("DROP TABLE dailyBalanceTable");
+            database.execSQL("ALTER TABLE new_dailyBalanceTable RENAME TO dailyBalanceTable");
         }
     };
 }

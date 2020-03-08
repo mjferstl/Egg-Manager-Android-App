@@ -28,12 +28,13 @@ import mfdevelopement.eggmanager.utils.DateTypeConverter;
 public class DailyBalance implements Serializable, Comparable<DailyBalance> {
 
     public static final String COL_DATE_PRIMARY_KEY = "dateKey";
-    public static final String COL_EGGS_COLLECTED_NAME = "eggsFetched";
+    public static final String COL_EGGS_COLLECTED_NAME = "eggsCollected";
     public static final String COL_EGGS_SOLD_NAME = "eggsSold";
     public static final String COL_PRICE_PER_EGG = "pricePerEgg";
     public static final String COL_NUMBER_HENS = "numberOfHens";
     public static final String COL_MONEY_EARNED = "moneyEarned";
     public static final String COL_DATE_CREATED = "dateCreated";
+    public static final String COL_USER_CREATED = "userCreated";
     public static final String DATE_KEY_FORMAT = "yyyyMMdd";
     public static final int NOT_SET = 0;
 
@@ -44,24 +45,32 @@ public class DailyBalance implements Serializable, Comparable<DailyBalance> {
     @ColumnInfo(name = COL_DATE_PRIMARY_KEY)
     private String dateKey;
 
-    @ColumnInfo(name = COL_EGGS_COLLECTED_NAME)
+    @NonNull
+    @ColumnInfo(name = COL_EGGS_COLLECTED_NAME, defaultValue = "0")
     private int eggsCollected;
 
-    @ColumnInfo(name = COL_EGGS_SOLD_NAME)
+    @NonNull
+    @ColumnInfo(name = COL_EGGS_SOLD_NAME, defaultValue = "0")
     private int eggsSold;
 
-    @ColumnInfo(name = COL_PRICE_PER_EGG)
+    @NonNull
+    @ColumnInfo(name = COL_PRICE_PER_EGG, defaultValue = "1.0")
     private double pricePerEgg;
 
-    @ColumnInfo(name = COL_MONEY_EARNED)
+    @NonNull
+    @ColumnInfo(name = COL_MONEY_EARNED, defaultValue = "0.0")
     private double moneyEarned;
 
-    @ColumnInfo(name = COL_NUMBER_HENS)
+    @NonNull
+    @ColumnInfo(name = COL_NUMBER_HENS, defaultValue = "0")
     private int numHens;
 
     @TypeConverters(DateTypeConverter.class)
     @ColumnInfo(name = COL_DATE_CREATED)
     private Date dateCreated;
+
+    @ColumnInfo(name = COL_USER_CREATED)
+    private String userCreated;
 
     public DailyBalance(String dateKey, int eggsCollected, int eggsSold, double pricePerEgg) {
         setDateKey(dateKey);
@@ -92,7 +101,6 @@ public class DailyBalance implements Serializable, Comparable<DailyBalance> {
         this.pricePerEgg = pricePerEgg;
         this.numHens = numHens;
         this.moneyEarned = calcMoneyEarned(eggsSold,pricePerEgg);
-
         this.dateCreated = dateCreated;
     }
 
@@ -160,6 +168,10 @@ public class DailyBalance implements Serializable, Comparable<DailyBalance> {
     public Date getCurrentDate() {
         return new Date(System.currentTimeMillis());
     }
+
+    public String getUserCreated() { return this.userCreated;}
+
+    public void setUserCreated(String username) { this.userCreated = username;}
 
     public static String getYearByDateKey(String dateKey) {
         if (dateKey.length() >= 4) {
