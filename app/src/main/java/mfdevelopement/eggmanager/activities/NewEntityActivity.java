@@ -35,10 +35,9 @@ import mfdevelopement.eggmanager.R;
 import mfdevelopement.eggmanager.data_models.DailyBalance;
 import mfdevelopement.eggmanager.dialog_fragments.DatePickerFragment;
 import mfdevelopement.eggmanager.fragments.DatabaseFragment;
+import mfdevelopement.eggmanager.utils.DateFormatter;
 import mfdevelopement.eggmanager.utils.InputManager;
 import mfdevelopement.eggmanager.viewmodels.NewEntityViewModel;
-
-import static mfdevelopement.eggmanager.activities.DataCompletenessCheckActivity.sdf_human_readable;
 
 public class NewEntityActivity extends AppCompatActivity implements DatePickerFragment.OnAddDateListener {
 
@@ -156,7 +155,7 @@ public class NewEntityActivity extends AppCompatActivity implements DatePickerFr
             Log.d(LOG_TAG, "starting activity with date: \"" + date + "\"");
             if (date != null) {
                 try {
-                    updateDate(sdf_human_readable.parse(date));
+                    updateDate(DateFormatter.parseHumanReadableDateString(date));
                 } catch (ParseException e) {
                     e.printStackTrace();
                 }

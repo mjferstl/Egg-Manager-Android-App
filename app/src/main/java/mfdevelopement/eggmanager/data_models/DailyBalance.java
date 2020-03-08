@@ -104,6 +104,18 @@ public class DailyBalance implements Serializable, Comparable<DailyBalance> {
         this.dateCreated = dateCreated;
     }
 
+    @Ignore
+    public DailyBalance(String dateKey, int eggsCollected, int eggsSold, double pricePerEgg, int numHens, Date dateCreated, String userCreated) {
+        setDateKey(dateKey);
+        this.eggsCollected = eggsCollected;
+        this.eggsSold = eggsSold;
+        this.pricePerEgg = pricePerEgg;
+        setNumHens(numHens);
+        setMoneyEarned(calcMoneyEarned(eggsSold, pricePerEgg));
+        setDateCreated(dateCreated);
+        setUserCreated(userCreated);
+    }
+
     private double calcMoneyEarned(int eggsSold, double pricePerEgg) {
         // calculate the earned money
         if (eggsSold != 0 && pricePerEgg != 0)
@@ -169,7 +181,9 @@ public class DailyBalance implements Serializable, Comparable<DailyBalance> {
         return new Date(System.currentTimeMillis());
     }
 
-    public String getUserCreated() { return this.userCreated;}
+    public String getUserCreated() {
+        return this.userCreated;
+    }
 
     public void setUserCreated(String username) { this.userCreated = username;}
 
@@ -206,6 +220,7 @@ public class DailyBalance implements Serializable, Comparable<DailyBalance> {
             jsonObject.put(DailyBalance.COL_PRICE_PER_EGG, this.getPricePerEgg());
             jsonObject.put(DailyBalance.COL_MONEY_EARNED, this.getMoneyEarned());
             jsonObject.put(DailyBalance.COL_NUMBER_HENS, this.getNumHens());
+            jsonObject.put(DailyBalance.COL_USER_CREATED, this.getUserCreated());
             DateTypeConverter dtc = new DateTypeConverter();
             jsonObject.put(DailyBalance.COL_DATE_CREATED, dtc.dateToTimestamp(this.getDateCreated()));
         } catch (JSONException e) {
@@ -236,15 +251,19 @@ public class DailyBalance implements Serializable, Comparable<DailyBalance> {
                 int eggsSold = item.getInt(DailyBalance.COL_EGGS_SOLD_NAME);
                 double pricePerEgg = item.getDouble(DailyBalance.COL_PRICE_PER_EGG);
                 int numHens = item.getInt(DailyBalance.COL_NUMBER_HENS);
+                String userCreated = item.getString(DailyBalance.COL_USER_CREATED);
+                Date dateCreated = null;
 
                 try {
                     long timeInMillis = item.getLong(DailyBalance.COL_DATE_CREATED);
                     DateTypeConverter dtc = new DateTypeConverter();
-                    dailyBalanceList.add(new DailyBalance(dateKey, eggsCollected, eggsSold, pricePerEgg, numHens, dtc.fromTimestamp(timeInMillis)));
+                    dateCreated = dtc.fromTimestamp(timeInMillis);
                 } catch (JSONException e) {
                     e.printStackTrace();
-                    dailyBalanceList.add(new DailyBalance(dateKey, eggsCollected, eggsSold, pricePerEgg, numHens));
                 }
+
+                // add DailyBalance object to the List
+                dailyBalanceList.add(new DailyBalance(dateKey, eggsCollected, eggsSold, pricePerEgg, numHens, dateCreated, userCreated));
             } catch (JSONException e) {
                 e.printStackTrace();
                 return dailyBalanceList;

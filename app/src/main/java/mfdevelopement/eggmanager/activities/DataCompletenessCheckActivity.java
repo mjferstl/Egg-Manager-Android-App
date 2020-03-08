@@ -32,6 +32,7 @@ import mfdevelopement.eggmanager.dialog_fragments.DatePickerFragment;
 import mfdevelopement.eggmanager.fragments.DatabaseFragment;
 import mfdevelopement.eggmanager.list_adapters.DataCompletenessCheckListAdapter;
 import mfdevelopement.eggmanager.list_adapters.MissingDateListAdapter;
+import mfdevelopement.eggmanager.utils.DateFormatter;
 import mfdevelopement.eggmanager.viewmodels.DataCheckViewModel;
 
 import static mfdevelopement.eggmanager.data_models.DailyBalance.DATE_KEY_FORMAT;
@@ -46,7 +47,6 @@ public class DataCompletenessCheckActivity extends AppCompatActivity implements 
 
     // date formatter for the date keys
     private SimpleDateFormat sdf_date_keys = new SimpleDateFormat(DATE_KEY_FORMAT, Locale.getDefault());
-    public static SimpleDateFormat sdf_human_readable = new SimpleDateFormat("dd.MM.yyyy", Locale.getDefault());
 
     private List<String> allDateKeys;
 
@@ -143,7 +143,7 @@ public class DataCompletenessCheckActivity extends AppCompatActivity implements 
 
         Date initialDate = null;
         try {
-            initialDate = sdf_human_readable.parse(initialDateString);
+            initialDate = DateFormatter.parseHumanReadableDateString(initialDateString);
         } catch (ParseException e) {
             e.printStackTrace();
         }
@@ -184,9 +184,9 @@ public class DataCompletenessCheckActivity extends AppCompatActivity implements 
         List<String> dateKeysInRange = new ArrayList<>();
 
         if (txtv_start_date != null)
-            txtv_start_date.setText(sdf_human_readable.format(startDate.getTimeInMillis()));
+            txtv_start_date.setText(DateFormatter.getHumanReadableDate(startDate));
         if (txtv_end_date != null)
-            txtv_end_date.setText(sdf_human_readable.format(endDate.getTimeInMillis()));
+            txtv_end_date.setText(DateFormatter.getHumanReadableDate(endDate));
 
         // calculate the difference in days between the first and last date
         int diffDays = (int)((endDate.getTimeInMillis() - startDate.getTimeInMillis())/(1000*60*60*24));
@@ -241,13 +241,13 @@ public class DataCompletenessCheckActivity extends AppCompatActivity implements 
 
     private Calendar getDateFromTextView(TextView textView) throws ParseException {
         Calendar cal = Calendar.getInstance();
-        cal.setTime(sdf_human_readable.parse(textView.getText().toString()));
+        cal.setTime(DateFormatter.parseHumanReadableDateString(textView.getText().toString()));
         return cal;
     }
 
     @Override
     public void onAddDateSubmit(Calendar calendar) {
-        String dateSubmitted = sdf_human_readable.format(calendar.getTimeInMillis());
+        String dateSubmitted = DateFormatter.getHumanReadableDate(calendar);
         Log.d(LOG_TAG,"date submitted: " + dateSubmitted);
 
         if (datePickerId == START_DATE_PICKER_ID) {
@@ -262,7 +262,7 @@ public class DataCompletenessCheckActivity extends AppCompatActivity implements 
 
     @Override
     public void onCreateEntityClicked(Calendar newDate) {
-        String dateString = sdf_human_readable.format(newDate.getTimeInMillis());
+        String dateString = DateFormatter.getHumanReadableDate(newDate);
         Log.d(LOG_TAG,"user wants to create a new entity for the date \"" + dateString + "\"");
         createNewEntity(dateString);
     }

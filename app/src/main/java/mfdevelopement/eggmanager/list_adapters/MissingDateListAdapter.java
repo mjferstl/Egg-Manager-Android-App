@@ -14,14 +14,12 @@ import java.util.Calendar;
 import java.util.List;
 
 import mfdevelopement.eggmanager.R;
-
-import static mfdevelopement.eggmanager.activities.DataCompletenessCheckActivity.sdf_human_readable;
+import mfdevelopement.eggmanager.utils.DateFormatter;
 
 public class MissingDateListAdapter extends BaseAdapter {
 
     private final String LOG_TAG = "MissingDateListAdapter";
     private List<String> mData;
-    private Context context;
     private OnCreateEntityClickListener listener;
 
     public interface OnCreateEntityClickListener {
@@ -77,7 +75,7 @@ public class MissingDateListAdapter extends BaseAdapter {
 
             Calendar cal = Calendar.getInstance();
             try {
-                cal.setTime(sdf_human_readable.parse(item));
+                cal.setTime(DateFormatter.parseHumanReadableDateString(item));
                 listener.onCreateEntityClicked(cal);
             } catch (ParseException e) {
                 Log.e(LOG_TAG,"ParseException when parsing \""+ item +"\"");
