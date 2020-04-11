@@ -1,6 +1,6 @@
 # EggManager
 Diese Android App dient der Speicherung und Analyse der Daten Ihres Hühnerhofs.
-Mit dieser App speichern Sie ganz einfacht die Anzahl der Eier, die Ihre Hüher an einem Tag gelegt haben sowie die Anzahl der Eier, die Sie an diesem Tag zu einem bestimmten Preis verkauft haben.
+Mit dieser App speichern Sie ganz einfacht die Anzahl der Eier, die Ihre Hühner an einem Tag gelegt haben sowie die Anzahl der Eier, die Sie an diesem Tag zu einem bestimmten Preis verkauft haben.
 Sie können diese Daten individuell nach Jahren oder Monaten filtern und so einfach einen Überblick über die Produktivität Ihres Hühnerhofs erhalten.
 
 ## Download
