@@ -140,6 +140,9 @@ public class FilterActivity extends AppCompatActivity implements DateFilterListA
         adapterMonths.setDatesList(monthNames, false);
     }
 
+    /**
+     * Method to initialize all observers for getting live data from the database
+     */
     private void initObservers() {
         Log.d(LOG_TAG,"initializing observers");
         viewModel.getAllDateKeys().observe(this, stringList -> {
@@ -153,6 +156,11 @@ public class FilterActivity extends AppCompatActivity implements DateFilterListA
         });
     }
 
+    /**
+     * Method to create the options menu specified in the menu_filter.xml
+     * @param menu Menu
+     * @return boolean
+     */
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         MenuInflater inflater = getMenuInflater();
@@ -185,6 +193,11 @@ public class FilterActivity extends AppCompatActivity implements DateFilterListA
         }
     }
 
+    /**
+     * Method for ending the activity
+     * @param resultCode Integer representing the result code, which is sent to the caller activity
+     * @param data Intent containing data to be sent to the caller activity
+     */
     private void endActivity(int resultCode, @Nullable Intent data) {
         if (data != null)
             setResult(resultCode, data);
@@ -214,10 +227,18 @@ public class FilterActivity extends AppCompatActivity implements DateFilterListA
         return filterString;
     }
 
+    /**
+     * Actions, when a filter button is clicked
+     * When the text of the filter button is an integer, then the user has clicked on a button containing a year
+     * Depedning on the current state of the button (selected or unselected), the list with the corresponding
+     * months is shown or hidden
+     * @param buttonText String containing the text of the clicked button
+     * @param isSelected boolean which indicates, if the button is selected
+     */
     @Override
     public void OnButtonClicked(String buttonText, boolean isSelected) {
         Log.d(LOG_TAG,"user clicked on button with text " + buttonText + ". Button is selected: " + isSelected);
-        if (buttonText.length() == 4) {
+        if (isInt(buttonText)) {
             Log.d(LOG_TAG,"user selected a button containing a year");
 
             // if the user selected the button, then update the months list
@@ -229,6 +250,20 @@ public class FilterActivity extends AppCompatActivity implements DateFilterListA
                 linLayMonths.setVisibility(View.GONE);
                 adapterMonths.setDatesList(new ArrayList<>(), true);
             }
+        }
+    }
+
+    /**
+     * Check if an string can be converted to an integer
+     * @param string String to be converted
+     * @return boolean which indicateds, if the string represents an integer
+     */
+    private boolean isInt(String string) {
+        try {
+            Integer.parseInt(string);
+            return true;
+        } catch (Exception e) {
+            return false;
         }
     }
 }
