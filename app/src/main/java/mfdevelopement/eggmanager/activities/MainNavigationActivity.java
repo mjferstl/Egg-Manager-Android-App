@@ -18,6 +18,7 @@ import com.google.android.material.navigation.NavigationView;
 
 import mfdevelopement.eggmanager.R;
 import mfdevelopement.eggmanager.data_models.DailyBalance;
+import mfdevelopement.eggmanager.dialog_fragments.DeleteDatabaseDialog;
 import mfdevelopement.eggmanager.dialog_fragments.SortingDialogFragment;
 import mfdevelopement.eggmanager.viewmodels.SharedViewModel;
 
@@ -25,7 +26,7 @@ import static mfdevelopement.eggmanager.utils.AppNotificationManager.INTENT_ACTI
 import static mfdevelopement.eggmanager.utils.AppNotificationManager.INTENT_ACTION_OPEN_DATABASE;
 
 public class MainNavigationActivity extends AppCompatActivity
-        implements SortingDialogFragment.OnSortingItemClickListener{
+        implements SortingDialogFragment.OnSortingItemClickListener, DeleteDatabaseDialog.DialogButtonClickedListener {
 
     private AppBarConfiguration mAppBarConfiguration;
     private final String LOG_TAG = "MainNavigationActivity";
@@ -159,5 +160,17 @@ public class MainNavigationActivity extends AppCompatActivity
     public void updateDailyBalance(DailyBalance dailyBalance) {
         Log.d(LOG_TAG,"updateDailyBalance() called with DailyBalance for " + dailyBalance.getDateKey());
         viewModel.insert(dailyBalance);
+    }
+
+    @Override
+    public void onDeleteOkClicked() {
+        Log.i(LOG_TAG, "User wants to delete all database items");
+        viewModel.deleteAll();
+        Log.d(LOG_TAG, "Finished deleting all items");
+    }
+
+    @Override
+    public void onDeleteCancelClicked() {
+        Log.d(LOG_TAG, "User canceled deleting all database items");
     }
 }

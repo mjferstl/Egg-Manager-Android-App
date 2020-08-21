@@ -24,7 +24,7 @@ public class EggManagerRepository {
     private final String KEY_PRICE_PER_EGG = "pricePerEgg";
     private final String KEY_FILTER_STRING = "filterString";
     private final String KEY_SORTING_ORDER = "sortingOrder";
-    private final String LOG_TAG = "EggManagerRepository";
+    private final static String LOG_TAG = "EggManagerRepository";
 
     private Application application;
 
@@ -86,6 +86,10 @@ public class EggManagerRepository {
         new deleteAsyncTask(dailyBalanceDao).execute(dailyBalance);
     }
 
+    public void deleteAll() {
+        new deleteAllAsyncTask(dailyBalanceDao).execute();
+    }
+
     public LiveData<List<DailyBalance>> getFilteredDailyBalance(String dateFilter) {
         this.dateFilter.setValue(dateFilter);
         return ldFilteredDailyBalance;
@@ -112,9 +116,7 @@ public class EggManagerRepository {
         List<String> dateKeys = new ArrayList<>();
         try {
             dateKeys = new getAllDateKeys(dailyBalanceDao).execute().get();
-        } catch (ExecutionException e) {
-            e.printStackTrace();
-        } catch (InterruptedException e) {
+        } catch (ExecutionException | InterruptedException e) {
             e.printStackTrace();
         }
         return dateKeys;
@@ -125,9 +127,7 @@ public class EggManagerRepository {
 
         try {
             dailyBalanceList = new getDailyBalanceByDateKeyAsyncTask(dailyBalanceDao).execute(dateKeyPattern).get();
-        } catch (ExecutionException e) {
-            e.printStackTrace();
-        } catch (InterruptedException e) {
+        } catch (ExecutionException | InterruptedException e) {
             e.printStackTrace();
         }
 
@@ -160,6 +160,26 @@ public class EggManagerRepository {
         @Override
         protected Void doInBackground(final DailyBalance... params) {
             mAsyncTaskDao.delete(params[0]);
+            return null;
+        }
+    }
+
+    /**
+     * Async Task to deere
+     */
+    private static class deleteAllAsyncTask extends AsyncTask<Void, Void, Void> {
+
+        private DailyBalanceDao mAsyncTaskDao;
+
+        deleteAllAsyncTask(DailyBalanceDao dao) {
+            mAsyncTaskDao = dao;
+        }
+
+        @Override
+        protected Void doInBackground(Void... voids) {
+            Log.d(LOG_TAG, "Starting to delete all items");
+            mAsyncTaskDao.deleteAll();
+            Log.d(LOG_TAG, "All items deleted.");
             return null;
         }
     }

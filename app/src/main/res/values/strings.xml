@@ -12,6 +12,8 @@
     <!-- action bars -->
     <string name="action_filter">Filtern</string>
     <string name="action_save">Speichern</string>
+    <string name="action_delete_database">Daten löschen</string>
+    <string name="action_data_check">Datenprüfung</string>
 
     <!-- Snackbars -->
     <string name="snackbar_error_loading_data_from_database">Fehler beim Lesen der Daten aus der Datenbank. Bitte den Fehler an den Entwickler melden.</string>
@@ -74,6 +76,9 @@
     <!-- options dialog -->
     <string name="txt_option_delete">Löschen</string>
     <string name="txt_option_import">Importieren</string>
+
+    <!-- delete database dialog -->
+    <string name="dialog_title_delete_database">Alle Einträge entfernen</string>
 
     <!-- hints -->
     <string name="hint_eggs_collected">gelegt</string>

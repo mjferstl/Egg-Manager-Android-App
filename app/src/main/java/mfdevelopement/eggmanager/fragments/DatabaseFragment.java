@@ -38,6 +38,7 @@ import mfdevelopement.eggmanager.activities.NewEntityActivity;
 import mfdevelopement.eggmanager.data_models.DailyBalance;
 import mfdevelopement.eggmanager.data_models.SortingItem;
 import mfdevelopement.eggmanager.data_models.SortingItemCollection;
+import mfdevelopement.eggmanager.dialog_fragments.DeleteDatabaseDialog;
 import mfdevelopement.eggmanager.dialog_fragments.SortingDialogFragment;
 import mfdevelopement.eggmanager.list_adapters.DailyBalanceListAdapter;
 import mfdevelopement.eggmanager.viewmodels.SharedViewModel;
@@ -236,8 +237,37 @@ public class DatabaseFragment extends Fragment {
                     Snackbar.make(rootView.findViewById(R.id.main_container), getString(R.string.snackbar_no_data_to_filter), Snackbar.LENGTH_SHORT).show();
                 }
                 return true;
+            case R.id.action_delete_database:
+                // Delete all items of the database
+                if (entriesCount > 0) {
+                    showDeleteDialog();
+                } else {
+                    Snackbar.make(rootView.findViewById(R.id.main_container), getString(R.string.snackbar_no_data_to_filter), Snackbar.LENGTH_SHORT).show();
+                }
+                return true;
         }
         return super.onOptionsItemSelected(item);
+    }
+
+    private void showDeleteDialog() {
+        // DialogFragment.show() will take care of adding the fragment
+        // in a transaction.  We also want to remove any currently showing
+        // dialog, so make our own transaction and take care of that here.
+        if (getActivity() != null) {
+            // FragmentActivity.getSupportFragmentManager()
+            FragmentTransaction ft = getActivity().getSupportFragmentManager().beginTransaction();
+            Fragment prev = getActivity().getSupportFragmentManager().findFragmentByTag("dialog");
+            if (prev != null) {
+                ft.remove(prev);
+            }
+            ft.addToBackStack(null);
+
+            // Create and show the dialog.
+            DialogFragment newFragment = DeleteDatabaseDialog.newInstance();
+            newFragment.show(ft, "dialog");
+        } else {
+            Log.e(LOG_TAG,"getActivity() = null");
+        }
     }
 
     private void showSortingDialog() {

@@ -113,6 +113,10 @@ public class SharedViewModel extends AndroidViewModel {
         mRepository.delete(dailyBalance);
     }
 
+    public void deleteAll() {
+        mRepository.deleteAll();
+    }
+
     public String loadDateFilter() {
         return mRepository.getDataFilter();
     }
