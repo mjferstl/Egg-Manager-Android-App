@@ -15,12 +15,24 @@ import mfdevelopement.eggmanager.R;
 
 public class DeleteDatabaseDialog extends DialogFragment {
 
+    /**
+     * String to be used for identification in log messages
+     */
     private final static String LOG_TAG = "DeleteDatabaseDialog";
 
+    /**
+     * listener to provide the interaction between activity and this dialog
+     */
     private DialogButtonClickedListener listener;
 
+    /**
+     * Interface containing functions to be called when the user clicks on buttons at the dialog UI
+     */
     public interface DialogButtonClickedListener {
+        // method to be called when the user clicks on the "OK" button
         void onDeleteOkClicked();
+
+        // method to be called when the user clicks on the "Cancel" button
         void onDeleteCancelClicked();
     }
 
@@ -28,13 +40,17 @@ public class DeleteDatabaseDialog extends DialogFragment {
      * Create a new instance of SortingDialogFragment
      */
     public static DeleteDatabaseDialog newInstance() {
-        Log.d(LOG_TAG,"creating new instance of DeleteDatabaseDialog");
+        Log.d(LOG_TAG, "creating new instance of DeleteDatabaseDialog");
         return new DeleteDatabaseDialog();
     }
 
     @Override
     public void onAttach(@NonNull Context context) {
         super.onAttach(context);
+
+        // initialize the listener
+        // the calling instance needs to implement the interface DeleteDatabaseDialog.DialogButtonClickedListener
+        // Otherwise an Exception will be thrown
         if (context instanceof DialogButtonClickedListener) {
             listener = (DialogButtonClickedListener) context;
         } else {
@@ -69,10 +85,13 @@ public class DeleteDatabaseDialog extends DialogFragment {
         return builder.create();
     }
 
+    /**
+     * Method which will be called when the dialog gets dismissed
+     */
     @Override
     public void dismiss() {
         super.dismiss();
-        Log.d(LOG_TAG,"dialog gets dismissed");
+        Log.d(LOG_TAG, "dialog gets dismissed");
     }
 }
 
