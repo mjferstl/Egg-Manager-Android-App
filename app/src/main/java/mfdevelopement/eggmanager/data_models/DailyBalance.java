@@ -78,7 +78,7 @@ public class DailyBalance implements Serializable, Comparable<DailyBalance> {
         this.eggsSold = eggsSold;
         this.pricePerEgg = pricePerEgg;
         this.numHens = 0;
-        this.moneyEarned = calcMoneyEarned(eggsSold,pricePerEgg);
+        this.moneyEarned = calcMoneyEarned(eggsSold, pricePerEgg);
         this.dateCreated = getCurrentDate();
     }
 
@@ -89,7 +89,7 @@ public class DailyBalance implements Serializable, Comparable<DailyBalance> {
         this.eggsSold = eggsSold;
         this.pricePerEgg = pricePerEgg;
         this.numHens = numHens;
-        this.moneyEarned = calcMoneyEarned(eggsSold,pricePerEgg);
+        this.moneyEarned = calcMoneyEarned(eggsSold, pricePerEgg);
         this.dateCreated = getCurrentDate();
     }
 
@@ -100,7 +100,7 @@ public class DailyBalance implements Serializable, Comparable<DailyBalance> {
         this.eggsSold = eggsSold;
         this.pricePerEgg = pricePerEgg;
         this.numHens = numHens;
-        this.moneyEarned = calcMoneyEarned(eggsSold,pricePerEgg);
+        this.moneyEarned = calcMoneyEarned(eggsSold, pricePerEgg);
         this.dateCreated = dateCreated;
     }
 
@@ -119,13 +119,13 @@ public class DailyBalance implements Serializable, Comparable<DailyBalance> {
     private double calcMoneyEarned(int eggsSold, double pricePerEgg) {
         // calculate the earned money
         if (eggsSold != 0 && pricePerEgg != 0)
-            return eggsSold*pricePerEgg;
+            return eggsSold * pricePerEgg;
         else
             return 0;
     }
 
     @NonNull
-    public String getDateKey(){
+    public String getDateKey() {
         return this.dateKey;
     }
 
@@ -139,11 +139,17 @@ public class DailyBalance implements Serializable, Comparable<DailyBalance> {
         }
     }
 
-    public int getEggsCollected() { return  this.eggsCollected; }
+    public int getEggsCollected() {
+        return this.eggsCollected;
+    }
 
-    public int getEggsSold() { return this.eggsSold; }
+    public int getEggsSold() {
+        return this.eggsSold;
+    }
 
-    public double getPricePerEgg() { return this.pricePerEgg; }
+    public double getPricePerEgg() {
+        return this.pricePerEgg;
+    }
 
     public Date getDate() {
         SimpleDateFormat sdf = new SimpleDateFormat(DATE_KEY_FORMAT, Locale.getDefault());
@@ -157,13 +163,17 @@ public class DailyBalance implements Serializable, Comparable<DailyBalance> {
         return date;
     }
 
-    public int getNumHens() { return this.numHens; }
+    public int getNumHens() {
+        return this.numHens;
+    }
 
     public void setNumHens(int numHens) {
         this.numHens = numHens;
     }
 
-    public double getMoneyEarned() { return this.moneyEarned; }
+    public double getMoneyEarned() {
+        return this.moneyEarned;
+    }
 
     public void setMoneyEarned(double money) {
         this.moneyEarned = money;
@@ -187,11 +197,13 @@ public class DailyBalance implements Serializable, Comparable<DailyBalance> {
         return this.userCreated;
     }
 
-    public void setUserCreated(String username) { this.userCreated = username;}
+    public void setUserCreated(String username) {
+        this.userCreated = username;
+    }
 
     public static String getYearByDateKey(String dateKey) {
         if (dateKey.length() >= 4) {
-            return dateKey.substring(0,4).trim();
+            return dateKey.substring(0, 4).trim();
         } else {
             return "";
         }
@@ -208,6 +220,7 @@ public class DailyBalance implements Serializable, Comparable<DailyBalance> {
 
     /**
      * create a JSONObject
+     *
      * @return JSONObject representing the DailyBalance object in JSON notation
      */
     public JSONObject toJSON() {
@@ -236,6 +249,7 @@ public class DailyBalance implements Serializable, Comparable<DailyBalance> {
 
     /**
      * parse a JSONArray to a list of DailyBalance objects
+     *
      * @param jsonArray JSONArray containing data for a DailyBalance
      * @return List<DailyBalance> list of DailyBalance objects
      */
@@ -248,12 +262,13 @@ public class DailyBalance implements Serializable, Comparable<DailyBalance> {
         for (int i = 0; i < jsonArray.length(); i++) {
             try {
                 item = jsonArray.getJSONObject(i);
+
                 String dateKey = item.getString(DailyBalance.COL_DATE_PRIMARY_KEY);
-                int eggsCollected = item.getInt(DailyBalance.COL_EGGS_COLLECTED_NAME);
-                int eggsSold = item.getInt(DailyBalance.COL_EGGS_SOLD_NAME);
-                double pricePerEgg = item.getDouble(DailyBalance.COL_PRICE_PER_EGG);
-                int numHens = item.getInt(DailyBalance.COL_NUMBER_HENS);
-                String userCreated = item.getString(DailyBalance.COL_USER_CREATED);
+                int eggsCollected = getJSONElementWithDefault(item, DailyBalance.COL_EGGS_COLLECTED_NAME, 0);
+                int eggsSold = getJSONElementWithDefault(item, DailyBalance.COL_EGGS_SOLD_NAME, 0);
+                double pricePerEgg = getJSONElementWithDefault(item, DailyBalance.COL_PRICE_PER_EGG, 0.0);
+                int numHens = getJSONElementWithDefault(item, DailyBalance.COL_NUMBER_HENS, 0);
+                String userCreated = getJSONElementWithDefault(item, DailyBalance.COL_USER_CREATED, "");
                 Date dateCreated = null;
 
                 try {
@@ -273,6 +288,27 @@ public class DailyBalance implements Serializable, Comparable<DailyBalance> {
         }
 
         return dailyBalanceList;
+    }
+
+    private static <T> T getJSONElementWithDefault(JSONObject jsonObject, String elementName, T defaultValue) {
+        try {
+            if (defaultValue instanceof String) {
+                return (T) jsonObject.getString(elementName);
+            } else if (defaultValue instanceof Integer) {
+                return (T) (Integer) jsonObject.getInt(elementName);
+            } else if (defaultValue instanceof Double) {
+                return (T) (Double) jsonObject.getDouble(elementName);
+            } else if (defaultValue instanceof Long) {
+                return (T) (Long) jsonObject.getLong(elementName);
+            } else if (defaultValue instanceof Boolean) {
+                return (T) (Boolean) jsonObject.getBoolean(elementName);
+            } else {
+                return (T) jsonObject.get(elementName);
+            }
+        } catch (JSONException e) {
+            Log.d(LOG_TAG, String.format("The json object has no element named \"%s\". The default value %s will be returned.", elementName, defaultValue));
+            return defaultValue;
+        }
     }
 
 
