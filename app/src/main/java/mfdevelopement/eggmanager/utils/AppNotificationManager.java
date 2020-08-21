@@ -89,7 +89,6 @@ public class AppNotificationManager {
         updateImportNotification(progress, 100);
     }
 
-
     public void updateImportNotification(int progress, int maxProgress) {
 
         Log.d(LOG_TAG,"updating notification. current progress: " + progress);
@@ -137,7 +136,4 @@ public class AppNotificationManager {
                 .setAutoCancel(true);
         notificationManager.notify(NOTIFICATION_ID_IMPORT, importNotificationBuilder.build());
     }
-
-
-
 }
