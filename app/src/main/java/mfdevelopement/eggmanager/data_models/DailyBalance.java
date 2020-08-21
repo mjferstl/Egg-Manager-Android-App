@@ -182,6 +182,8 @@ public class DailyBalance implements Serializable, Comparable<DailyBalance> {
     }
 
     public String getUserCreated() {
+        if (this.userCreated == null)
+            return "";
         return this.userCreated;
     }
 
