@@ -500,10 +500,13 @@ public class DatabaseBackupFragment extends Fragment {
         protected void onPostExecute(Integer numItems) {
             super.onPostExecute(numItems);
 
-            if (numItems > 0)
+            Log.d(LOG_TAG, String.format("import of %s items finished", numItems));
+
+            if (numItems > 0) {
                 appNotificationManager.setImportNotificationFinished("Import abgeschlossen.\n" + numItems + " Einträge eingelesen.");
-            else
+            } else {
                 appNotificationManager.setImportNotificationFinished("Fehler beim Einlesen der Daten. Keine neuen Daten importiert.");
+            }
         }
     }
 }

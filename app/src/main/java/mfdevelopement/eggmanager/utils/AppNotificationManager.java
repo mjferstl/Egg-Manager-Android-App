@@ -69,14 +69,13 @@ public class AppNotificationManager {
 
 
         importNotificationBuilder = new NotificationCompat.Builder(this.context, NOTIFICATION_CHANNEL_ID)
-                .setSmallIcon(R.drawable.ic_import_export_black_24dp)
+                .setSmallIcon(R.drawable.ic_eggs_black)
                 .setContentTitle(this.context.getString(R.string.notification_import_title_prefix) + " \"" + backupName + "\"")
                 .setContentText(this.context.getString(R.string.notification_importing_backup))
                 .setPriority(NotificationCompat.PRIORITY_LOW)
                 // Set the intent that will fire when the user taps the notification
                 .setContentIntent(pendingIntent)
                 .setAutoCancel(false);
-
 
         // Issue the initial notification with zero progress
         int PROGRESS_MAX = 100;
@@ -121,8 +120,9 @@ public class AppNotificationManager {
             return;
         }
 
-        if (notificationManager == null)
+        if (notificationManager == null) {
             notificationManager = NotificationManagerCompat.from(this.context);
+        }
 
         // start the database overview if the import finished
         Intent intent = new Intent(this.context, MainNavigationActivity.class);
@@ -131,9 +131,10 @@ public class AppNotificationManager {
         PendingIntent pendingIntent = PendingIntent.getActivity(this.context, 0, intent, 0);
 
         importNotificationBuilder.setContentText(notificationText)
-                .setProgress(0,0,false)
+                .setProgress(0, 0, false)
                 .setContentIntent(pendingIntent)
                 .setAutoCancel(true);
+
         notificationManager.notify(NOTIFICATION_ID_IMPORT, importNotificationBuilder.build());
     }
 }
