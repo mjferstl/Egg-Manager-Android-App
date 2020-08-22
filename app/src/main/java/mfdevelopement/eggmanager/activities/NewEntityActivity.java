@@ -39,23 +39,60 @@ import mfdevelopement.eggmanager.utils.DateFormatter;
 import mfdevelopement.eggmanager.utils.InputManager;
 import mfdevelopement.eggmanager.viewmodels.NewEntityViewModel;
 
+/**
+ * Class for creating an activity to create and edit the data of one day
+ */
 public class NewEntityActivity extends AppCompatActivity implements DatePickerFragment.OnAddDateListener {
 
     private static final String LOG_TAG = "NewEntityActivity";
 
+    /**
+     * GUI elements
+     */
     private TextView dateTextView;
     private EditText eggsCollectedEditText, eggsSoldEditText, pricePerEggEditText, moneyEarnedEditText;
     private ImageButton btn_date_foreward, btn_date_backward;
+
+    /**
+     * Date formats
+     */
     private final SimpleDateFormat sdf_key = new SimpleDateFormat(DailyBalance.DATE_KEY_FORMAT, Locale.getDefault());
     private final SimpleDateFormat sdf_weekday = new SimpleDateFormat("EE, dd.MM.yyyy", Locale.getDefault());
+
+    /**
+     * View model
+     */
     private NewEntityViewModel newEntityViewModel;
+
+    /**
+     * Constants
+     */
     private final int NOT_SET = DailyBalance.NOT_SET;
     private final String PRICE_FORMAT = "%.2f";
+
+    /**
+     * Number for storing the type of request from the calling activity
+     */
     private int requestCode;
+
+    /**
+     * Variable for storing an object of DailyBalance
+     */
     private DailyBalance loadedDailyBalance;
+
+    /**
+     *
+     */
     private List<String> listDateKeys;
+
+    /**
+     * Snackbar to display information to the user
+     */
     private Snackbar snackbarEggsCollectedEmpty;
 
+    /**
+     * FragmentActivity
+     */
     private FragmentActivity fragmentActivity;
 
     @Override
@@ -182,6 +219,7 @@ public class NewEntityActivity extends AppCompatActivity implements DatePickerFr
                 saveEntryAndExit();
                 break;
             case android.R.id.home:
+                Log.d(LOG_TAG, "User pressed home button");
                 onBackPressed();
                 break;
             default:
