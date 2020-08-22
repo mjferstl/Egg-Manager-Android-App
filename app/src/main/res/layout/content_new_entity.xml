@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
@@ -27,39 +26,42 @@
             android:id="@+id/imgv_calendar"
             style="@style/basic_icon"
             android:layout_gravity="center_vertical"
-            android:src="@drawable/ic_date_range_black_24dp"
-            android:contentDescription="@string/content_description_icon_calendar"/>
+            android:contentDescription="@string/content_description_icon_calendar"
+            android:foregroundGravity="center_vertical"
+            android:src="@drawable/ic_date_range_black_24dp" />
 
         <TextView
             android:id="@+id/txtv_new_entity_date"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
+            android:layout_marginEnd="@dimen/large_padding"
             android:layout_weight="1"
             android:fontFamily="sans-serif"
             android:paddingStart="@dimen/small_padding"
             android:paddingTop="@dimen/small_padding"
             android:paddingEnd="@dimen/small_padding"
-            android:layout_marginEnd="@dimen/LARGE_padding"
             android:paddingBottom="@dimen/small_padding"
             android:text="So. 08.09.2020"
             android:textColor="@color/main_text_color"
-            android:textSize="@dimen/textAppearanceHeadline6"/>
+            android:textSize="@dimen/textAppearanceHeadline6" />
 
         <ImageButton
             android:id="@+id/imgbtn_date_backward"
             style="@style/basic_button"
-            android:paddingStart="@dimen/large_padding"
-            android:paddingEnd="@dimen/large_padding"
-            android:src="@drawable/ic_arrow_left_black_24dp"
-            android:contentDescription="@string/content_description_button_previous_day"/>
+            android:layout_gravity="center_vertical"
+            android:contentDescription="@string/content_description_button_previous_day"
+            android:paddingStart="@dimen/small_padding"
+            android:paddingEnd="@dimen/small_padding"
+            android:src="@drawable/ic_arrow_left_black_24dp" />
 
         <ImageButton
             android:id="@+id/imgbtn_date_foreward"
             style="@style/basic_button"
-            android:paddingStart="@dimen/large_padding"
-            android:paddingEnd="@dimen/large_padding"
-            android:src="@drawable/ic_arrow_right_black_24dp"
-            android:contentDescription="@string/content_description_button_next_day"/>
+            android:layout_gravity="center_vertical"
+            android:contentDescription="@string/content_description_button_next_day"
+            android:paddingStart="@dimen/small_padding"
+            android:paddingEnd="@dimen/small_padding"
+            android:src="@drawable/ic_arrow_right_black_24dp" />
 
     </LinearLayout>
 
@@ -69,9 +71,9 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="@dimen/large_padding"
         android:layout_marginBottom="@dimen/large_padding"
+        android:baselineAligned="false"
         android:focusableInTouchMode="true"
         android:orientation="horizontal"
-        android:baselineAligned="false"
         app:layout_constraintBottom_toTopOf="@+id/constrLay_new_entity_price"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -88,17 +90,17 @@
                 style="@style/new_entity_icon"
                 android:layout_gravity="center_horizontal"
                 android:layout_marginBottom="@dimen/large_padding"
+                android:contentDescription="@string/content_description_icon_eggs_collected"
                 android:src="@drawable/ic_egg_nest"
-                android:transitionName="imageEggsCollected"
-                android:contentDescription="@string/content_description_icon_eggs_collected"/>
+                android:transitionName="imageEggsCollected" />
 
             <EditText
                 android:id="@+id/etxt_fetched_eggs"
                 style="@style/new_entity_edit_text"
                 android:hint="@string/hint_eggs_collected"
+                android:importantForAutofill="no"
                 android:singleLine="true"
-                android:transitionName="@string/transition_txtv_eggs_collected"
-                android:importantForAutofill="no"/>
+                android:transitionName="@string/transition_txtv_eggs_collected" />
 
         </LinearLayout>
 
@@ -113,16 +115,16 @@
                 style="@style/new_entity_icon"
                 android:layout_gravity="center_horizontal"
                 android:layout_marginBottom="@dimen/large_padding"
+                android:contentDescription="@string/content_description_icon_eggs_sold"
                 android:src="@drawable/ic_eggs_black"
-                android:transitionName="@string/transition_imgv_eggs_sold"
-                android:contentDescription="@string/content_description_icon_eggs_sold"/>
+                android:transitionName="@string/transition_imgv_eggs_sold" />
 
             <EditText
                 android:id="@+id/etxt_sold_eggs"
                 style="@style/new_entity_edit_text"
                 android:hint="@string/hint_eggs_sold"
-                android:transitionName="@string/transition_txtv_eggs_sold"
-                android:importantForAutofill="no"/>
+                android:importantForAutofill="no"
+                android:transitionName="@string/transition_txtv_eggs_sold" />
 
         </LinearLayout>
 
@@ -142,8 +144,8 @@
         <ImageView
             android:id="@+id/imgv_egg_price"
             style="@style/new_entity_icon"
-            android:src="@drawable/ic_egg_price_48dp"
             android:contentDescription="@string/content_description_icon_price_per_egg"
+            android:src="@drawable/ic_egg_price_48dp"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toStartOf="@id/etxt_egg_price"
             app:layout_constraintStart_toStartOf="parent"
@@ -154,13 +156,13 @@
             style="@style/new_entity_edit_text"
             android:digits="1234567890,."
             android:hint="@string/hint_price_per_egg"
+            android:importantForAutofill="no"
             android:inputType="numberDecimal"
             android:maxLength="4"
-            android:importantForAutofill="no"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toStartOf="@id/txtv_new_entity_currency"
             app:layout_constraintStart_toEndOf="@+id/imgv_egg_price"
-            app:layout_constraintTop_toTopOf="parent"/>
+            app:layout_constraintTop_toTopOf="parent" />
 
         <TextView
             android:id="@+id/txtv_new_entity_currency"
@@ -171,7 +173,7 @@
             android:textSize="@dimen/textAppearanceHeadline6"
             app:layout_constraintBaseline_toBaselineOf="@+id/etxt_egg_price"
             app:layout_constraintStart_toEndOf="@+id/etxt_egg_price"
-            app:layout_constraintTop_toTopOf="parent"/>
+            app:layout_constraintTop_toTopOf="parent" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 
@@ -188,8 +190,8 @@
         <ImageView
             android:id="@+id/imgv_egg_money_earned"
             style="@style/new_entity_icon"
-            android:src="@drawable/ic_money"
             android:contentDescription="@string/content_description_icon_money"
+            android:src="@drawable/ic_money"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toStartOf="@id/etxt_egg_money_earned"
             app:layout_constraintStart_toStartOf="parent"
@@ -200,13 +202,13 @@
             style="@style/new_entity_edit_text"
             android:digits="1234567890,."
             android:hint="@string/hint_money_earned"
+            android:importantForAutofill="no"
             android:inputType="numberDecimal"
             android:maxLength="5"
-            android:importantForAutofill="no"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toStartOf="@id/txtv_new_entity_currency_money_earned"
             app:layout_constraintStart_toEndOf="@+id/imgv_egg_money_earned"
-            app:layout_constraintTop_toTopOf="parent"/>
+            app:layout_constraintTop_toTopOf="parent" />
 
         <TextView
             android:id="@+id/txtv_new_entity_currency_money_earned"
@@ -217,7 +219,7 @@
             android:textSize="@dimen/textAppearanceHeadline6"
             app:layout_constraintBaseline_toBaselineOf="@+id/etxt_egg_money_earned"
             app:layout_constraintStart_toEndOf="@+id/etxt_egg_money_earned"
-            app:layout_constraintTop_toTopOf="parent"/>
+            app:layout_constraintTop_toTopOf="parent" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 
