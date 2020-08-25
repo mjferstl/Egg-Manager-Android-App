@@ -15,4 +15,3 @@
 *.jks
 *.apk
 app/release/output.json
-app/debug/output-metadata.json
