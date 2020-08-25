@@ -102,12 +102,6 @@ public class DateFilterListAdapter extends RecyclerView.Adapter<DateFilterListAd
      */
     public void setDatesList(List<String> datesList, boolean clearSelection) {
 
-        // TODO: remove the following 4 lines of code
-        Log.d(LOG_TAG,"setDatesList(): entry names:");
-        for (String dateString : datesList) {
-            Log.d(LOG_TAG,dateString);
-        }
-
         dateStrings = datesList;
         // delete the last selection
         if (clearSelection) {
