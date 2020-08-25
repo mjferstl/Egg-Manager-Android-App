@@ -113,6 +113,7 @@
     <string name="menu_diagrams" translatable="false">Statistik</string>
     <string name="menu_about" translatable="false">Über EggManager</string>
     <string name="menu_backup_data" translatable="false">Datensicherung</string>
+    <string name="menu_settings" translatable="false">Einstellungen</string>
 
     <!-- month names -->
     <string name="january">Januar</string>
