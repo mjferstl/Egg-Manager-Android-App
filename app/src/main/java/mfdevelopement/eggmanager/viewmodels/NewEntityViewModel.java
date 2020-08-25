@@ -34,7 +34,6 @@ public class NewEntityViewModel extends AndroidViewModel {
     }
 
     public void addDailyBalance(DailyBalance dailyBalance) {
-        pricePerEgg = dailyBalance.getPricePerEgg();
         repository.insert(dailyBalance);
     }
 

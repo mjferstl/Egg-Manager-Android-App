@@ -265,7 +265,6 @@ public class NewEntityActivity extends AppCompatActivity implements DatePickerFr
             moneyEarned = string2double(moneyEarnedString);
         }
 
-
         double pricePerEgg = string2double(pricePerEggString);
         if (moneyEarned != 0.0 && eggsSold != 0) {
             pricePerEgg = moneyEarned/eggsSold;

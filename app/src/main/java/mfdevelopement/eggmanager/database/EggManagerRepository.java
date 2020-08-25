@@ -78,7 +78,6 @@ public class EggManagerRepository {
     }
 
     public void insert(DailyBalance dailyBalance) {
-        setPricePerEgg(dailyBalance.getPricePerEgg());
         new insertAsyncTask(dailyBalanceDao).execute(dailyBalance);
     }
 
