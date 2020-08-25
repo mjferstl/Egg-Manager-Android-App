@@ -3,7 +3,7 @@
     <PreferenceCategory app:title="@string/settings_header_user">
 
         <EditTextPreference
-            app:key="username"
+            app:key="@string/preferences_key_username"
             app:title="@string/settings_title_username"
             app:useSimpleSummaryProvider="true" />
 

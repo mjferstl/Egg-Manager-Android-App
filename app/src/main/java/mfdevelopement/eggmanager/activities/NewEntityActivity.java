@@ -134,9 +134,7 @@ public class NewEntityActivity extends AppCompatActivity implements DatePickerFr
         // set observer for date keys
         newEntityViewModel.getDateKeys().observe(this, strings -> listDateKeys = strings);
 
-
-
-
+        // get the price per egg
         double pricePerEgg = newEntityViewModel.getPricePerEgg();
         Log.d(LOG_TAG,"loaded price per egg: " + pricePerEgg);
         pricePerEggEditText.setText(String.format(Locale.getDefault(), PRICE_FORMAT, pricePerEgg));
@@ -250,6 +248,7 @@ public class NewEntityActivity extends AppCompatActivity implements DatePickerFr
         String eggsSoldString = eggsSoldEditText.getText().toString();
         String moneyEarnedString = moneyEarnedEditText.getText().toString();
         String pricePerEggString = pricePerEggEditText.getText().toString();
+        String username = newEntityViewModel.getUsername();
         Date selectedDate = null;
         try {
             selectedDate = sdf_weekday.parse(dateTextView.getText().toString());
@@ -269,7 +268,9 @@ public class NewEntityActivity extends AppCompatActivity implements DatePickerFr
             pricePerEgg = moneyEarned/eggsSold;
         }
 
-        return new DailyBalance(dateToString(selectedDate), eggsCollected, eggsSold, pricePerEgg);
+        DailyBalance dailyBalance = new DailyBalance(dateToString(selectedDate), eggsCollected, eggsSold, pricePerEgg);
+        dailyBalance.setUserCreated(username);
+        return dailyBalance;
     }
 
     /**

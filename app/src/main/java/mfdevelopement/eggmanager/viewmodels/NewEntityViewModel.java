@@ -21,10 +21,25 @@ public class NewEntityViewModel extends AndroidViewModel {
     private EggManagerRepository repository;
     private LiveData<List<String>> ldDateKeys;
 
+    private final SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(getApplication());
+
     public NewEntityViewModel(Application application) {
         super(application);
         repository = new EggManagerRepository(application);
         ldDateKeys = repository.getDateKeys();
+    }
+
+    /**
+     * Load the username from the apps preferences
+     * 
+     * @return username
+     */
+    public String getUsername() {
+        String keyUsername = getApplication().getString(R.string.preferences_key_username);
+        String defaultUsername = getApplication().getString(R.string.preferences_username_default);
+        String username = sharedPreferences.getString(keyUsername, defaultUsername);
+        Log.d(LOG_TAG, String.format("loaded username from preferences: %s", username));
+        return username;
     }
 
     /**
@@ -33,10 +48,11 @@ public class NewEntityViewModel extends AndroidViewModel {
      * @return price per egg
      */
     public double getPricePerEgg() {
-        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(getApplication());
-        String stringValue = sharedPreferences.getString(getApplication().getString(R.string.preferences_key_pricePerEgg_cent), getApplication().getString(R.string.preferences_pricePerEgg_cent_default));
+        String keyPricePerEgg = getApplication().getString(R.string.preferences_key_pricePerEgg_cent);
+        String defaultPricePerEgg = getApplication().getString(R.string.preferences_pricePerEgg_cent_default);
+        String stringValue = sharedPreferences.getString(keyPricePerEgg, defaultPricePerEgg);
         double value = Double.parseDouble(stringValue) / 100;
-        Log.d(LOG_TAG, String.format("loaded price per egg from preferences: %f", value));
+        Log.d(LOG_TAG, String.format("loaded price per egg in Euro from preferences: %f", value));
         return value;
     }
 

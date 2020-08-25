@@ -155,5 +155,7 @@
     <!-- Preference keys -->
     <string name="preferences_key_pricePerEgg_cent">pricePerEgg</string>
     <string name="preferences_pricePerEgg_cent_default">50</string>
+    <string name="preferences_key_username">username</string>
+    <string name="preferences_username_default">default_user</string>
 
 </resources>
