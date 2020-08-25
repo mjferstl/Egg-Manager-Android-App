@@ -44,7 +44,10 @@ public class SettingsActivity extends AppCompatActivity {
             EditTextPreference editTextPricePerEgg = findPreference(getString(R.string.preferences_key_pricePerEgg_cent));
             if (editTextPricePerEgg != null) {
                 // change the keyboard layout to make the user input a number
-                editTextPricePerEgg.setOnBindEditTextListener(editText -> editText.setInputType(InputType.TYPE_CLASS_NUMBER | InputType.TYPE_NUMBER_FLAG_DECIMAL));
+                editTextPricePerEgg.setOnBindEditTextListener(editText -> {
+                    editText.setInputType(InputType.TYPE_CLASS_NUMBER | InputType.TYPE_NUMBER_FLAG_DECIMAL);
+                    editText.setSelection(editText.getText().length());
+                });
 
                 // action when a new value has been set for the preference
                 editTextPricePerEgg.setOnPreferenceChangeListener((preference, newValue) -> {

@@ -13,6 +13,7 @@ import android.widget.ImageButton;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.core.content.ContextCompat;
@@ -69,6 +70,7 @@ public class NewEntityActivity extends AppCompatActivity implements DatePickerFr
      */
     private final int NOT_SET = DailyBalance.NOT_SET;
     private final String PRICE_FORMAT = "%.2f";
+    private final String STATE_SAVE_KEY_PRICE_PER_EGG = "savedPricePerEgg";
 
     /**
      * Number for storing the type of request from the calling activity
@@ -91,6 +93,11 @@ public class NewEntityActivity extends AppCompatActivity implements DatePickerFr
     private Snackbar snackbarEggsCollectedEmpty;
 
     /**
+     * Locale
+     */
+    private Locale locale;
+
+    /**
      * FragmentActivity
      */
     private FragmentActivity fragmentActivity;
@@ -98,6 +105,7 @@ public class NewEntityActivity extends AppCompatActivity implements DatePickerFr
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        Log.d(LOG_TAG, "onCreate called");
         setContentView(R.layout.activity_new_entity);
 
         fragmentActivity = this;
@@ -119,6 +127,8 @@ public class NewEntityActivity extends AppCompatActivity implements DatePickerFr
         btn_date_foreward = findViewById(R.id.imgbtn_date_foreward);
         btn_date_backward = findViewById(R.id.imgbtn_date_backward);
 
+        locale = Locale.ENGLISH;
+
         // create snackbar
         snackbarEggsCollectedEmpty = Snackbar.make(findViewById(R.id.new_entity_container), getString(R.string.number_eggs_collected_empty), Snackbar.LENGTH_INDEFINITE);
 
@@ -134,39 +144,52 @@ public class NewEntityActivity extends AppCompatActivity implements DatePickerFr
         // set observer for date keys
         newEntityViewModel.getDateKeys().observe(this, strings -> listDateKeys = strings);
 
+        // set keyboard for the price per egg
+        //pricePerEggEditText.setInputType(InputType.TYPE_CLASS_NUMBER | InputType.TYPE_NUMBER_FLAG_DECIMAL);
+
         // get the price per egg
-        double pricePerEgg = newEntityViewModel.getPricePerEgg();
-        Log.d(LOG_TAG,"loaded price per egg: " + pricePerEgg);
-        pricePerEggEditText.setText(String.format(Locale.getDefault(), PRICE_FORMAT, pricePerEgg));
+        Log.d(LOG_TAG, "current text: " + pricePerEggEditText.getText().toString());
+        if (pricePerEggEditText.getText().toString().isEmpty()) {
+            double pricePerEgg = newEntityViewModel.getPricePerEgg();
+            Log.d(LOG_TAG, "loaded price per egg: " + pricePerEgg);
+            pricePerEggEditText.setText(String.format(locale, PRICE_FORMAT, pricePerEgg));
+        } else {
+            Log.d(LOG_TAG, "The price per egg is not set, because the user already entered a value");
+        }
+
 
         // fill in fields, if a item is edited
         requestCode = getIntent().getIntExtra(DatabaseFragment.EXTRA_REQUEST_CODE_NAME, DatabaseFragment.NEW_ENTITY_REQUEST_CODE);
         Log.d(LOG_TAG, "activity startet with request code " + requestCode);
         if (requestCode == DatabaseFragment.EDIT_ENTITY_REQUEST_CODE) {
             loadedDailyBalance = (DailyBalance) getIntent().getSerializableExtra(DatabaseFragment.EXTRA_DAILY_BALANCE);
+            if (loadedDailyBalance == null) {
+                Toast.makeText(this, "Error while loading data", Toast.LENGTH_SHORT).show();
+                return;
+            }
             String dateKey = loadedDailyBalance.getDateKey();
 
             eggsCollectedEditText.setText(String.valueOf(loadedDailyBalance.getEggsCollected()));
 
             // get the saved price per egg and set the String of the EditText
             // The price is rounded to 2 decimal places for displaying
-            pricePerEggEditText.setText(String.format(Locale.getDefault(), PRICE_FORMAT, loadedDailyBalance.getPricePerEgg()));
+            pricePerEggEditText.setText(String.format(locale, PRICE_FORMAT, loadedDailyBalance.getPricePerEgg()));
 
             // get the amount f money earned and set the String of the EditText
             double loadedMoneyEarned = loadedDailyBalance.getMoneyEarned();
             // request focus to prevent an update because of an updated
             moneyEarnedEditText.requestFocus();
-            moneyEarnedEditText.setText(String.format(Locale.getDefault(), PRICE_FORMAT, loadedMoneyEarned));
+            moneyEarnedEditText.setText(String.format(locale, PRICE_FORMAT, loadedMoneyEarned));
 
             // load the number of sold eggs, if there has been a value saved
             // furthermore update the price per egg
             if (loadedDailyBalance.getEggsSold() != NOT_SET) {
                 int loadedEggsSold = loadedDailyBalance.getEggsSold();
                 eggsSoldEditText.setText(String.valueOf(loadedEggsSold));
-                double calcedPricePerEgg = loadedMoneyEarned/loadedEggsSold;
-                Log.d(LOG_TAG,"moneyEarnedEditText has content: " + moneyEarnedEditText.getText().toString());
-                pricePerEggEditText.setText(String.format(Locale.getDefault(), PRICE_FORMAT, calcedPricePerEgg));
-                Log.d(LOG_TAG,"moneyEarnedEditText has content: " + moneyEarnedEditText.getText().toString());
+                double calcedPricePerEgg = loadedMoneyEarned / loadedEggsSold;
+                Log.d(LOG_TAG, "moneyEarnedEditText has content: " + moneyEarnedEditText.getText().toString());
+                pricePerEggEditText.setText(String.format(locale, PRICE_FORMAT, calcedPricePerEgg));
+                Log.d(LOG_TAG, "moneyEarnedEditText has content: " + moneyEarnedEditText.getText().toString());
             }
 
             // get the date from the dateKey String and update the TextView containing the date
@@ -235,11 +258,16 @@ public class NewEntityActivity extends AppCompatActivity implements DatePickerFr
     }
 
     private boolean isValidDouble(String priceString) {
-        double price = string2double(priceString);
-        return (!Double.isNaN(price) && !Double.isInfinite(price));
+        try {
+            double price = string2double(priceString);
+            return (!Double.isNaN(price) && !Double.isInfinite(price));
+        } catch (NumberFormatException e) {
+            Log.d(LOG_TAG, String.format("The string \"%s\" cannot be parsed to a double.", priceString));
+            return false;
+        }
     }
 
-    private double string2double(String string) {
+    private double string2double(String string) throws NumberFormatException {
         return Double.parseDouble(string.replace(',', '.'));
     }
 
@@ -265,7 +293,7 @@ public class NewEntityActivity extends AppCompatActivity implements DatePickerFr
 
         double pricePerEgg = string2double(pricePerEggString);
         if (moneyEarned != 0.0 && eggsSold != 0) {
-            pricePerEgg = moneyEarned/eggsSold;
+            pricePerEgg = moneyEarned / eggsSold;
         }
 
         DailyBalance dailyBalance = new DailyBalance(dateToString(selectedDate), eggsCollected, eggsSold, pricePerEgg);
@@ -276,25 +304,28 @@ public class NewEntityActivity extends AppCompatActivity implements DatePickerFr
     /**
      * create a Date object from a given date key
      * if the dateKey cannot be parsed, then
+     *
      * @param dateKey String containing the dateKey
      * @return Date parsed from the date key
      */
-    private Date getDateFromDateKey(String dateKey) throws ParseException{
+    private Date getDateFromDateKey(String dateKey) throws ParseException {
         return sdf_key.parse(dateKey);
     }
 
     /**
      * create a date object from a String containing a date in the format EE, dd.MM.yyyy
+     *
      * @param dateWeekday String containig the formatted date
      * @return Date object
      * @throws ParseException if the String parameter is not formatted correctly
      */
-    private Date getDateFromString(String dateWeekday) throws ParseException{
+    private Date getDateFromString(String dateWeekday) throws ParseException {
         return sdf_weekday.parse(dateWeekday);
     }
 
     /**
      * create a string with date format dd.MM.yyyy from a Date object
+     *
      * @param date Date object
      * @return String containing the formatted date
      */
@@ -307,14 +338,18 @@ public class NewEntityActivity extends AppCompatActivity implements DatePickerFr
 
     /**
      * create a string with date format EE, dd.MM.yyyy from a Date object
+     *
      * @param date Date object
      * @return String containing the formatted date
      */
-    private String dateToStringWeekDay(Date date) { return sdf_weekday.format(date); }
+    private String dateToStringWeekDay(Date date) {
+        return sdf_weekday.format(date);
+    }
 
     /**
      * converts a string to an int
      * if the conversion fails, then 0 is returned
+     *
      * @param string containing the integer number
      * @return int
      */
@@ -394,7 +429,7 @@ public class NewEntityActivity extends AppCompatActivity implements DatePickerFr
     }
 
     private boolean dateKeyExists(String dateKey) {
-        for (int i=0; i<listDateKeys.size(); i++) {
+        for (int i = 0; i < listDateKeys.size(); i++) {
             if (listDateKeys.get(i).equals(dateKey)) {
                 return true;
             }
@@ -412,6 +447,21 @@ public class NewEntityActivity extends AppCompatActivity implements DatePickerFr
      * initialize OnClickListeners
      */
     private void initOnClickListeners() {
+
+        // parse the date from the TextView
+        final Date currentDate;
+        try {
+            currentDate = sdf_weekday.parse(dateTextView.getText().toString());
+            if (currentDate == null) {
+                throw new Exception(String.format("%s: currentDate == null", LOG_TAG));
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            Toast.makeText(this, "Error while loading date information", Toast.LENGTH_SHORT).show();
+            onBackPressed();
+            return;
+        }
+
         // open dialog to select a date
         dateTextView.setOnClickListener(v -> {
             FragmentTransaction ft = fragmentActivity.getSupportFragmentManager().beginTransaction();
@@ -436,29 +486,21 @@ public class NewEntityActivity extends AppCompatActivity implements DatePickerFr
         });
 
         btn_date_foreward.setOnClickListener(v -> {
-            Log.d(LOG_TAG,"switch date to the next day");
-            try {
-                Calendar cal = Calendar.getInstance();
-                cal.setTime(sdf_weekday.parse(dateTextView.getText().toString()));
-                cal.add(Calendar.DAY_OF_MONTH, 1);
-                dateTextView.setText(sdf_weekday.format(cal.getTimeInMillis()));
-            } catch (ParseException e) {
-                e.printStackTrace();
-            }
+            Log.d(LOG_TAG, "switch date to the next day");
+            Calendar cal = Calendar.getInstance();
+            cal.setTime(currentDate);
+            cal.add(Calendar.DAY_OF_MONTH, 1);
+            dateTextView.setText(sdf_weekday.format(cal.getTimeInMillis()));
 
         });
 
         btn_date_backward.setOnClickListener(v -> {
-            Log.d(LOG_TAG,"switch date to the previous day");
+            Log.d(LOG_TAG, "switch date to the previous day");
+            Calendar cal = Calendar.getInstance();
+            cal.setTime(currentDate);
+            cal.add(Calendar.DAY_OF_MONTH, -1);
+            dateTextView.setText(sdf_weekday.format(cal.getTimeInMillis()));
 
-            try {
-                Calendar cal = Calendar.getInstance();
-                cal.setTime(sdf_weekday.parse(dateTextView.getText().toString()));
-                cal.add(Calendar.DAY_OF_MONTH, -1);
-                dateTextView.setText(sdf_weekday.format(cal.getTimeInMillis()));
-            } catch (ParseException e) {
-                e.printStackTrace();
-            }
         });
     }
 
@@ -476,10 +518,12 @@ public class NewEntityActivity extends AppCompatActivity implements DatePickerFr
         // number of eggs collected
         eggsCollectedEditText.addTextChangedListener(new TextWatcher() {
             @Override
-            public void beforeTextChanged(CharSequence s, int start, int count, int after) { }
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+            }
 
             @Override
-            public void onTextChanged(CharSequence s, int start, int before, int count) { }
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+            }
 
             @Override
             public void afterTextChanged(Editable s) {
@@ -502,17 +546,20 @@ public class NewEntityActivity extends AppCompatActivity implements DatePickerFr
 
             @Override
             public void afterTextChanged(Editable s) {
-                Log.d(LOG_TAG,"updated eggsSoldEditText. New content: " + s.toString());
+                Log.d(LOG_TAG, "updated eggsSoldEditText. New content: " + s.toString());
 
-                if (!s.toString().equals("") && !pricePerEggEditText.getText().toString().equals("") && isValidDouble(pricePerEggEditText.getText().toString()) ) {
+                if (!s.toString().equals("") && !pricePerEggEditText.getText().toString().equals("") && isValidDouble(pricePerEggEditText.getText().toString())) {
                     int eggsCollected = parseInt(s.toString());
                     double pricePerEgg = string2double(pricePerEggEditText.getText().toString());
-                    double moneyEarned = eggsCollected*pricePerEgg;
-                    String moneyEarnedString = String.format(Locale.getDefault(), PRICE_FORMAT, moneyEarned);
+                    double moneyEarned = eggsCollected * pricePerEgg;
+                    String moneyEarnedString = String.format(locale, PRICE_FORMAT, moneyEarned);
 
                     if (!moneyEarnedEditText.isFocused()) {
                         changeEditText(moneyEarnedEditText, moneyEarnedString);
                     }
+                } else if (s.toString().isEmpty()) {
+                    // remove any previous calculated money earned
+                    changeEditText(moneyEarnedEditText, "");
                 }
             }
         });
@@ -520,14 +567,45 @@ public class NewEntityActivity extends AppCompatActivity implements DatePickerFr
         // price per egg
         pricePerEggEditText.addTextChangedListener(new TextWatcher() {
             @Override
-            public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+            }
 
             @Override
-            public void onTextChanged(CharSequence s, int start, int before, int count) {}
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+            }
 
             @Override
             public void afterTextChanged(Editable s) {
-                Log.d(LOG_TAG,"updated pricePerEggEditText. New content: " + s.toString());
+
+                // get the last character
+                Character lastChar = ' ';
+                if (s.length() > 0) {
+                    lastChar = s.charAt(s.length() - 1);
+                }
+
+                // check if multiple commas or dots are used, as only one dot or comma can be used for representing a number
+                if (s.length() >= 2) {
+                    String stringExclLastChar = s.toString().substring(0, s.length() - 1);
+                    if ((lastChar.equals(',') || lastChar.equals('.')) && (stringExclLastChar.contains(",") || stringExclLastChar.contains("."))) {
+                        Log.d(LOG_TAG, "a comma or dot too much ... The newly added character gets removed.");
+                        // set the text to the previous text without the newly added character
+                        pricePerEggEditText.setText(stringExclLastChar);
+                        // set the cursor to the end of the string
+                        pricePerEggEditText.setSelection(pricePerEggEditText.getText().length());
+                        return;
+                    }
+                }
+
+                // replace a comma by a dot to support the soft keyboard in landscape fullscreen mode
+                if (lastChar.equals(',')) {
+                    pricePerEggEditText.setText(s.toString().replace(",", "."));
+                    // set the cursor to the end of the string
+                    pricePerEggEditText.setSelection(pricePerEggEditText.getText().length());
+                    return;
+                }
+
+
+                Log.d(LOG_TAG, "updated pricePerEggEditText. New content: " + s.toString());
 
                 if (!s.toString().equals("") && isValidDouble(s.toString())) {
                     // update the color of the price
@@ -541,7 +619,7 @@ public class NewEntityActivity extends AppCompatActivity implements DatePickerFr
                         int eggsCollected = parseInt(eggsSoldEditText.getText().toString());
                         double pricePerEgg = string2double(pricePerEggEditText.getText().toString());
                         double moneyEarned = eggsCollected * pricePerEgg;
-                        String moneyEarnedString = String.format(Locale.getDefault(), PRICE_FORMAT, moneyEarned);
+                        String moneyEarnedString = String.format(locale, PRICE_FORMAT, moneyEarned);
 
                         if (!moneyEarnedEditText.isFocused()) {
                             changeEditText(moneyEarnedEditText, moneyEarnedString);
@@ -564,7 +642,7 @@ public class NewEntityActivity extends AppCompatActivity implements DatePickerFr
 
             @Override
             public void afterTextChanged(Editable s) {
-                Log.d(LOG_TAG,"updated moneyEarnedEditText. New content: " + s.toString());
+                Log.d(LOG_TAG, "updated moneyEarnedEditText. New content: " + s.toString());
 
                 if (!s.toString().equals("") && isValidDouble(s.toString())) {
                     if (!(eggsSoldEditText.getText().toString().isEmpty() || moneyEarnedEditText.getText().toString().isEmpty())) {
@@ -573,23 +651,35 @@ public class NewEntityActivity extends AppCompatActivity implements DatePickerFr
 
                         double pricePerEgg = string2double(pricePerEggEditText.getText().toString());
                         if (eggsSold != 0) {
-                            pricePerEgg = moneyEarned/eggsSold;
+                            pricePerEgg = moneyEarned / eggsSold;
                         }
 
                         // change price per egg, if it's a different number now
-                        String pricePerEggString = String.format(Locale.getDefault(), PRICE_FORMAT, pricePerEgg);
+                        String pricePerEggString = String.format(locale, PRICE_FORMAT, pricePerEgg);
 
                         if (!pricePerEggEditText.isFocused()) {
                             changeEditText(pricePerEggEditText, pricePerEggString);
                         }
                     }
-                } else {
-                    // load the price per egg from the database and update the edit text containing the price
-                    double loadedPricePerEgg = newEntityViewModel.getPricePerEgg();
-                    String pricePerEggString = String.format(Locale.getDefault(), PRICE_FORMAT, loadedPricePerEgg);
-                    changeEditText(pricePerEggEditText,pricePerEggString);
                 }
             }
         });
+    }
+
+    @Override
+    protected void onSaveInstanceState(@NonNull Bundle outState) {
+        Log.d(LOG_TAG, "saving state");
+        outState.putString(STATE_SAVE_KEY_PRICE_PER_EGG, pricePerEggEditText.getText().toString());
+        super.onSaveInstanceState(outState);
+    }
+
+    @Override
+    protected void onRestoreInstanceState(@NonNull Bundle savedInstanceState) {
+        Log.d(LOG_TAG, "restoring saved state");
+        String savedPricePerEggString = savedInstanceState.getString(STATE_SAVE_KEY_PRICE_PER_EGG);
+        if (savedPricePerEggString != null) {
+            pricePerEggEditText.setText(savedPricePerEggString);
+        }
+        super.onRestoreInstanceState(savedInstanceState);
     }
 }
