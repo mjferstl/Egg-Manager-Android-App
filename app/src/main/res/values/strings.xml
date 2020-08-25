@@ -144,18 +144,15 @@
     <string name="content_description_icon_money">Icon für den Erlös</string>
     <string name="title_activity_settings">SettingsActivity</string>
 
-    <!-- Preference Titles -->
-    <string name="messages_header">Messages</string>
-    <string name="sync_header">Sync</string>
+    <!-- Preference Groups -->
+    <string name="settings_header_user">Nutzer</string>
+    <string name="settings_header_default_value">Standardwerte</string>
 
-    <!-- Messages Preferences -->
-    <string name="signature_title">Your signature</string>
-    <string name="reply_title">Default reply action</string>
+    <!-- Preferences -->
+    <string name="settings_title_username">Benutzername</string>
+    <string name="settings_title_price_per_egg">Preis pro Ei in Cent</string>
 
-    <!-- Sync Preferences -->
-    <string name="sync_title">Sync email periodically</string>
-    <string name="attachment_title">Download incoming attachments</string>
-    <string name="attachment_summary_on">Automatically download attachments for incoming emails
-    </string>
-    <string name="attachment_summary_off">Only download attachments when manually requested</string>
+    <!-- Preference keys -->
+    <string name="preferences_key_pricePerEgg">pricePerEgg</string>
+
 </resources>
