@@ -31,7 +31,7 @@ public class NewEntityViewModel extends AndroidViewModel {
 
     /**
      * Load the username from the apps preferences
-     * 
+     *
      * @return username
      */
     public String getUsername() {

@@ -1,4 +1,4 @@
-package mfdevelopement.eggmanager;
+package mfdevelopement.eggmanager.activities;
 
 import android.os.Bundle;
 import android.text.InputType;
@@ -6,11 +6,10 @@ import android.util.Log;
 
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.lifecycle.ViewModelProvider;
 import androidx.preference.EditTextPreference;
 import androidx.preference.PreferenceFragmentCompat;
 
-import mfdevelopement.eggmanager.viewmodels.NewEntityViewModel;
+import mfdevelopement.eggmanager.R;
 
 public class SettingsActivity extends AppCompatActivity {
 
@@ -34,14 +33,10 @@ public class SettingsActivity extends AppCompatActivity {
 
         private final String LOG_TAG = "SettingsFragment";
 
-        private NewEntityViewModel viewModel;
 
         @Override
         public void onCreatePreferences(Bundle savedInstanceState, String rootKey) {
             setPreferencesFromResource(R.xml.root_preferences, rootKey);
-
-            // initialize the view model
-            viewModel = new ViewModelProvider(this).get(NewEntityViewModel.class);
 
             /*
              * Add functionality to the preference field, which specifies the price per egg

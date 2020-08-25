@@ -31,7 +31,7 @@
 
     <fragment
         android:id="@+id/nav_settings"
-        android:name="mfdevelopement.eggmanager.SettingsActivity$SettingsFragment"
+        android:name="mfdevelopement.eggmanager.activities.SettingsActivity$SettingsFragment"
         android:label="@string/menu_settings"
         tools:layout="@layout/settings_activity" />
 
