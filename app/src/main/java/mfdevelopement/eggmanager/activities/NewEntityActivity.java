@@ -134,12 +134,11 @@ public class NewEntityActivity extends AppCompatActivity implements DatePickerFr
         // set observer for date keys
         newEntityViewModel.getDateKeys().observe(this, strings -> listDateKeys = strings);
 
+
+
+
         double pricePerEgg = newEntityViewModel.getPricePerEgg();
         Log.d(LOG_TAG,"loaded price per egg: " + pricePerEgg);
-        if (Double.isNaN(pricePerEgg)) {
-            pricePerEgg = 0.5;
-            newEntityViewModel.setPricePerEgg(pricePerEgg);
-        }
         pricePerEggEditText.setText(String.format(Locale.getDefault(), PRICE_FORMAT, pricePerEgg));
 
         // fill in fields, if a item is edited

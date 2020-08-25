@@ -46,7 +46,7 @@ public class SettingsActivity extends AppCompatActivity {
             /*
              * Add functionality to the preference field, which specifies the price per egg
              */
-            EditTextPreference editTextPricePerEgg = findPreference(getString(R.string.preferences_key_pricePerEgg));
+            EditTextPreference editTextPricePerEgg = findPreference(getString(R.string.preferences_key_pricePerEgg_cent));
             if (editTextPricePerEgg != null) {
                 // change the keyboard layout to make the user input a number
                 editTextPricePerEgg.setOnBindEditTextListener(editText -> editText.setInputType(InputType.TYPE_CLASS_NUMBER | InputType.TYPE_NUMBER_FLAG_DECIMAL));
@@ -57,18 +57,13 @@ public class SettingsActivity extends AppCompatActivity {
 
                     // check if the new value is a numeric value
                     double newPricePerEgg = Double.parseDouble(newValue.toString());
-                    savePricePerEgg(newPricePerEgg);
+                    Log.d(LOG_TAG, String.format("Saved new value for price per egg: %f cents", newPricePerEgg));
                     return true;
                 });
             } else {
                 Log.d(LOG_TAG, "The EditTextPreference is null. The field may not work as expected.");
             }
 
-        }
-
-        private void savePricePerEgg(double value) {
-            viewModel.setPricePerEgg(value/100);
-            Log.d(LOG_TAG, String.format("Saved new value for price per egg: %f cents", value));
         }
     }
 }

@@ -225,18 +225,6 @@ public class EggManagerRepository {
         }
     }
 
-    public double getPricePerEgg() {
-        sharedPreferences = application.getSharedPreferences(PREFERENCE_FILE_KEY, Context.MODE_PRIVATE);
-        return sharedPreferences.getFloat(KEY_PRICE_PER_EGG, 0);
-    }
-
-    public void setPricePerEgg(double pricePerEgg) {
-        sharedPreferences = application.getSharedPreferences(PREFERENCE_FILE_KEY, Context.MODE_PRIVATE);
-        SharedPreferences.Editor editor = sharedPreferences.edit();
-        editor.putFloat(KEY_PRICE_PER_EGG, (float) pricePerEgg);
-        editor.apply();
-    }
-
     public void setDataFilter(String filterString) {
         sharedPreferences = application.getSharedPreferences(PREFERENCE_FILE_KEY, Context.MODE_PRIVATE);
         SharedPreferences.Editor editor = sharedPreferences.edit();

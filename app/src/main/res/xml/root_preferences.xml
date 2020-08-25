@@ -12,9 +12,10 @@
     <PreferenceCategory app:title="@string/settings_header_default_value">
 
         <EditTextPreference
-            app:key="@string/preferences_key_pricePerEgg"
+            app:key="@string/preferences_key_pricePerEgg_cent"
             app:title="@string/settings_title_price_per_egg"
-            app:useSimpleSummaryProvider="true" />
+            app:useSimpleSummaryProvider="true"
+            app:defaultValue="@string/preferences_pricePerEgg_cent_default"/>
 
     </PreferenceCategory>
 

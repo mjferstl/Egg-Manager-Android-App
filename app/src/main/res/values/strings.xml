@@ -153,6 +153,7 @@
     <string name="settings_title_price_per_egg">Preis pro Ei in Cent</string>
 
     <!-- Preference keys -->
-    <string name="preferences_key_pricePerEgg">pricePerEgg</string>
+    <string name="preferences_key_pricePerEgg_cent">pricePerEgg</string>
+    <string name="preferences_pricePerEgg_cent_default">50</string>
 
 </resources>
