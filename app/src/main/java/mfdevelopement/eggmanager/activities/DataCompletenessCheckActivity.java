@@ -52,6 +52,12 @@ public class DataCompletenessCheckActivity extends AppCompatActivity implements 
 
     private final String LOG_TAG = "DataCompletenessCheckAc";
 
+    /**
+     * Strings which are used for storing the UI data during orientation changes etc.
+     */
+    private final String KEY_START_DATE = "startDate";
+    private final String KEY_END_DATE = "endDate";
+
     // Constants to determine the date, which the user wants to change
     private final int START_DATE_PICKER_ID = 1;
     private final int END_DATE_PICKER_ID = 2;
@@ -272,5 +278,33 @@ public class DataCompletenessCheckActivity extends AppCompatActivity implements 
         intent.putExtra(DatabaseFragment.EXTRA_REQUEST_CODE_NAME, DatabaseFragment.NEW_ENTITY_REQUEST_CODE);
         intent.putExtra(DatabaseFragment.EXTRA_ENTITY_DATE, dateString);
         startActivityForResult(intent, DatabaseFragment.NEW_ENTITY_REQUEST_CODE);
+    }
+
+    @Override
+    protected void onSaveInstanceState(@NonNull Bundle outState) {
+        // save the current specified start date from the UI
+        if (txtv_start_date != null) {
+            outState.putString(KEY_START_DATE, txtv_start_date.getText().toString());
+        }
+        // save the current specified end date from the UI
+        if (txtv_end_date != null) {
+            outState.putString(KEY_END_DATE, txtv_end_date.getText().toString());
+        }
+        super.onSaveInstanceState(outState);
+    }
+
+    @Override
+    protected void onRestoreInstanceState(@NonNull Bundle savedInstanceState) {
+        // get the saved start date and update the text view
+        String savedStartDate = savedInstanceState.getString(KEY_START_DATE, null);
+        if (savedStartDate != null) {
+            txtv_start_date.setText(savedStartDate);
+        }
+        // get the saved end date and update the text view
+        String savedEndDate = savedInstanceState.getString(KEY_END_DATE, null);
+        if (savedEndDate != null) {
+            txtv_end_date.setText(savedEndDate);
+        }
+        super.onRestoreInstanceState(savedInstanceState);
     }
 }
