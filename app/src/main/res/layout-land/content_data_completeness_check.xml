@@ -15,17 +15,18 @@
         android:id="@+id/constrLay_data_check_date_from"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintHorizontal_bias="0.9"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintBottom_toTopOf="@id/constrLay_data_check_date_to">
+        app:layout_constraintEnd_toStartOf="@id/guideline"
+        app:layout_constraintBottom_toTopOf="@id/recv_data_completeness_check">
 
         <TextView
             android:id="@+id/txtv_data_check_from"
             style="@style/basic_text"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_marginStart="@dimen/huge_padding"
             android:text="@string/from"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toStartOf="@+id/txtv_data_check_start_date"
@@ -41,10 +42,9 @@
             android:textStyle="bold"
             app:drawableStartCompat="@drawable/ic_date_range_black_24dp"
             app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintEnd_toStartOf="parent"
             app:layout_constraintStart_toEndOf="@+id/txtv_data_check_from"
-            app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintVertical_bias="0.0" />
+            app:layout_constraintTop_toTopOf="parent" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 
@@ -52,11 +52,11 @@
         android:id="@+id/constrLay_data_check_date_to"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        app:layout_constraintHorizontal_bias="1"
-        app:layout_constraintStart_toStartOf="@+id/constrLay_data_check_date_from"
-        app:layout_constraintTop_toBottomOf="@+id/constrLay_data_check_date_from"
-        app:layout_constraintEnd_toEndOf="@+id/constrLay_data_check_date_from"
-        app:layout_constraintBottom_toTopOf="@id/recv_data_completeness_check">
+        app:layout_constraintHorizontal_bias="0.1"
+        app:layout_constraintStart_toEndOf="@id/guideline"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintBottom_toBottomOf="@id/constrLay_data_check_date_from">
 
         <TextView
             android:id="@+id/txtv_data_check_to"
@@ -84,6 +84,13 @@
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/guideline"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        app:layout_constraintGuide_percent="0.5" />
+
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/recv_data_completeness_check"
         android:layout_width="0dp"
@@ -92,7 +99,7 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/constrLay_data_check_date_to"
+        app:layout_constraintTop_toBottomOf="@+id/constrLay_data_check_date_from"
         tools:listitem="@layout/recyclerview_item_completeness_check">
 
     </androidx.recyclerview.widget.RecyclerView>
