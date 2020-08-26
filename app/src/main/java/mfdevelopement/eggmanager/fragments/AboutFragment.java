@@ -31,6 +31,9 @@ public class AboutFragment extends Fragment {
         TextView txt_app_version = root.findViewById(R.id.txtv_about_appversion);
         txt_app_version.setText(versionName);
 
+        TextView txtv_build_type = root.findViewById(R.id.txtv_about_build_type);
+        txtv_build_type.setText(String.format("build type: %s", BuildConfig.BUILD_TYPE));
+
         return root;
     }
 }

@@ -49,6 +49,18 @@
         app:layout_constraintTop_toBottomOf="@+id/txtv_about_appname_eggmanager"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintBottom_toTopOf="@id/txtv_about_build_type"/>
+
+    <TextView
+        android:id="@+id/txtv_about_build_type"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:textSize="@dimen/textAppearanceBody1"
+        android:textColor="@color/secondary_text_color"
+        android:gravity="center_horizontal"
+        app:layout_constraintTop_toBottomOf="@+id/txtv_about_appversion"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintBottom_toTopOf="@id/txtv_about_developer"/>
 
     <TextView
@@ -57,7 +69,7 @@
         android:layout_width="match_parent"
         android:text="@string/app_developer"
         android:layout_marginTop="@dimen/LARGE_padding"
-        app:layout_constraintTop_toBottomOf="@id/txtv_about_appversion"
+        app:layout_constraintTop_toBottomOf="@id/txtv_about_build_type"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintBottom_toTopOf="@+id/txtv_about_credits_header"/>
