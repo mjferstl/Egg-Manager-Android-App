@@ -62,21 +62,25 @@ public class ChartFragment extends Fragment {
     private TextView txtv_title, txtv_title_extra;
     private View rootView;
 
-    public final static String NAME_EGGS_COLLECTED = "Abgenommene Eier";
-    public final static String NAME_EGGS_SOLD = "Verkaufte Eier";
-    public final static String ARG_DATA = "chartData";
+    public static String NAME_EGGS_COLLECTED;
+    public static String NAME_EGGS_SOLD;
+    public static String ARG_DATA = "chartData";
 
     private int chartSwitch = 1; // inital view is "Abgenommene Eier"
     private final int chartSwitchCollectedEggs = 1;
     private final int chartSwitchSoldEggs = 2;
     private int databaseEntryCount = 0;
 
-    private String chartTitle = "Abgenommene Eier";
-
-
+    private String chartTitle;
 
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
+
+        // initialize tab titles
+        NAME_EGGS_COLLECTED = getString(R.string.txt_title_eggs_collected);
+        NAME_EGGS_SOLD = getString(R.string.txt_title_eggs_sold);
+        // initialize default chart title
+        chartTitle = getString(R.string.txt_title_eggs_collected);
 
         Bundle args = getArguments();
         if (args != null) {
@@ -503,7 +507,7 @@ public class ChartFragment extends Fragment {
             chartTitle = getString(R.string.txt_title_eggs_collected);
         }
         else if (chartSwitch == chartSwitchSoldEggs) {
-            chartTitle = "Verkaufte Eier";
+            chartTitle = getString(R.string.txt_title_eggs_sold);
         }
     }
 

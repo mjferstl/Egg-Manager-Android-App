@@ -65,6 +65,7 @@
 
     <!-- chart fragment -->
     <string name="txt_title_eggs_collected">Abgenommene Eier</string>
+    <string name="txt_title_eggs_sold">Verkaufte Eier</string>
     <string name="tab_name_collected">abgenommen</string>
     <string name="tab_name_sold">verkauft</string>
     <string name="chart_no_data_text">Keine Daten vorhanden</string>
