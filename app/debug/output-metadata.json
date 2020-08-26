@@ -4,7 +4,7 @@
     "type": "APK",
     "kind": "Directory"
   },
-  "applicationId": "mfdevelopement.eggmanager",
+  "applicationId": "mfdevelopement.eggmanager.debug",
   "variantName": "debug",
   "elements": [
     {
