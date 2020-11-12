@@ -14,6 +14,7 @@ import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 
@@ -115,9 +116,15 @@ public class ChartFragment extends Fragment {
 
         // line chart
         lineChart = rootView.findViewById(R.id.line_chart);
+
+        if (this.getContext() == null) {
+            Log.e(LOG_TAG, "onCreateView: this.getContext() returned null");
+            return null;
+        }
+
         // modify chart layout
-        lineChart.setBackgroundColor(getResources().getColor(R.color.transparent));     // transparent background
-        lineChart.setBorderColor(getResources().getColor(R.color.main_text_color));     // color of the chart borders
+        lineChart.setBackgroundColor(ContextCompat.getColor(this.getContext(), R.color.transparent));     // transparent background
+        lineChart.setBorderColor(ContextCompat.getColor(this.getContext(), R.color.main_text_color));     // color of the chart borders
         lineChart.getLegend().setEnabled(false);                                        // hide the legend
         lineChart.setNoDataText(getString(R.string.chart_no_data_text));
         // Change text size of the no-data text
@@ -131,7 +138,7 @@ public class ChartFragment extends Fragment {
 
         // bar chart
         barChart = rootView.findViewById(R.id.bar_chart);
-        barChart.setBackgroundColor(getResources().getColor(R.color.transparent));     // transparent background
+        barChart.setBackgroundColor(ContextCompat.getColor(this.getContext(), R.color.transparent));     // transparent background
         barChart.getLegend().setEnabled(false);                                        // hide the legend
         barChart.setNoDataText(getString(R.string.chart_no_data_text));
         // Change text size of the no-data text
@@ -225,7 +232,7 @@ public class ChartFragment extends Fragment {
         xAxis.setTextSize(TEXT_SIZE);                   // text size
 
         if (this.getContext() != null) {
-            xAxis.setTextColor(getResources().getColor(R.color.main_text_color)); // text color
+            xAxis.setTextColor(ContextCompat.getColor(this.getContext(), R.color.main_text_color)); // text color
         }
 
         // get the first and the last day of the x data
@@ -285,7 +292,7 @@ public class ChartFragment extends Fragment {
         yAxis.setDrawGridLinesBehindData(true);
 
         if (this.getContext() != null) {
-            yAxis.setTextColor(getResources().getColor(R.color.main_text_color));
+            yAxis.setTextColor(ContextCompat.getColor(this.getContext(), R.color.main_text_color));
         }
 
         if (max/5 < 8) {
@@ -304,8 +311,8 @@ public class ChartFragment extends Fragment {
         // sometimes there is no context and the resources cannot be fetched
         // but then a NullPointerException is thrown
         if (this.getContext() != null) {
-            dataSet.setColor(getResources().getColor(R.color.colorPrimary));
-            dataSet.setValueTextColor(getResources().getColor(R.color.main_text_color));
+            dataSet.setColor(ContextCompat.getColor(this.getContext(), R.color.colorPrimary));
+            dataSet.setValueTextColor(ContextCompat.getColor(this.getContext(), R.color.main_text_color));
         }
 
         dataSet.setDrawCircles(false);
@@ -322,8 +329,14 @@ public class ChartFragment extends Fragment {
 
     private BarDataSet createBarDataSet(List<BarEntry> entries, String dataSetName) {
         BarDataSet dataSet = new BarDataSet(entries, dataSetName);
-        dataSet.setColor(getResources().getColor(R.color.colorAccent));
-        dataSet.setValueTextColor(getResources().getColor(R.color.main_text_color));
+
+        if (this.getContext() == null) {
+            Log.e(LOG_TAG, "createBarDataSet: this.getContext() returned null");
+            return null;
+        }
+
+        dataSet.setColor(ContextCompat.getColor(this.getContext(), R.color.colorAccent));
+        dataSet.setValueTextColor(ContextCompat.getColor(this.getContext(), R.color.main_text_color));
         dataSet.setValueTextSize(TEXT_SIZE);            // text size of the text for each data point
         if (entries.size() > 5) {
             dataSet.setDrawValues(false);                   // do not show the value of each data point

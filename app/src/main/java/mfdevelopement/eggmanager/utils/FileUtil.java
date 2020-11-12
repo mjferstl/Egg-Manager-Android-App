@@ -1,6 +1,6 @@
 package mfdevelopement.eggmanager.utils;
 
-import android.os.Environment;
+import android.content.Context;
 import android.util.Log;
 
 import java.io.BufferedReader;
@@ -8,6 +8,7 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.util.Objects;
 
 public class FileUtil {
 
@@ -39,11 +40,20 @@ public class FileUtil {
         return builder.toString();
     }
 
-
-    public static int writeContentToFile(String fileName, String content) {
-
+    public static String getExternalDirPath(Context context) {
         // get path
-        String publicDataDir = Environment.getExternalStorageDirectory().getPath();
+        if (context == null) {
+            Log.e(LOG_TAG, "getExternalDirPath: context is null");
+            return "";
+        }
+
+        return Objects.requireNonNull(context.getExternalFilesDir(null)).getAbsolutePath();
+    }
+
+
+    public static int writeContentToFile(Context context, String fileName, String content) {
+
+        String publicDataDir = getExternalDirPath(context);
 
         // create a new file
         File newFile = new File(publicDataDir, fileName);

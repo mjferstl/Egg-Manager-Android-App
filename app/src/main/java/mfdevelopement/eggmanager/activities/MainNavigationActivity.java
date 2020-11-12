@@ -90,7 +90,7 @@ public class MainNavigationActivity extends AppCompatActivity
         mAppBarConfiguration = new AppBarConfiguration.Builder(
                 R.id.nav_main_database, R.id.nav_diagrams, R.id.nav_about,
                 R.id.nav_backup)
-                .setDrawerLayout(drawer)
+                .setOpenableLayout(drawer)
                 .build();
 
         navController = Navigation.findNavController(this, R.id.nav_host_fragment);

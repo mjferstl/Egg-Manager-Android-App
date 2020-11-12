@@ -290,6 +290,7 @@ public class DailyBalance implements Serializable, Comparable<DailyBalance> {
         return dailyBalanceList;
     }
 
+    @SuppressWarnings("unchecked")
     private static <T> T getJSONElementWithDefault(JSONObject jsonObject, String elementName, T defaultValue) {
         try {
             if (defaultValue instanceof String) {

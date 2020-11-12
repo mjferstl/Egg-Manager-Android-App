@@ -57,7 +57,7 @@ public class DatabaseBackupFragment extends Fragment {
     private final Locale stringFormatLocale = Locale.ENGLISH;
 
     // get path to the directory, where the EggManager backup files are stored
-    private static final String publicDataDir = Environment.getExternalStorageDirectory().getPath();
+    private static String publicDataDir;
 
     // View Model
     private SharedViewModel viewModel;
@@ -84,6 +84,8 @@ public class DatabaseBackupFragment extends Fragment {
         // get the view model
         viewModel = new ViewModelProvider(this).get(SharedViewModel.class);
         idSnackbarContainer = R.id.database_import_export_container;
+
+        publicDataDir = FileUtil.getExternalDirPath(this.getContext());
 
         initRecyclerView();
         initFab();
@@ -333,7 +335,7 @@ public class DatabaseBackupFragment extends Fragment {
         if (isExternalStorageReadable()) {
 
             // get path, where the files are stored
-            String path = Environment.getExternalStorageDirectory().getPath();
+            String path = FileUtil.getExternalDirPath(this.getContext());
             Log.d(LOG_TAG, "getBackupFiles(): searching for backup files in the directory " + path);
 
             // get content of this directory
@@ -419,15 +421,16 @@ public class DatabaseBackupFragment extends Fragment {
 
         @Override
         protected String doInBackground(String... strings) {
-            String filename = strings[0];
-            String content = strings[1];
-            int status = FileUtil.writeContentToFile(filename, content);
 
             MainNavigationActivity activity = weakReference.get();
             if (activity == null || activity.isFinishing()) {
                 Log.e(LOG_TAG, "activity == null or activity is finishing");
                 return "";
             }
+
+            String filename = strings[0];
+            String content = strings[1];
+            int status = FileUtil.writeContentToFile(activity.getBaseContext(), filename, content);
 
             if (status == 0)
                 return filename;

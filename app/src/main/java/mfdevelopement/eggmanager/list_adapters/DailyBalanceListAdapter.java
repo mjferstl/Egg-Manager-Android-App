@@ -190,7 +190,8 @@ public class DailyBalanceListAdapter extends RecyclerView.Adapter<DailyBalanceLi
         if (getItem(itemPosition).getEggsSold() != DailyBalance.NOT_SET) {numPairs = 2;}
 
         if (holder != null) {
-            Pair[] pairs = new Pair[numPairs];
+            @SuppressWarnings("unchecked")
+            Pair<View, String>[] pairs = new Pair[numPairs];
             pairs[0] = new Pair<View, String>(holder.imgv_eggs_collected, context.getString(R.string.transition_imgv_eggs_collected));
             if (numPairs == 2)
                 pairs[1] = new Pair<View, String>(holder.imgv_eggs_sold, context.getString(R.string.transition_imgv_eggs_sold));
