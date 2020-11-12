@@ -279,7 +279,7 @@ public class NewEntityActivity extends AppCompatActivity implements DatePickerFr
         String username = newEntityViewModel.getUsername();
         Date selectedDate = null;
         try {
-            selectedDate = sdf_weekday.parse(dateTextView.getText().toString());
+            selectedDate = getSelectedDate();
         } catch (ParseException e) {
             e.printStackTrace();
         }
@@ -442,6 +442,14 @@ public class NewEntityActivity extends AppCompatActivity implements DatePickerFr
         updateDate(calendar.getTime());
     }
 
+    private Date getSelectedDate() throws ParseException {
+        if (this.dateTextView != null) {
+            return sdf_weekday.parse(dateTextView.getText().toString());
+        } else {
+            Log.e(LOG_TAG, "dateTextView has not been initilized. dateTextView is null.");
+            return null;
+        }
+    }
 
     /**
      * initialize OnClickListeners
@@ -451,7 +459,7 @@ public class NewEntityActivity extends AppCompatActivity implements DatePickerFr
         // parse the date from the TextView
         final Date currentDate;
         try {
-            currentDate = sdf_weekday.parse(dateTextView.getText().toString());
+            currentDate = getSelectedDate();
             if (currentDate == null) {
                 throw new Exception(String.format("%s: currentDate == null", LOG_TAG));
             }
@@ -488,19 +496,31 @@ public class NewEntityActivity extends AppCompatActivity implements DatePickerFr
         btn_date_foreward.setOnClickListener(v -> {
             Log.d(LOG_TAG, "switch date to the next day");
             Calendar cal = Calendar.getInstance();
-            cal.setTime(currentDate);
+            Date selectedDate;
+            try {
+                selectedDate = getSelectedDate();
+            } catch (ParseException e) {
+                Log.e(LOG_TAG,"the selected date cannot be parsed. The current date will be used instead.");
+                selectedDate = currentDate;
+            }
+            cal.setTime(selectedDate);
             cal.add(Calendar.DAY_OF_MONTH, 1);
-            dateTextView.setText(sdf_weekday.format(cal.getTimeInMillis()));
-
+            updateDate(cal.getTime());
         });
 
         btn_date_backward.setOnClickListener(v -> {
             Log.d(LOG_TAG, "switch date to the previous day");
             Calendar cal = Calendar.getInstance();
-            cal.setTime(currentDate);
+            Date selectedDate;
+            try {
+                selectedDate = getSelectedDate();
+            } catch (ParseException e) {
+                Log.e(LOG_TAG,"the selected date cannot be parsed. The current date will be used instead.");
+                selectedDate = currentDate;
+            }
+            cal.setTime(selectedDate);
             cal.add(Calendar.DAY_OF_MONTH, -1);
-            dateTextView.setText(sdf_weekday.format(cal.getTimeInMillis()));
-
+            updateDate(cal.getTime());
         });
     }
 
