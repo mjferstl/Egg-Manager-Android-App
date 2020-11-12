@@ -84,7 +84,7 @@ dependencies {
     def navigationVersion = '2.3.1'
 
     // Layout
-    implementation 'androidx.constraintlayout:constraintlayout:2.0.2'
+    implementation 'androidx.constraintlayout:constraintlayout:2.0.4'
 
     // Room database
     implementation "androidx.room:room-runtime:$roomVersion"
