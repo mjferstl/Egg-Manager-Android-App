@@ -58,11 +58,12 @@
 
         <LinearLayout
             android:id="@+id/linLay_database_summary_eggs_collected"
-            android:layout_width="0dp"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:orientation="horizontal"
-            app:layout_constraintBottom_toTopOf="@+id/linLay_database_summary_eggs_sold"
+            app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toStartOf="@id/linLay_database_summary_money_earned"
+            app:layout_constraintHorizontal_bias="0"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
             tools:ignore="UseCompoundDrawables">
@@ -86,13 +87,13 @@
 
         <LinearLayout
             android:id="@+id/linLay_database_summary_eggs_sold"
-            android:layout_width="0dp"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:orientation="horizontal"
             app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="@id/linLay_database_summary_eggs_collected"
-            app:layout_constraintStart_toStartOf="@id/linLay_database_summary_eggs_collected"
-            app:layout_constraintTop_toBottomOf="@id/linLay_database_summary_eggs_collected"
+            app:layout_constraintEnd_toStartOf="@id/linLay_database_summary_money_earned"
+            app:layout_constraintStart_toEndOf="@id/linLay_database_summary_eggs_collected"
+            app:layout_constraintTop_toTopOf="parent"
             tools:ignore="UseCompoundDrawables">
 
             <ImageView
@@ -107,21 +108,20 @@
                 style="@style/basic_text"
                 android:layout_marginEnd="@dimen/small_padding"
                 android:minWidth="30dp"
-                android:text=""/>
+                android:text="" />
 
         </LinearLayout>
 
         <LinearLayout
             android:id="@+id/linLay_database_summary_money_earned"
-            android:layout_width="wrap_content"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:orientation="horizontal"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHorizontal_bias="1"
-            app:layout_constraintStart_toEndOf="@id/linLay_database_summary_eggs_collected"
-            app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintVertical_bias="1">
+            app:layout_constraintStart_toEndOf="@id/linLay_database_summary_eggs_sold"
+            app:layout_constraintTop_toTopOf="parent">
 
             <TextView
                 android:id="@+id/txtv_summary_money_earned"

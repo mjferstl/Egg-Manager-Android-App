@@ -11,11 +11,11 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.fragment.app.DialogFragment;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentTransaction;
@@ -69,7 +69,7 @@ public class DatabaseFragment extends Fragment {
     private TextView txtv_summary_eggs_collected, txtv_summary_eggs_sold, txtv_summary_money_earned;
     private TextView txtv_summary_extra_info;
     private TextView txtv_empty_recyclerview;
-    private LinearLayout linLay_summary;
+    private ConstraintLayout linLay_summary;
 
     private View rootView;
     private Context mainContext;
@@ -139,20 +139,22 @@ public class DatabaseFragment extends Fragment {
         updateDataFilter();
     }
 
+
+
     private void updateEggsCollected(int numEggs) {
-        Log.d(LOG_TAG,"updateEggsCollected(): updating number of collected eggs");
+        Log.d(LOG_TAG,"updateEggsCollected(): updating number of collected eggs. New value: " + numEggs);
         txtv_summary_eggs_collected.setText(String.format(Locale.getDefault(), "%d" , numEggs));
         updateSummary();
     }
 
     private void updateEggsSold(int numEggs) {
-        Log.d(LOG_TAG,"updateEggsSold(): updating number of sold eggs");
+        Log.d(LOG_TAG,"updateEggsSold(): updating number of sold eggs. New value: " + numEggs);
         txtv_summary_eggs_sold.setText(String.format(Locale.getDefault(), "%d", numEggs));
         updateSummary();
     }
 
     private void updateMoneyEarned(double amountMoney) {
-        Log.d(LOG_TAG,"updateMoneyEarned(): updating the amount of money earned");
+        Log.d(LOG_TAG,"updateMoneyEarned(): updating the amount of money earned. New value: " + amountMoney);
         txtv_summary_money_earned.setText(String.format(Locale.getDefault(), "%.2f", amountMoney));
         updateSummary();
     }
@@ -182,6 +184,9 @@ public class DatabaseFragment extends Fragment {
             }
             txtv_summary_extra_info.setText(extraInfo);
         }
+
+        Log.d(LOG_TAG, "height of eggs collected: " + txtv_summary_eggs_collected.getHeight());
+        Log.d(LOG_TAG, "height of money earned: " + txtv_summary_money_earned.getHeight());
     }
 
     private void hideSummary() {
@@ -200,11 +205,6 @@ public class DatabaseFragment extends Fragment {
         super.onCreateOptionsMenu(menu, inflater);
     }
 
-    /**
-     * action when the user clicks on an item at the action bar
-     * @param item selected MenuItem of the Action Bar
-     * @return
-     */
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         // Handle action bar item clicks here. The action bar will
