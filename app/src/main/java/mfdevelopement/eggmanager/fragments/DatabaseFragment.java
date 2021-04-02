@@ -43,7 +43,6 @@ import mfdevelopement.eggmanager.dialog_fragments.SortingDialogFragment;
 import mfdevelopement.eggmanager.list_adapters.DailyBalanceListAdapter;
 import mfdevelopement.eggmanager.viewmodels.SharedViewModel;
 
-import static android.app.Activity.RESULT_CANCELED;
 import static mfdevelopement.eggmanager.utils.FilterActivityResultHandler.handleFilterActivityResult;
 
 public class DatabaseFragment extends Fragment {
@@ -183,9 +182,6 @@ public class DatabaseFragment extends Fragment {
             }
             txtv_summary_extra_info.setText(extraInfo);
         }
-
-        Log.d(LOG_TAG, "height of eggs collected: " + txtv_summary_eggs_collected.getHeight());
-        Log.d(LOG_TAG, "height of money earned: " + txtv_summary_money_earned.getHeight());
     }
 
     private void hideSummary() {
@@ -343,9 +339,7 @@ public class DatabaseFragment extends Fragment {
 
         String snackbarText = "";
 
-        if (resultCode == RESULT_CANCELED) {
-            //snackbarText = getString(R.string.entry_not_added);
-        } else if (requestCode == NEW_ENTITY_REQUEST_CODE && resultCode == NEW_ENTITY_RESULT_CODE) {
+        if (requestCode == NEW_ENTITY_REQUEST_CODE && resultCode == NEW_ENTITY_RESULT_CODE) {
             snackbarText = getString(R.string.new_entity_saved);
         } else if (requestCode == EDIT_ENTITY_REQUEST_CODE && resultCode == EDITED_ENTITY_RESULT_CODE) {
             snackbarText = getString(R.string.changes_saved);

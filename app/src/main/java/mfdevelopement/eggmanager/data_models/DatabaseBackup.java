@@ -20,7 +20,7 @@ public class DatabaseBackup implements Comparable<DatabaseBackup> {
     private static final String exportFileDataType = ".emb"; // EggManagerBackup
 
     private String backupName, filename;
-    private Calendar saveDate;
+    private final Calendar saveDate;
 
     private long fileSize;
 
@@ -93,8 +93,8 @@ public class DatabaseBackup implements Comparable<DatabaseBackup> {
     }
 
     /**
-     * create the filename for the backup file
-     * @return
+     * Get the filename for the backup file
+     * @return filename
      */
     private String createBackupFilename() {
         return exportFilePrefix + this.getBackupName() + "_" + sdf.format(this.getSaveDate().getTimeInMillis()) + exportFileDataType;
@@ -125,8 +125,8 @@ public class DatabaseBackup implements Comparable<DatabaseBackup> {
      */
     public static boolean isEggManagerBackupFile(String filename) {
         return (filename.length() > (exportFilePrefix.length() + exportFileDataType.length()) &&
-                filename.substring(0, exportFilePrefix.length()).equals(exportFilePrefix) &&
-                filename.substring(filename.length()-exportFileDataType.length()).equals(exportFileDataType));
+                filename.startsWith(exportFilePrefix) &&
+                filename.endsWith(exportFileDataType));
     }
 
 

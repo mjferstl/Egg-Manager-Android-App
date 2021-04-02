@@ -47,6 +47,9 @@ public class FileUtil {
             return "";
         }
 
+        // Android 11 stores the app specific files in
+        // /storage/emulated/0/Android/data/mfdevelopement.eggmanager.debug/files
+        // and not in /storage/emulated/0/ any more
         return Objects.requireNonNull(context.getExternalFilesDir(null)).getAbsolutePath();
     }
 

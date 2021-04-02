@@ -318,11 +318,7 @@ public class ChartFragment extends Fragment {
         dataSet.setDrawCircles(false);
         dataSet.setLineWidth(DATA_LINE_WIDTH);
         dataSet.setValueTextSize(TEXT_SIZE);            // text size of the text for each data point
-        if (entries.size() > 5) {
-            dataSet.setDrawValues(false);                   // do not show the value of each data point
-        } else {
-            dataSet.setDrawValues(true);
-        }
+        dataSet.setDrawValues(entries.size() <= 5);     // do not show the value of each data point for large data
 
         return dataSet;
     }
@@ -338,11 +334,7 @@ public class ChartFragment extends Fragment {
         dataSet.setColor(ContextCompat.getColor(this.getContext(), R.color.colorAccent));
         dataSet.setValueTextColor(ContextCompat.getColor(this.getContext(), R.color.main_text_color));
         dataSet.setValueTextSize(TEXT_SIZE);            // text size of the text for each data point
-        if (entries.size() > 5) {
-            dataSet.setDrawValues(false);                   // do not show the value of each data point
-        } else {
-            dataSet.setDrawValues(true);
-        }
+        dataSet.setDrawValues(entries.size() <= 5);     // do not show the value of each data point for large data
         return dataSet;
     }
 
@@ -455,6 +447,9 @@ public class ChartFragment extends Fragment {
         refreshChart(barChart);
     }
 
+    /**
+     * Hide the chart
+     */
     private void hideChart(Chart chart) {
         Log.d(LOG_TAG,"hiding chart");
         chart.setVisibility(View.GONE);
@@ -479,15 +474,12 @@ public class ChartFragment extends Fragment {
     @Override
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
 
-        switch (item.getItemId()) {
-            case R.id.action_charts_filter:
-                // Show the filter activity if there's some data in the database
-                if (databaseEntryCount > 0) {
-                    openFilterActivity();
-                } else {
-                    Snackbar.make(rootView.findViewById(R.id.main_chart_container), getString(R.string.snackbar_no_data_to_filter), Snackbar.LENGTH_SHORT).show();
-                }
-                break;
+        if (item.getItemId() == R.id.action_charts_filter) {// Show the filter activity if there's some data in the database
+            if (databaseEntryCount > 0) {
+                openFilterActivity();
+            } else {
+                Snackbar.make(rootView.findViewById(R.id.main_chart_container), getString(R.string.snackbar_no_data_to_filter), Snackbar.LENGTH_SHORT).show();
+            }
         }
 
         return super.onOptionsItemSelected(item);
@@ -578,7 +570,7 @@ public class ChartFragment extends Fragment {
      */
     private class AxisDateFormatterWithYear extends ValueFormatter {
 
-        private SimpleDateFormat sdf = new SimpleDateFormat("dd.MM.yy", Locale.getDefault());
+        private final SimpleDateFormat sdf = new SimpleDateFormat("dd.MM.yy", Locale.getDefault());
 
         @Override
         public String getAxisLabel(float value, AxisBase axis) {
@@ -590,7 +582,7 @@ public class ChartFragment extends Fragment {
 
     private class AxisDateFormatterWithOutYear extends ValueFormatter {
 
-        private SimpleDateFormat sdf = new SimpleDateFormat("dd.MM", Locale.getDefault());
+        private final SimpleDateFormat sdf = new SimpleDateFormat("dd.MM", Locale.getDefault());
 
         @Override
         public String getAxisLabel(float value, AxisBase axis) {
@@ -602,7 +594,7 @@ public class ChartFragment extends Fragment {
 
     private class AxisMonthYearFormatter extends ValueFormatter {
 
-        private SimpleDateFormat sdf = new SimpleDateFormat("MM/yy", Locale.getDefault());
+        private final SimpleDateFormat sdf = new SimpleDateFormat("MM/yy", Locale.getDefault());
 
         @Override
         public String getAxisLabel(float value, AxisBase axis) {

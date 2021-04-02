@@ -233,17 +233,12 @@ public class NewEntityActivity extends AppCompatActivity implements DatePickerFr
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        switch (item.getItemId()) {
-            // action with ID action_save was selected
-            case R.id.action_save:
-                saveEntryAndExit();
-                break;
-            case android.R.id.home:
-                Log.d(LOG_TAG, "User pressed home button");
-                onBackPressed();
-                break;
-            default:
-                break;
+        int itemId = item.getItemId();// action with ID action_save was selected
+        if (itemId == R.id.action_save) {
+            saveEntryAndExit();
+        } else if (itemId == android.R.id.home) {
+            Log.d(LOG_TAG, "User pressed home button");
+            onBackPressed();
         }
         return true;
     }
