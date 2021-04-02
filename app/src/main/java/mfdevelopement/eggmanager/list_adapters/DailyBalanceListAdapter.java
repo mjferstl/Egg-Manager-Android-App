@@ -145,7 +145,7 @@ public class DailyBalanceListAdapter extends RecyclerView.Adapter<DailyBalanceLi
 
                 // Specifying a sortingOrderChangedListener allows you to take an action before dismissing the dialog.
                 // The dialog is automatically dismissed when a dialog button is clicked.
-                .setPositiveButton(android.R.string.yes, (dialog, which) -> {
+                .setPositiveButton(android.R.string.ok, (dialog, which) -> {
                     // Continue with delete operation
                     Log.d(LOG_TAG,"removing item at position " + itemPosition);
                     viewModel.delete(getItem(itemPosition));
@@ -153,7 +153,7 @@ public class DailyBalanceListAdapter extends RecyclerView.Adapter<DailyBalanceLi
                 })
 
                 // A null sortingOrderChangedListener allows the button to dismiss the dialog and take no further action.
-                .setNegativeButton(android.R.string.no, null)
+                .setNegativeButton(android.R.string.cancel, null)
                 .setIcon(R.drawable.ic_warning_black_24dp)
                 .show();
     }

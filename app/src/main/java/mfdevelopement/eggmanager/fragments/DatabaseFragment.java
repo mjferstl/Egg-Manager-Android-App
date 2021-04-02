@@ -94,13 +94,13 @@ public class DatabaseFragment extends Fragment {
             viewModel = new ViewModelProvider(getActivity()).get(SharedViewModel.class);
         } else {
             String errorMsg = "Es ist ein Fehler beim Laden des ViewModels aufgetreten";
-            Log.wtf(LOG_TAG,errorMsg);
+            Log.wtf(LOG_TAG, errorMsg);
             Snackbar.make(rootView.findViewById(R.id.main_container), errorMsg, Snackbar.LENGTH_LONG).show();
         }
 
         // add sortingOrderChangedListener
         // when the user changes the sorting order, then the recycler view needs to be updated manually
-        ((MainNavigationActivity)getActivity()).setSortingOrderChangedListener(this::reverseRecyclerView);
+        ((MainNavigationActivity) getActivity()).setSortingOrderChangedListener(this::reverseRecyclerView);
 
         // this framgent has its own options menu
         setHasOptionsMenu(true);
@@ -140,21 +140,20 @@ public class DatabaseFragment extends Fragment {
     }
 
 
-
     private void updateEggsCollected(int numEggs) {
-        Log.d(LOG_TAG,"updateEggsCollected(): updating number of collected eggs. New value: " + numEggs);
-        txtv_summary_eggs_collected.setText(String.format(Locale.getDefault(), "%d" , numEggs));
+        Log.d(LOG_TAG, "updateEggsCollected(): updating number of collected eggs. New value: " + numEggs);
+        txtv_summary_eggs_collected.setText(String.format(Locale.getDefault(), "%d", numEggs));
         updateSummary();
     }
 
     private void updateEggsSold(int numEggs) {
-        Log.d(LOG_TAG,"updateEggsSold(): updating number of sold eggs. New value: " + numEggs);
+        Log.d(LOG_TAG, "updateEggsSold(): updating number of sold eggs. New value: " + numEggs);
         txtv_summary_eggs_sold.setText(String.format(Locale.getDefault(), "%d", numEggs));
         updateSummary();
     }
 
     private void updateMoneyEarned(double amountMoney) {
-        Log.d(LOG_TAG,"updateMoneyEarned(): updating the amount of money earned. New value: " + amountMoney);
+        Log.d(LOG_TAG, "updateMoneyEarned(): updating the amount of money earned. New value: " + amountMoney);
         txtv_summary_money_earned.setText(String.format(Locale.getDefault(), "%.2f", amountMoney));
         updateSummary();
     }
@@ -173,11 +172,11 @@ public class DatabaseFragment extends Fragment {
             else {
                 hideSummary();
                 if (adapter.getItemCount() == 0) {
-                    Log.d(LOG_TAG,"recyclerView contains no items");
+                    Log.d(LOG_TAG, "recyclerView contains no items");
                     showTextEmptyRecyclerview(true);
                     txtv_empty_recyclerview.setText(getString(R.string.text_empty_recyclerview));
                 } else if (recyclerViewNotVisibile) {
-                    Log.d(LOG_TAG,"recyclerView is not visible");
+                    Log.d(LOG_TAG, "recyclerView is not visible");
                     //showTextEmptyRecyclerview(true);
                     txtv_empty_recyclerview.setText(getString(R.string.text_recyclerview_not_visible));
                 }
@@ -212,40 +211,25 @@ public class DatabaseFragment extends Fragment {
         // as you specify a parent activity in AndroidManifest.xml.
         int id = item.getItemId();
 
-        switch (id) {
-            case R.id.action_data_filter:
-                // Open filter activity, if there's some data in the database
-                if (entriesCount > 0) {
-                    openFilterActivity();
-                } else {
-                    Snackbar.make(rootView.findViewById(R.id.main_container), getString(R.string.snackbar_no_data_to_filter), Snackbar.LENGTH_SHORT).show();
-                }
+        if (!(entriesCount > 0)) {
+            Snackbar.make(rootView.findViewById(R.id.main_container), getString(R.string.snackbar_no_data_to_filter), Snackbar.LENGTH_SHORT).show();
+        } else {
+            if (id == R.id.action_data_filter) {// Open filter activity, if there's some data in the database
+                openFilterActivity();
                 return true;
-            case R.id.action_data_sort:
-                // SHow options for list sorting, if there's some data in the database
-                if (entriesCount > 0) {
-                    showSortingDialog();
-                } else {
-                    Snackbar.make(rootView.findViewById(R.id.main_container), getString(R.string.snackbar_no_data_to_filter), Snackbar.LENGTH_SHORT).show();
-                }
+            } else if (id == R.id.action_data_sort) {// Show options for list sorting, if there's some data in the database
+                showSortingDialog();
                 return true;
-            case R.id.action_completeness_check:
-                // Show completeness check activity, if there's some data in the database
-                if (entriesCount > 0) {
-                    openCompletenessCheckActivity();
-                } else {
-                    Snackbar.make(rootView.findViewById(R.id.main_container), getString(R.string.snackbar_no_data_to_filter), Snackbar.LENGTH_SHORT).show();
-                }
+            } else if (id == R.id.action_completeness_check) {// Show completeness check activity, if there's some data in the database
+                openCompletenessCheckActivity();
                 return true;
-            case R.id.action_delete_database:
-                // Delete all items of the database
-                if (entriesCount > 0) {
-                    showDeleteDialog();
-                } else {
-                    Snackbar.make(rootView.findViewById(R.id.main_container), getString(R.string.snackbar_no_data_to_filter), Snackbar.LENGTH_SHORT).show();
-                }
+            } else if (id == R.id.action_delete_database) {// Delete all items of the database
+                showDeleteDialog();
                 return true;
+            }
         }
+
+        // call the super method, if the item selection has not been handeled
         return super.onOptionsItemSelected(item);
     }
 
@@ -266,7 +250,7 @@ public class DatabaseFragment extends Fragment {
             DialogFragment newFragment = DeleteDatabaseDialog.newInstance();
             newFragment.show(ft, "dialog");
         } else {
-            Log.e(LOG_TAG,"getActivity() = null");
+            Log.e(LOG_TAG, "getActivity() = null");
         }
     }
 
@@ -285,8 +269,8 @@ public class DatabaseFragment extends Fragment {
 
             //
             SortingItemCollection sortingList = new SortingItemCollection();
-            sortingList.addItem(new SortingItem("Aufsteigend","ASC",false));
-            sortingList.addItem(new SortingItem("Absteigend","DESC",false));
+            sortingList.addItem(new SortingItem("Aufsteigend", "ASC", false));
+            sortingList.addItem(new SortingItem("Absteigend", "DESC", false));
             String savedSortingOrder = viewModel.getSortingOrder();
             for (SortingItem item : sortingList.getItems()) {
                 if (item.getSortingOrder().equals(savedSortingOrder))
@@ -297,7 +281,7 @@ public class DatabaseFragment extends Fragment {
             DialogFragment newFragment = SortingDialogFragment.newInstance(sortingList);
             newFragment.show(ft, "dialog");
         } else {
-            Log.e(LOG_TAG,"getActivity() = null");
+            Log.e(LOG_TAG, "getActivity() = null");
         }
     }
 
@@ -317,7 +301,7 @@ public class DatabaseFragment extends Fragment {
         Slide slide = new Slide();
         slide.setDuration(1000);
         if (getActivity() != null) {
-            Log.e(LOG_TAG,"setupExitSlideAnimation():: getActivity() == null");
+            Log.e(LOG_TAG, "setupExitSlideAnimation():: getActivity() == null");
             getActivity().getWindow().setExitTransition(slide);
         }
     }
@@ -345,27 +329,25 @@ public class DatabaseFragment extends Fragment {
      * Re-Sort the items of the recycler view, if the sorting order changed
      */
     private void reverseRecyclerView() {
-        Log.d(LOG_TAG,"reverseRecyclerView(): updating recycler view items, because the sorting order may has changed");
-                List<DailyBalance> currentList = adapter.getItems();
-                Collections.reverse(currentList);
-                adapter.setDailyBalances(currentList);
+        Log.d(LOG_TAG, "reverseRecyclerView(): updating recycler view items, because the sorting order may has changed");
+        List<DailyBalance> currentList = adapter.getItems();
+        Collections.reverse(currentList);
+        adapter.setDailyBalances(currentList);
     }
 
     @Override
     public void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
 
-        Log.d(LOG_TAG,"onActivityResult::requestCode=" + requestCode + ",resultCode=" + resultCode);
+        Log.d(LOG_TAG, "onActivityResult::requestCode=" + requestCode + ",resultCode=" + resultCode);
 
         String snackbarText = "";
 
         if (resultCode == RESULT_CANCELED) {
             //snackbarText = getString(R.string.entry_not_added);
-        }
-        else if (requestCode == NEW_ENTITY_REQUEST_CODE && resultCode == NEW_ENTITY_RESULT_CODE) {
+        } else if (requestCode == NEW_ENTITY_REQUEST_CODE && resultCode == NEW_ENTITY_RESULT_CODE) {
             snackbarText = getString(R.string.new_entity_saved);
-        }
-        else if (requestCode == EDIT_ENTITY_REQUEST_CODE && resultCode == EDITED_ENTITY_RESULT_CODE) {
+        } else if (requestCode == EDIT_ENTITY_REQUEST_CODE && resultCode == EDITED_ENTITY_RESULT_CODE) {
             snackbarText = getString(R.string.changes_saved);
         }
         // results from FilterActivity
@@ -402,7 +384,7 @@ public class DatabaseFragment extends Fragment {
                 }
             } else if (resultCode == FILTER_REMOVED_RESULT_CODE) {
                 updateDataFilter();
-                Log.d(LOG_TAG,"user removed the filter");
+                Log.d(LOG_TAG, "user removed the filter");
             }
             if (getActivity() != null)
                 getActivity().invalidateOptionsMenu();
@@ -437,9 +419,9 @@ public class DatabaseFragment extends Fragment {
 
         viewModel.getFilteredDailyBalance().observe(getViewLifecycleOwner(), dailyBalanceList -> {
             // Update the cached copy of the items in the adapter
-            Log.d(LOG_TAG,"getFilteredDailyBalance() received updated data");
+            Log.d(LOG_TAG, "getFilteredDailyBalance() received updated data");
             if (dailyBalanceList != null) {
-                Log.d(LOG_TAG,"new list has " + dailyBalanceList.size() + " items");
+                Log.d(LOG_TAG, "new list has " + dailyBalanceList.size() + " items");
 
                 // if the user wants to get the items in the recycler view in descending order, then reverse the list
                 String savedSortingOrder = viewModel.getSortingOrder();
@@ -455,19 +437,19 @@ public class DatabaseFragment extends Fragment {
         });
 
         viewModel.getFilteredEggsCollected().observe(getViewLifecycleOwner(), eggsCollected -> {
-            Log.d(LOG_TAG,"getFilteredEggsCollected() received updated data");
+            Log.d(LOG_TAG, "getFilteredEggsCollected() received updated data");
             if (eggsCollected != null)
                 updateEggsCollected(eggsCollected);
         });
 
         viewModel.getFilteredEggsSold().observe(getViewLifecycleOwner(), eggsSold -> {
-            Log.d(LOG_TAG,"getFilteredEggsSold() received updated data");
+            Log.d(LOG_TAG, "getFilteredEggsSold() received updated data");
             if (eggsSold != null)
                 updateEggsSold(eggsSold);
         });
 
         viewModel.getFilteredMoneyEarned().observe(getViewLifecycleOwner(), moneyEarned -> {
-            Log.d(LOG_TAG,"getFilteredMoneyEarned() received updated data");
+            Log.d(LOG_TAG, "getFilteredMoneyEarned() received updated data");
             if (moneyEarned != null)
                 updateMoneyEarned(moneyEarned);
         });
