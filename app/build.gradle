@@ -9,14 +9,14 @@ android {
             keyPassword "KeyPassword"
         }
     }
-    compileSdkVersion 29
+    compileSdkVersion 30
     buildFeatures.viewBinding = true
     defaultConfig {
         applicationId "mfdevelopement.eggmanager"
         minSdkVersion 21
-        targetSdkVersion 29
+        targetSdkVersion 30
         versionCode 1
-        versionName "2.0.2"
+        versionName "2.0.3"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
 
         // export the database schema
@@ -80,11 +80,11 @@ dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
     implementation 'androidx.appcompat:appcompat:1.2.0'
 
-    def roomVersion = '2.2.5'
-    def archLifecycleVersion = '2.2.0'
+    def roomVersion = '2.2.6'
+    def archLifecycleVersion = '2.3.1'
     def coreTestingVersion = '2.1.0'
-    def materialVersion = '1.3.0-alpha03'
-    def navigationVersion = '2.3.1'
+    def materialVersion = '1.4.0-alpha02'
+    def navigationVersion = '2.3.4'
 
     // Layout
     implementation 'androidx.constraintlayout:constraintlayout:2.0.4'
@@ -115,7 +115,7 @@ dependencies {
     androidTestImplementation "androidx.arch.core:core-testing:$coreTestingVersion"
     androidTestImplementation 'androidx.test.ext:junit:1.1.2'
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.3.0'
-    testImplementation 'junit:junit:4.12'
+    testImplementation 'junit:junit:4.13.1'
 }
 
 repositories {
