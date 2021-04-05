@@ -120,8 +120,9 @@ public class DatabaseBackup implements Comparable<DatabaseBackup> {
 
     /**
      * checks if a file is a backup file of EggManager depending on the filename
+     *
      * @param filename Name of the file to check
-     * @return status wheather the file is an EggManager backup file or not
+     * @return status weather the file is an EggManager backup file or not
      */
     public static boolean isEggManagerBackupFile(String filename) {
         return (filename.length() > (exportFilePrefix.length() + exportFileDataType.length()) &&

@@ -30,6 +30,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
 
+import mfdevelopement.eggmanager.DatabaseActions;
 import mfdevelopement.eggmanager.R;
 import mfdevelopement.eggmanager.activities.DataCompletenessCheckActivity;
 import mfdevelopement.eggmanager.activities.FilterActivity;
@@ -49,16 +50,6 @@ public class DatabaseFragment extends Fragment {
 
     private SharedViewModel viewModel;
     private DailyBalanceListAdapter adapter;
-
-    public static final int NEW_ENTITY_REQUEST_CODE = 2;
-    public static final int EDIT_ENTITY_REQUEST_CODE = 3;
-    public static final int EDIT_FILTER_STRING_REQUEST_CODE = 4;
-
-    public static final int NEW_ENTITY_RESULT_CODE = 2;
-    public static final int EDITED_ENTITY_RESULT_CODE = 3;
-    public static final int FILTER_OK_RESULT_CODE = 4;
-    public static final int FILTER_CANCEL_RESULT_CODE = 5;
-    public static final int FILTER_REMOVED_RESULT_CODE = 6;
 
     public static final String EXTRA_REQUEST_CODE_NAME = "requestCode";
     public static final String EXTRA_DAILY_BALANCE = "extraDailyBalance";
@@ -283,9 +274,9 @@ public class DatabaseFragment extends Fragment {
 
     private void openFilterActivity() {
         Intent intent = new Intent(mainContext, FilterActivity.class);
-        intent.putExtra(EXTRA_REQUEST_CODE_NAME, EDIT_FILTER_STRING_REQUEST_CODE);
+        intent.putExtra(EXTRA_REQUEST_CODE_NAME, DatabaseActions.Request.EDIT_FILTER.ordinal());
         //setupExitSlideAnimation();
-        startActivityForResult(intent, EDIT_FILTER_STRING_REQUEST_CODE);
+        startActivityForResult(intent, DatabaseActions.Request.EDIT_FILTER.ordinal());
     }
 
     private void openCompletenessCheckActivity() {
@@ -339,16 +330,16 @@ public class DatabaseFragment extends Fragment {
 
         String snackbarText = "";
 
-        if (requestCode == NEW_ENTITY_REQUEST_CODE && resultCode == NEW_ENTITY_RESULT_CODE) {
+        if (requestCode == DatabaseActions.Request.NEW_ENTITY.ordinal() && resultCode == DatabaseActions.Result.NEW_ENTITY.ordinal()) {
             snackbarText = getString(R.string.new_entity_saved);
-        } else if (requestCode == EDIT_ENTITY_REQUEST_CODE && resultCode == EDITED_ENTITY_RESULT_CODE) {
+        } else if (requestCode == DatabaseActions.Request.EDIT_ENTITY.ordinal() && resultCode == DatabaseActions.Result.ENTITY_EDITED.ordinal()) {
             snackbarText = getString(R.string.changes_saved);
         }
         // results from FilterActivity
-        else if (requestCode == EDIT_FILTER_STRING_REQUEST_CODE) {
+        else if (requestCode == DatabaseActions.Request.EDIT_FILTER.ordinal()) {
             handleFilterActivityResult(resultCode, data);
 
-            if (resultCode == FILTER_OK_RESULT_CODE) {
+            if (resultCode == DatabaseActions.Result.FILTER_OK.ordinal()) {
 
                 Log.d(LOG_TAG, "filtered list of daily balanced with filter key \"" + viewModel.loadDateFilter() + "\"");
                 updateDataFilter();
@@ -376,7 +367,7 @@ public class DatabaseFragment extends Fragment {
                     if (!filterName.isEmpty())
                         snackbarText = "Daten nach " + filterName + " gefiltert";
                 }
-            } else if (resultCode == FILTER_REMOVED_RESULT_CODE) {
+            } else if (resultCode == DatabaseActions.Result.FILTER_REMOVED.ordinal()) {
                 updateDataFilter();
                 Log.d(LOG_TAG, "user removed the filter");
             }
@@ -401,8 +392,8 @@ public class DatabaseFragment extends Fragment {
         FloatingActionButton fab = rootView.findViewById(R.id.fab);
         fab.setOnClickListener(view -> {
             Intent intent = new Intent(mainContext, NewEntityActivity.class);
-            intent.putExtra(EXTRA_REQUEST_CODE_NAME, NEW_ENTITY_REQUEST_CODE);
-            startActivityForResult(intent, NEW_ENTITY_REQUEST_CODE);
+            intent.putExtra(EXTRA_REQUEST_CODE_NAME, DatabaseActions.Request.NEW_ENTITY.ordinal());
+            startActivityForResult(intent, DatabaseActions.Request.NEW_ENTITY.ordinal());
         });
     }
 

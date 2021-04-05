@@ -40,12 +40,12 @@ import java.util.Calendar;
 import java.util.List;
 import java.util.Locale;
 
+import mfdevelopement.eggmanager.DatabaseActions;
 import mfdevelopement.eggmanager.R;
 import mfdevelopement.eggmanager.activities.FilterActivity;
 import mfdevelopement.eggmanager.data_models.ChartAxisLimits;
 import mfdevelopement.eggmanager.viewmodels.SharedViewModel;
 
-import static mfdevelopement.eggmanager.fragments.DatabaseFragment.EDIT_FILTER_STRING_REQUEST_CODE;
 import static mfdevelopement.eggmanager.fragments.DatabaseFragment.EXTRA_REQUEST_CODE_NAME;
 import static mfdevelopement.eggmanager.utils.FilterActivityResultHandler.handleFilterActivityResult;
 
@@ -487,20 +487,20 @@ public class ChartFragment extends Fragment {
 
     private void openFilterActivity() {
         Intent intent = new Intent(getContext(), FilterActivity.class);
-        intent.putExtra(EXTRA_REQUEST_CODE_NAME, EDIT_FILTER_STRING_REQUEST_CODE);
-        startActivityForResult(intent, EDIT_FILTER_STRING_REQUEST_CODE);
+        intent.putExtra(EXTRA_REQUEST_CODE_NAME, DatabaseActions.Request.EDIT_FILTER.ordinal());
+        startActivityForResult(intent, DatabaseActions.Request.EDIT_FILTER.ordinal());
     }
 
     @Override
     public void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
 
-        if (requestCode == EDIT_FILTER_STRING_REQUEST_CODE) {
+        if (requestCode == DatabaseActions.Request.EDIT_FILTER.ordinal()) {
 
             // handle the return value from the FilterActivity
             handleFilterActivityResult(resultCode, data);
 
-            if (resultCode == DatabaseFragment.FILTER_OK_RESULT_CODE) {
+            if (resultCode == DatabaseActions.Result.FILTER_OK.ordinal()) {
                 // update the new filter string in the view model
                 viewModel.setDateFilter(viewModel.loadDateFilter());
             }

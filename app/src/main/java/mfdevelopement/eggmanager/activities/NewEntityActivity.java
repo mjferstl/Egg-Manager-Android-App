@@ -32,6 +32,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 
+import mfdevelopement.eggmanager.DatabaseActions;
 import mfdevelopement.eggmanager.R;
 import mfdevelopement.eggmanager.data_models.DailyBalance;
 import mfdevelopement.eggmanager.dialog_fragments.DatePickerFragment;
@@ -159,9 +160,9 @@ public class NewEntityActivity extends AppCompatActivity implements DatePickerFr
 
 
         // fill in fields, if a item is edited
-        requestCode = getIntent().getIntExtra(DatabaseFragment.EXTRA_REQUEST_CODE_NAME, DatabaseFragment.NEW_ENTITY_REQUEST_CODE);
+        requestCode = getIntent().getIntExtra(DatabaseFragment.EXTRA_REQUEST_CODE_NAME, DatabaseActions.Request.NEW_ENTITY.ordinal());
         Log.d(LOG_TAG, "activity startet with request code " + requestCode);
-        if (requestCode == DatabaseFragment.EDIT_ENTITY_REQUEST_CODE) {
+        if (requestCode == DatabaseActions.Request.EDIT_ENTITY.ordinal()) {
             loadedDailyBalance = (DailyBalance) getIntent().getSerializableExtra(DatabaseFragment.EXTRA_DAILY_BALANCE);
             if (loadedDailyBalance == null) {
                 Toast.makeText(this, "Error while loading data", Toast.LENGTH_SHORT).show();
@@ -205,7 +206,7 @@ public class NewEntityActivity extends AppCompatActivity implements DatePickerFr
             updateDate(loadedDate);
         }
         // the user wants to create a new entity
-        else if (requestCode == DatabaseFragment.NEW_ENTITY_REQUEST_CODE) {
+        else if (requestCode == DatabaseActions.Request.NEW_ENTITY.ordinal()) {
 
             // update the date, if the user wants to create an entity for a special date
             String date = getIntent().getStringExtra(DatabaseFragment.EXTRA_ENTITY_DATE);
@@ -395,7 +396,7 @@ public class NewEntityActivity extends AppCompatActivity implements DatePickerFr
                         // Continue with delete operation
                         newEntityViewModel.deleteDailyBalance(loadedDailyBalance);
                         newEntityViewModel.addDailyBalance(dailyBalance);
-                        fragmentActivity.setResult(DatabaseFragment.EDITED_ENTITY_RESULT_CODE);
+                        fragmentActivity.setResult(DatabaseActions.Result.ENTITY_EDITED.ordinal());
 
                         fragmentActivity.finish();
                     })
@@ -409,11 +410,11 @@ public class NewEntityActivity extends AppCompatActivity implements DatePickerFr
         else {
 
             // if the user edited an entry and selected a new date which has no data yet, then delete the selected entry and save the entry with the selected date
-            if (requestCode == DatabaseFragment.EDIT_ENTITY_REQUEST_CODE) {
+            if (requestCode == DatabaseActions.Request.EDIT_ENTITY.ordinal()) {
                 newEntityViewModel.deleteDailyBalance(loadedDailyBalance);
-                fragmentActivity.setResult(DatabaseFragment.EDITED_ENTITY_RESULT_CODE);
+                fragmentActivity.setResult(DatabaseActions.Result.ENTITY_EDITED.ordinal());
             } else {
-                fragmentActivity.setResult(DatabaseFragment.NEW_ENTITY_RESULT_CODE);
+                fragmentActivity.setResult(DatabaseActions.Result.NEW_ENTITY.ordinal());
             }
 
             // save created item

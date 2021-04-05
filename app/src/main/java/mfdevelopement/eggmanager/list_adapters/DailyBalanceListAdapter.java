@@ -25,6 +25,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 
+import mfdevelopement.eggmanager.DatabaseActions;
 import mfdevelopement.eggmanager.R;
 import mfdevelopement.eggmanager.activities.NewEntityActivity;
 import mfdevelopement.eggmanager.data_models.DailyBalance;
@@ -33,14 +34,14 @@ import mfdevelopement.eggmanager.viewmodels.SharedViewModel;
 
 public class DailyBalanceListAdapter extends RecyclerView.Adapter<DailyBalanceListAdapter.DailyBalanceViewHolder> {
 
-    private SharedViewModel viewModel;
+    private final SharedViewModel viewModel;
     private final String LOG_TAG = "DailyBalanceListAdapter";
     private final SimpleDateFormat sdf = new SimpleDateFormat("EE, dd.MM.yyyy", Locale.getDefault());
     private final LayoutInflater mInflater;
     private List<DailyBalance> mDailyBalances; // Cached copy of words
-    private Context context;
+    private final Context context;
     private ActionMode actionMode;
-    private List<Boolean> selectedItemPosition = new ArrayList<>();
+    private final List<Boolean> selectedItemPosition = new ArrayList<>();
 
     public class DailyBalanceViewHolder extends RecyclerView.ViewHolder {
         private final TextView txtv_date, txtv_eggs_collected, txtv_eggs_sold, txtv_money_earned, txtv_money_earned_currency;
@@ -178,28 +179,30 @@ public class DailyBalanceListAdapter extends RecyclerView.Adapter<DailyBalanceLi
     private void editEntity(int itemPosition) { editEntity(itemPosition, null);}
 
     private void editEntity(int itemPosition, DailyBalanceViewHolder holder) {
-        Log.d(LOG_TAG,"editing item at position " + itemPosition);
+        Log.d(LOG_TAG, "editing item at position " + itemPosition);
 
         Context context = this.context;
 
         Intent intent = new Intent(this.context, NewEntityActivity.class);
-        intent.putExtra(DatabaseFragment.EXTRA_REQUEST_CODE_NAME, DatabaseFragment.EDIT_ENTITY_REQUEST_CODE);
-        intent.putExtra(DatabaseFragment.EXTRA_DAILY_BALANCE,getItem(itemPosition));
+        intent.putExtra(DatabaseFragment.EXTRA_REQUEST_CODE_NAME, DatabaseActions.Request.EDIT_ENTITY.ordinal());
+        intent.putExtra(DatabaseFragment.EXTRA_DAILY_BALANCE, getItem(itemPosition));
 
         int numPairs = 1;
-        if (getItem(itemPosition).getEggsSold() != DailyBalance.NOT_SET) {numPairs = 2;}
+        if (getItem(itemPosition).getEggsSold() != DailyBalance.NOT_SET) {
+            numPairs = 2;
+        }
 
         if (holder != null) {
             @SuppressWarnings("unchecked")
             Pair<View, String>[] pairs = new Pair[numPairs];
-            pairs[0] = new Pair<View, String>(holder.imgv_eggs_collected, context.getString(R.string.transition_imgv_eggs_collected));
+            pairs[0] = new Pair<>(holder.imgv_eggs_collected, context.getString(R.string.transition_imgv_eggs_collected));
             if (numPairs == 2)
-                pairs[1] = new Pair<View, String>(holder.imgv_eggs_sold, context.getString(R.string.transition_imgv_eggs_sold));
+                pairs[1] = new Pair<>(holder.imgv_eggs_sold, context.getString(R.string.transition_imgv_eggs_sold));
 
             ActivityOptions options = ActivityOptions.makeSceneTransitionAnimation((Activity) context, pairs);
-            ((Activity) context).startActivityForResult(intent, DatabaseFragment.EDIT_ENTITY_REQUEST_CODE, options.toBundle());
+            ((Activity) context).startActivityForResult(intent, DatabaseActions.Request.EDIT_ENTITY.ordinal(), options.toBundle());
         } else {
-            ((Activity) context).startActivityForResult(intent, DatabaseFragment.EDIT_ENTITY_REQUEST_CODE);
+            ((Activity) context).startActivityForResult(intent, DatabaseActions.Request.EDIT_ENTITY.ordinal());
         }
     }
 
@@ -232,7 +235,7 @@ public class DailyBalanceListAdapter extends RecyclerView.Adapter<DailyBalanceLi
         return mDailyBalances.get(index);
     }
 
-    private ActionMode.Callback actionModeCallback = new ActionMode.Callback() {
+    private final ActionMode.Callback actionModeCallback = new ActionMode.Callback() {
 
         // Called when the action mode is created; startActionMode() was called
         @Override
@@ -254,20 +257,19 @@ public class DailyBalanceListAdapter extends RecyclerView.Adapter<DailyBalanceLi
         @Override
         public boolean onActionItemClicked(ActionMode mode, MenuItem item) {
             int indexSelectedItem = selectedItemPosition.indexOf(true);
-            switch (item.getItemId()) {
-                case R.id.action_edit:
-                    Log.d(LOG_TAG,"user wants to edit the selected item at position " + indexSelectedItem);
-                    editEntity(indexSelectedItem);
-                    mode.finish(); // Action picked, so close the CAB
-                    return true;
-                case R.id.action_delete:
-                    Log.d(LOG_TAG,"user wants to delete the selected item at position " + indexSelectedItem);
-                    showDeleteDialog(indexSelectedItem);
-                    mode.finish(); // Action picked, so close the CAB
-                    return true;
-                default:
-                    return false;
+            int itemId = item.getItemId();
+            if (itemId == R.id.action_edit) {
+                Log.d(LOG_TAG, "user wants to edit the selected item at position " + indexSelectedItem);
+                editEntity(indexSelectedItem);
+                mode.finish(); // Action picked, so close the CAB
+                return true;
+            } else if (itemId == R.id.action_delete) {
+                Log.d(LOG_TAG, "user wants to delete the selected item at position " + indexSelectedItem);
+                showDeleteDialog(indexSelectedItem);
+                mode.finish(); // Action picked, so close the CAB
+                return true;
             }
+            return false;
         }
 
         // Called when the user exits the action mode

@@ -22,9 +22,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 
+import mfdevelopement.eggmanager.DatabaseActions;
 import mfdevelopement.eggmanager.R;
 import mfdevelopement.eggmanager.data_models.DailyBalance;
-import mfdevelopement.eggmanager.fragments.DatabaseFragment;
 import mfdevelopement.eggmanager.list_adapters.DateFilterListAdapter;
 import mfdevelopement.eggmanager.viewmodels.FilterActivityViewModel;
 
@@ -170,34 +170,36 @@ public class FilterActivity extends AppCompatActivity implements DateFilterListA
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        switch (item.getItemId()) {
-            case R.id.action_apply:
-                String newFiterString = parseSelectedFilter();
+        int itemId = item.getItemId();
+        if (itemId == R.id.action_apply) {
+            String newFilterString = parseSelectedFilter();
 
-                // apply the filter string to the view model
-                viewModel.setFilterString(newFiterString);
+            // apply the filter string to the view model
+            viewModel.setFilterString(newFilterString);
 
-                // finish the activity with a result code
-                endActivity(DatabaseFragment.FILTER_OK_RESULT_CODE, new Intent().setData(Uri.parse(newFiterString)));
-                return true;
-            case R.id.action_remove_filter:
-                viewModel.setFilterString("");
-                endActivity(DatabaseFragment.FILTER_REMOVED_RESULT_CODE, null);
-                return true;
-            case android.R.id.home:
-                // action when clicking on the home up button
-                endActivity(DatabaseFragment.FILTER_CANCEL_RESULT_CODE, null);
-                return true;
-            default:
-                return false;
+            // finish the activity with a result code
+            endActivity(DatabaseActions.Result.FILTER_OK, new Intent().setData(Uri.parse(newFilterString)));
+            return true;
+        } else if (itemId == R.id.action_remove_filter) {
+            viewModel.setFilterString("");
+            endActivity(DatabaseActions.Result.FILTER_REMOVED, null);
+            return true;
+        } else if (itemId == android.R.id.home) {// action when clicking on the home up button
+            endActivity(DatabaseActions.Result.FILTER_CANCEL, null);
+            return true;
         }
+        return false;
     }
 
     /**
      * Method for ending the activity
+     * This method is deprecated.
+     * Consider using endActivity(FilterAction action, @Nullable Intent data)
+     *
      * @param resultCode Integer representing the result code, which is sent to the caller activity
-     * @param data Intent containing data to be sent to the caller activity
+     * @param data       Intent containing data to be sent to the caller activity
      */
+    @Deprecated
     private void endActivity(int resultCode, @Nullable Intent data) {
         if (data != null)
             setResult(resultCode, data);
@@ -206,15 +208,29 @@ public class FilterActivity extends AppCompatActivity implements DateFilterListA
         super.onBackPressed();
     }
 
+    /**
+     * Method for ending the activity
+     *
+     * @param action {@link DatabaseActions.Result}
+     * @param data   Intent containing data to be sent to the caller activity
+     */
+    private void endActivity(DatabaseActions.Result action, @Nullable Intent data) {
+        if (data != null)
+            setResult(action.ordinal(), data);
+        else
+            setResult(action.ordinal());
+        super.onBackPressed();
+    }
+
     @Override
     public void onBackPressed() {
-        endActivity(DatabaseFragment.FILTER_CANCEL_RESULT_CODE, null);
+        endActivity(DatabaseActions.Result.FILTER_CANCEL, null);
     }
 
     private String parseSelectedFilter() {
         String yearsSelection = adapterYears.getCurrentSelection();
         String monthSelection = adapterMonths.getCurrentSelection();
-        Log.d(LOG_TAG,"user wants to apply a filter: \"" + yearsSelection + "\" and \"" + monthSelection + "\"");
+        Log.d(LOG_TAG, "user wants to apply a filter: \"" + yearsSelection + "\" and \"" + monthSelection + "\"");
 
         String filterString = yearsSelection;
 

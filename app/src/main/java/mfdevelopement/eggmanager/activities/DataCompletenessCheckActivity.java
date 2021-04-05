@@ -25,6 +25,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
 
+import mfdevelopement.eggmanager.DatabaseActions;
 import mfdevelopement.eggmanager.R;
 import mfdevelopement.eggmanager.data_models.DailyBalance;
 import mfdevelopement.eggmanager.data_models.DataCheckMonthly;
@@ -275,9 +276,9 @@ public class DataCompletenessCheckActivity extends AppCompatActivity implements 
 
     private void createNewEntity(String dateString) {
         Intent intent = new Intent(this, NewEntityActivity.class);
-        intent.putExtra(DatabaseFragment.EXTRA_REQUEST_CODE_NAME, DatabaseFragment.NEW_ENTITY_REQUEST_CODE);
+        intent.putExtra(DatabaseFragment.EXTRA_REQUEST_CODE_NAME, DatabaseActions.Request.NEW_ENTITY.ordinal());
         intent.putExtra(DatabaseFragment.EXTRA_ENTITY_DATE, dateString);
-        startActivityForResult(intent, DatabaseFragment.NEW_ENTITY_REQUEST_CODE);
+        startActivityForResult(intent, DatabaseActions.Request.NEW_ENTITY.ordinal());
     }
 
     @Override
