@@ -27,17 +27,20 @@ public class SharedViewModel extends AndroidViewModel {
     private final String LOG_TAG = "DatabaseActivityViewMod";
 
     // Repository
-    private EggManagerRepository mRepository;
+    private final EggManagerRepository mRepository;
 
     // LiveData
-    private LiveData<Integer> ldFilteredEggsCollected, ldFilteredEggsSold, ldEntriesCount;
-    private LiveData<Double> ldFilteredMoneyEarned;
-    private List<String> monthNamesReference;
-    private LiveData<List<DailyBalance>> filteredDailyBalances, allDailyBalances;
+    private final LiveData<Integer> ldFilteredEggsCollected;
+    private final LiveData<Integer> ldFilteredEggsSold;
+    private final LiveData<Integer> ldEntriesCount;
+    private final LiveData<Double> ldFilteredMoneyEarned;
+    private final List<String> monthNamesReference;
+    private final LiveData<List<DailyBalance>> filteredDailyBalances;
+    private final LiveData<List<DailyBalance>> allDailyBalances;
 
     // Mutable LiveData
-    private MutableLiveData<String> dataFilter = new MutableLiveData<>();
-    private MutableLiveData<String> sortingOrder = new MutableLiveData<>();
+    private final MutableLiveData<String> dataFilter = new MutableLiveData<>();
+    private final MutableLiveData<String> sortingOrder = new MutableLiveData<>();
 
     // Calendar containing the reference date
     private final Calendar referenceDate;
@@ -62,10 +65,10 @@ public class SharedViewModel extends AndroidViewModel {
 
         // filtered live data
         dataFilter.setValue(mRepository.getDataFilter());
-        filteredDailyBalances = Transformations.switchMap(dataFilter, filter -> mRepository.getFilteredDailyBalance(filter));
-        ldFilteredMoneyEarned = Transformations.switchMap(dataFilter, filter -> mRepository.getFilteredMoneyEarned(filter));
-        ldFilteredEggsCollected = Transformations.switchMap(dataFilter, filter -> mRepository.getFilteredEggsCollected(filter));
-        ldFilteredEggsSold = Transformations.switchMap(dataFilter, filter -> mRepository.getFilteredEggsSold(filter));
+        filteredDailyBalances = Transformations.switchMap(dataFilter, mRepository::getFilteredDailyBalance);
+        ldFilteredMoneyEarned = Transformations.switchMap(dataFilter, mRepository::getFilteredMoneyEarned);
+        ldFilteredEggsCollected = Transformations.switchMap(dataFilter, mRepository::getFilteredEggsCollected);
+        ldFilteredEggsSold = Transformations.switchMap(dataFilter, mRepository::getFilteredEggsSold);
     }
 
     public LiveData<List<DailyBalance>> getAllDailyBalances() {
@@ -221,9 +224,8 @@ public class SharedViewModel extends AndroidViewModel {
 
         int diffYear = endCalendar.get(Calendar.YEAR) - startCalendar.get(Calendar.YEAR);
         int diffMonth = endCalendar.get(Calendar.MONTH) - startCalendar.get(Calendar.MONTH);
-        int diffMonths = diffYear * 12 + diffMonth;
 
-        return diffMonths;
+        return diffYear * 12 + diffMonth;
     }
 
     public Calendar getReferenceDate() {
