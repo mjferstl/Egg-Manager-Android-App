@@ -26,17 +26,20 @@ public class EggManagerRepository {
     private final String KEY_SORTING_ORDER = "sortingOrder";
     private final static String LOG_TAG = "EggManagerRepository";
 
-    private Application application;
+    private final Application application;
 
-    private DailyBalanceDao dailyBalanceDao;
-    private LiveData<List<DailyBalance>> mAllData, ldFilteredDailyBalance;
-    private LiveData<Integer> ldFilteredEggsSold, ldFilteredEggsCollected, ldEntriesCount;
-    private LiveData<Double> ldFilteredMoneyEarned;
-    private LiveData<List<String>> ldDateKeys;
+    private final DailyBalanceDao dailyBalanceDao;
+    private final LiveData<List<DailyBalance>> mAllData;
+    private final LiveData<List<DailyBalance>> ldFilteredDailyBalance;
+    private final LiveData<Integer> ldFilteredEggsSold;
+    private final LiveData<Integer> ldFilteredEggsCollected;
+    private final LiveData<Integer> ldEntriesCount;
+    private final LiveData<Double> ldFilteredMoneyEarned;
+    private final LiveData<List<String>> ldDateKeys;
 
-    private MutableLiveData<String> dateFilter = new MutableLiveData<>();
+    private final MutableLiveData<String> dateFilter = new MutableLiveData<>();
 
-    public EggManagerRepository(Application application){
+    public EggManagerRepository(Application application) {
         this.application = application;
         EggManagerRoomDatabase db = EggManagerRoomDatabase.getDatabase(application);
         dailyBalanceDao = db.dailyBalanceDao();
@@ -45,10 +48,10 @@ public class EggManagerRepository {
         ldEntriesCount = dailyBalanceDao.getRowCount();
 
         dateFilter.setValue(getDataFilter());
-        ldFilteredDailyBalance = Transformations.switchMap(dateFilter, filter -> dailyBalanceDao.getFilteredDailyBalance(filter));
-        ldFilteredMoneyEarned = Transformations.switchMap(dateFilter, filter -> dailyBalanceDao.getFilteredMoneyEarned(filter));
-        ldFilteredEggsCollected = Transformations.switchMap(dateFilter, filter -> dailyBalanceDao.getFilteredEggsCollected(filter));
-        ldFilteredEggsSold = Transformations.switchMap(dateFilter, filter -> dailyBalanceDao.getFilteredEggsSold(filter));
+        ldFilteredDailyBalance = Transformations.switchMap(dateFilter, dailyBalanceDao::getFilteredDailyBalance);
+        ldFilteredMoneyEarned = Transformations.switchMap(dateFilter, dailyBalanceDao::getFilteredMoneyEarned);
+        ldFilteredEggsCollected = Transformations.switchMap(dateFilter, dailyBalanceDao::getFilteredEggsCollected);
+        ldFilteredEggsSold = Transformations.switchMap(dateFilter, dailyBalanceDao::getFilteredEggsSold);
     }
 
     public LiveData<List<DailyBalance>> getAllDailyBalances() {
