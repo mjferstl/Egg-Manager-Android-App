@@ -3,7 +3,10 @@ package mfdevelopement.eggmanager.activities;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.View;
+import android.widget.ExpandableListView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
@@ -12,44 +15,31 @@ import androidx.fragment.app.DialogFragment;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentTransaction;
 import androidx.lifecycle.ViewModelProvider;
-import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
 
 import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.Collections;
 import java.util.Date;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Locale;
 
 import mfdevelopement.eggmanager.DatabaseActions;
 import mfdevelopement.eggmanager.R;
 import mfdevelopement.eggmanager.data_models.DailyBalance;
-import mfdevelopement.eggmanager.data_models.DataCheckMonthly;
+import mfdevelopement.eggmanager.data_models.HasDateInterface;
+import mfdevelopement.eggmanager.data_models.HasDateInterfaceObject;
+import mfdevelopement.eggmanager.data_models.data_check.DataCompletenessChecker;
+import mfdevelopement.eggmanager.data_models.expandable_list.GroupInfo;
 import mfdevelopement.eggmanager.dialog_fragments.DatePickerFragment;
 import mfdevelopement.eggmanager.fragments.DatabaseFragment;
-import mfdevelopement.eggmanager.list_adapters.DataCompletenessCheckListAdapter;
-import mfdevelopement.eggmanager.list_adapters.MissingDateListAdapter;
+import mfdevelopement.eggmanager.list_adapters.DataCompletenessCheckExpandableListAdapter;
 import mfdevelopement.eggmanager.utils.DateFormatter;
 import mfdevelopement.eggmanager.viewmodels.DataCheckViewModel;
 
-import static mfdevelopement.eggmanager.data_models.DailyBalance.DATE_KEY_FORMAT;
-
-public class DataCompletenessCheckActivity extends AppCompatActivity implements DatePickerFragment.OnAddDateListener, MissingDateListAdapter.OnCreateEntityClickListener {
+public class DataCompletenessCheckActivity extends AppCompatActivity implements DatePickerFragment.OnAddDateListener {
 
     private DataCheckViewModel viewModel;
 
-    private DataCompletenessCheckListAdapter adapter;
-
-    private TextView txtv_start_date, txtv_end_date;
-
-    // date formatter for the date keys
-    private SimpleDateFormat sdf_date_keys = new SimpleDateFormat(DATE_KEY_FORMAT, Locale.getDefault());
-
-    private List<String> allDateKeys;
+    private TextView txtv_start_date, txtv_end_date, txtv_info_no_data_missing;
 
     private final String LOG_TAG = "DataCompletenessCheckAc";
 
@@ -64,6 +54,10 @@ public class DataCompletenessCheckActivity extends AppCompatActivity implements 
     private final int END_DATE_PICKER_ID = 2;
 
     private int datePickerId;
+
+    private DataCompletenessCheckExpandableListAdapter expandableListAdapter;
+
+    private ExpandableListView expandableListView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -81,18 +75,27 @@ public class DataCompletenessCheckActivity extends AppCompatActivity implements 
         txtv_start_date = findViewById(R.id.txtv_data_check_start_date);
         txtv_end_date = findViewById(R.id.txtv_data_check_end_date);
         txtv_start_date.setOnClickListener(v -> {
-            Log.d(LOG_TAG,"user clicked on the start date");
+            Log.d(LOG_TAG, "user clicked on the start date");
             datePickerId = START_DATE_PICKER_ID;
             showDatePickerDialog(txtv_start_date.getText().toString());
         });
         txtv_end_date.setOnClickListener(v -> {
-            Log.d(LOG_TAG,"user clicked on the end date");
+            Log.d(LOG_TAG, "user clicked on the end date");
             datePickerId = END_DATE_PICKER_ID;
             showDatePickerDialog(txtv_end_date.getText().toString());
         });
 
-        initRecyclerView();
+        txtv_info_no_data_missing = findViewById(R.id.txtv_no_missing_data);
+        txtv_info_no_data_missing.setVisibility(View.GONE);
+
         initObservers();
+        initListView();
+    }
+
+    private void initListView() {
+        expandableListView = findViewById(R.id.elv_data_completeness_check);
+        expandableListAdapter = new DataCompletenessCheckExpandableListAdapter(getApplicationContext(), new ArrayList<>());
+        expandableListView.setAdapter(expandableListAdapter);
     }
 
     @Override
@@ -101,44 +104,71 @@ public class DataCompletenessCheckActivity extends AppCompatActivity implements 
         updateList();
     }
 
-    private void initRecyclerView() {
-        RecyclerView recyclerView = findViewById(R.id.recv_data_completeness_check);
-        recyclerView.setLayoutManager(new LinearLayoutManager(this));
-        adapter = new DataCompletenessCheckListAdapter(this);
-        recyclerView.setAdapter(adapter);
+    private void updateList() {
+        if (viewModel.getAllDateKeys().getValue() != null)
+            updateList(convertDateKeys(viewModel.getAllDateKeys().getValue()));
     }
 
-    private void updateList() {
+    private void updateList(List<Date> dateList) {
 
-        if (this.allDateKeys == null || adapter == null)
-            return;
-
-        List<DataCheckMonthly> dataCheckMonthlyList;
+        if (txtv_start_date.getText().toString().isEmpty())
+            txtv_start_date.setText(DateFormatter.getHumanReadableDate(dateList.get(0)));
+        if (txtv_end_date.getText().toString().isEmpty())
+            txtv_end_date.setText(DateFormatter.getHumanReadableDate(dateList.get(dateList.size() - 1)));
 
         try {
+            // parse the dates from the text views
             Calendar startDate = getDateFromTextView(txtv_start_date);
             Calendar endDate = getDateFromTextView(txtv_end_date);
-            dataCheckMonthlyList = checkCompleteness(this.allDateKeys, startDate, endDate);
-        } catch (Exception e) {
-            e.printStackTrace();
-            dataCheckMonthlyList = checkCompleteness(this.allDateKeys);
-        }
 
-        // update recycler view
-        if (!dataCheckMonthlyList.isEmpty() && adapter != null)
-            adapter.setData(dataCheckMonthlyList);
+            // create a list with objects implementing the HasDateInterface
+            List<HasDateInterface> hasDateInterfaceObjectList = new ArrayList<>();
+            for (Date d : dateList)
+                hasDateInterfaceObjectList.add(HasDateInterfaceObject.createFromDate(d));
+
+            // Check the data for completeness within the start date and end date
+            DataCompletenessChecker dcc = new DataCompletenessChecker(startDate, endDate, hasDateInterfaceObjectList);
+            List<GroupInfo> groupInfoList = dcc.getGroupInfoList();
+
+            // update the expandable list view
+            expandableListAdapter.setData(groupInfoList);
+
+            // hide the list, if it is empty
+            if (expandableListAdapter.getGroupCount() == 0) {
+                expandableListView.setVisibility(View.GONE);
+                txtv_info_no_data_missing.setVisibility(View.VISIBLE);
+            } else {
+                expandableListView.setVisibility(View.VISIBLE);
+                txtv_info_no_data_missing.setVisibility(View.GONE);
+            }
+
+        } catch (ParseException e) {
+            String errorMsg = "Cannot parse \"" + txtv_start_date.getText().toString() + "\" and \"" + txtv_end_date.getText().toString() + "\" to dates";
+            Toast.makeText(this.getApplicationContext(), errorMsg, Toast.LENGTH_LONG).show();
+            Log.e(LOG_TAG, errorMsg);
+            e.printStackTrace();
+        }
+    }
+
+    private List<Date> convertDateKeys(List<String> dateKeyList) {
+        List<Date> dateList = new ArrayList<>();
+        for (String s : dateKeyList) {
+            try {
+                dateList.add(DailyBalance.getDateByDateKey(s));
+            } catch (ParseException e) {
+                e.printStackTrace();
+            }
+        }
+        return dateList;
     }
 
     private void initObservers() {
-        viewModel.getAllDateKeys().observe(this, allDateKeysList -> {
-            this.allDateKeys = allDateKeysList;
-            updateList();
-        });
+        viewModel.getAllDateKeys().observe(this, allDateKeysList -> updateList(convertDateKeys(allDateKeysList)));
     }
 
     private void showDatePickerDialog(String initialDateString) {
 
-        Log.d(LOG_TAG,"showing DatePicker dialog with initial date \"" + initialDateString + "\"");
+        Log.d(LOG_TAG, "showing DatePicker dialog with initial date \"" + initialDateString + "\"");
 
         FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
         Fragment prev = getSupportFragmentManager().findFragmentByTag("dialog");
@@ -161,91 +191,6 @@ public class DataCompletenessCheckActivity extends AppCompatActivity implements 
         }
     }
 
-    private List<DataCheckMonthly> checkCompleteness(List<String> allDateKeys) {
-        // sort Strings in ascending order
-        Collections.sort(allDateKeys);
-
-        // create Calendar instances for the first and the last date
-        Calendar startDate = Calendar.getInstance();
-        Calendar endDate = Calendar.getInstance();
-        try {
-            startDate.setTime(sdf_date_keys.parse(allDateKeys.get(0)));
-            endDate.setTime(sdf_date_keys.parse(allDateKeys.get(allDateKeys.size()-1)));
-        } catch (ParseException e) {
-            e.printStackTrace();
-            return new ArrayList<>();
-        }
-
-        return checkCompleteness(allDateKeys, startDate, endDate);
-    }
-
-
-    private List<DataCheckMonthly> checkCompleteness(List<String> allDateKeys, @NonNull Calendar startDate, @NonNull Calendar endDate) {
-
-        if (allDateKeys.isEmpty())
-            return new ArrayList<>();
-
-        // create empty String array lists for the found and the missing date keys
-        List<String> matchingDateKeys = new ArrayList<>();
-        List<String> missingDateKeys = new ArrayList<>();
-        List<String> dateKeysInRange = new ArrayList<>();
-
-        if (txtv_start_date != null)
-            txtv_start_date.setText(DateFormatter.getHumanReadableDate(startDate));
-        if (txtv_end_date != null)
-            txtv_end_date.setText(DateFormatter.getHumanReadableDate(endDate));
-
-        // calculate the difference in days between the first and last date
-        int diffDays = (int)((endDate.getTimeInMillis() - startDate.getTimeInMillis())/(1000*60*60*24));
-
-        // check every day between the start and end date, if it exists in the date keys list
-        Calendar currDate = Calendar.getInstance();
-        currDate.setTimeInMillis(startDate.getTimeInMillis());
-        currDate.add(Calendar.DAY_OF_MONTH, -1);
-        for (int d = 0; d <= diffDays; d++) {
-            currDate.add(Calendar.DAY_OF_MONTH, 1);
-            String currDateKey = sdf_date_keys.format(currDate.getTimeInMillis());
-            dateKeysInRange.add(currDateKey);
-            if (allDateKeys.contains(currDateKey))
-                matchingDateKeys.add(currDateKey);
-            else
-                missingDateKeys.add(currDateKey);
-        }
-
-        // get all unique date keys in the format yyyyMM within the range
-        List<String> allDateKeysYearMonth = new ArrayList<>();
-        for (String dateKey : dateKeysInRange) {
-            allDateKeysYearMonth.add(getYearAndMonthOfDateKey(dateKey));
-        }
-        // get unique entries
-        List<String> uniqueDateKeysYearMonth = new ArrayList<>(new HashSet<>(allDateKeysYearMonth));
-        Collections.sort(uniqueDateKeysYearMonth);
-
-
-        // check every month for data completeness
-        List<DataCheckMonthly> dataCheckMonthlyList = new ArrayList<>();
-
-        for (String uniqueDateKeyYearMonth : uniqueDateKeysYearMonth) {
-            List<String> currMatchingKeys = new ArrayList<>();
-            List<String> currMissingKeys = new ArrayList<>();
-            for (String foundDateKey : matchingDateKeys) {
-                if (getYearAndMonthOfDateKey(foundDateKey).equals(uniqueDateKeyYearMonth))
-                    currMatchingKeys.add(foundDateKey);
-            }
-            for (String missingDateKey : missingDateKeys) {
-                if (getYearAndMonthOfDateKey(missingDateKey).equals(uniqueDateKeyYearMonth))
-                    currMissingKeys.add(missingDateKey);
-            }
-            dataCheckMonthlyList.add(new DataCheckMonthly(uniqueDateKeyYearMonth, currMatchingKeys, currMissingKeys));
-        }
-
-        return dataCheckMonthlyList;
-    }
-
-    private String getYearAndMonthOfDateKey(String dateKey) {
-        return DailyBalance.getYearByDateKey(dateKey) + DailyBalance.getMonthByDateKey(dateKey);
-    }
-
     private Calendar getDateFromTextView(TextView textView) throws ParseException {
         Calendar cal = Calendar.getInstance();
         cal.setTime(DateFormatter.parseHumanReadableDateString(textView.getText().toString()));
@@ -265,13 +210,6 @@ public class DataCompletenessCheckActivity extends AppCompatActivity implements 
             updateList();
         } else
             Log.e(LOG_TAG,"onAddDateSubmit(): datePickerId is not START_DATE_PICKER_ID or END_DATE_PICKER_ID ");
-    }
-
-    @Override
-    public void onCreateEntityClicked(Calendar newDate) {
-        String dateString = DateFormatter.getHumanReadableDate(newDate);
-        Log.d(LOG_TAG,"user wants to create a new entity for the date \"" + dateString + "\"");
-        createNewEntity(dateString);
     }
 
     private void createNewEntity(String dateString) {

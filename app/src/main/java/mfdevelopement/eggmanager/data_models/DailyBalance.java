@@ -25,7 +25,7 @@ import java.util.Locale;
 import mfdevelopement.eggmanager.utils.DateTypeConverter;
 
 @Entity(tableName = "dailyBalanceTable")
-public class DailyBalance implements Serializable, Comparable<DailyBalance> {
+public class DailyBalance implements Serializable, Comparable<DailyBalance>, HasDateInterface {
 
     public static final String COL_DATE_PRIMARY_KEY = "dateKey";
     public static final String COL_EGGS_COLLECTED_NAME = "eggsCollected";
@@ -45,23 +45,18 @@ public class DailyBalance implements Serializable, Comparable<DailyBalance> {
     @ColumnInfo(name = COL_DATE_PRIMARY_KEY)
     private String dateKey;
 
-    @NonNull
     @ColumnInfo(name = COL_EGGS_COLLECTED_NAME, defaultValue = "0")
-    private int eggsCollected;
+    private final int eggsCollected;
 
-    @NonNull
     @ColumnInfo(name = COL_EGGS_SOLD_NAME, defaultValue = "0")
-    private int eggsSold;
+    private final int eggsSold;
 
-    @NonNull
     @ColumnInfo(name = COL_PRICE_PER_EGG, defaultValue = "1.0")
-    private double pricePerEgg;
+    private final double pricePerEgg;
 
-    @NonNull
     @ColumnInfo(name = COL_MONEY_EARNED, defaultValue = "0.0")
     private double moneyEarned;
 
-    @NonNull
     @ColumnInfo(name = COL_NUMBER_HENS, defaultValue = "0")
     private int numHens;
 
@@ -215,6 +210,11 @@ public class DailyBalance implements Serializable, Comparable<DailyBalance> {
         } else {
             return "";
         }
+    }
+
+    public static Date getDateByDateKey(String dateKey) throws ParseException {
+        SimpleDateFormat sdfDateKeyFormat = new SimpleDateFormat(DATE_KEY_FORMAT, Locale.getDefault());
+        return sdfDateKeyFormat.parse(dateKey);
     }
 
 

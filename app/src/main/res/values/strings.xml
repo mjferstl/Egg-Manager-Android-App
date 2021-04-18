@@ -36,7 +36,6 @@
     <string name="text_empty_recyclerview">Keine Daten vorhanden.\nKlicken Sie dazu auf das + um Daten einzutragen.</string>
     <string name="text_recyclerview_not_visible">Die Daten wurden ausgeblendet</string>
 
-
     <!-- database backup activity -->
     <string name="txt_backup">Sichern Sie Ihre Daten in einer Datei auf dem Gerät. Gespeicherte Daten können Sie bei Bedarf wieder laden.</string>
     <string name="txt_no_backup_files">Es wurde noch keine Datensicherung erstellt.\nKlicken Sie auf dieses Feld oder das + um eine neue Datensicherung auf dem Gerät zu erstellen.</string>
@@ -62,6 +61,7 @@
     <!-- data check activity -->
     <string name="from">von</string>
     <string name="to">bis</string>
+    <string name="data_check_no_data_missing">Im ausgwählten Zeitraum sind für alle Tage Einträge vorhanden</string>
 
     <!-- chart fragment -->
     <string name="txt_title_eggs_collected">Abgenommene Eier</string>

@@ -5,6 +5,8 @@ import android.app.Application;
 import androidx.lifecycle.AndroidViewModel;
 import androidx.lifecycle.LiveData;
 
+import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 import mfdevelopement.eggmanager.database.EggManagerRepository;
@@ -15,9 +17,11 @@ public class DataCheckViewModel extends AndroidViewModel {
     private final String LOG_TAG = "DataCheckViewModel";
 
     // Repository
-    private EggManagerRepository repository;
+    private final EggManagerRepository repository;
 
-    private LiveData<List<String>> allDateKeys;
+    private final LiveData<List<String>> allDateKeys;
+
+    private List<Date> storedMissingDates = new ArrayList<>();
 
     public DataCheckViewModel(Application application) {
         super(application);
@@ -29,5 +33,13 @@ public class DataCheckViewModel extends AndroidViewModel {
 
     public LiveData<List<String>> getAllDateKeys() {
         return this.allDateKeys;
+    }
+
+    public void storeMissingDates(List<Date> missingDates) {
+        this.storedMissingDates = missingDates;
+    }
+
+    public List<Date> getStoredMissingDates() {
+        return this.storedMissingDates;
     }
 }

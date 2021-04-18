@@ -56,7 +56,7 @@
         app:layout_constraintStart_toStartOf="@+id/constrLay_data_check_date_from"
         app:layout_constraintTop_toBottomOf="@+id/constrLay_data_check_date_from"
         app:layout_constraintEnd_toEndOf="@+id/constrLay_data_check_date_from"
-        app:layout_constraintBottom_toTopOf="@id/recv_data_completeness_check">
+        app:layout_constraintBottom_toTopOf="@id/txtv_placeholder">
 
         <TextView
             android:id="@+id/txtv_data_check_to"
@@ -84,17 +84,40 @@
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 
-    <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/recv_data_completeness_check"
-        android:layout_width="0dp"
+    <TextView
+        android:id="@+id/txtv_placeholder"
+        android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:layout_marginTop="@dimen/large_padding"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/constrLay_data_check_date_to"
-        tools:listitem="@layout/recyclerview_item_completeness_check">
+        app:layout_constraintTop_toBottomOf="@+id/constrLay_data_check_date_to" />
 
-    </androidx.recyclerview.widget.RecyclerView>
+    <ExpandableListView
+        android:id="@+id/elv_data_completeness_check"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:indicatorLeft="?android:attr/expandableListPreferredItemIndicatorLeft"
+        android:visibility="gone"
+        app:layout_constraintBottom_toBottomOf="@+id/txtv_placeholder"
+        app:layout_constraintEnd_toEndOf="@+id/txtv_placeholder"
+        app:layout_constraintStart_toStartOf="@+id/txtv_placeholder"
+        app:layout_constraintTop_toTopOf="@+id/txtv_placeholder" />
+
+    <TextView
+        android:id="@+id/txtv_no_missing_data"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        style="@style/basic_text"
+        android:text="@string/data_check_no_data_missing"
+        android:lineSpacingExtra="10sp"
+        android:textAlignment="center"
+        android:paddingTop="@dimen/HUGE_padding"
+        android:paddingStart="@dimen/large_padding"
+        android:paddingEnd="@dimen/large_padding"
+        app:layout_constraintBottom_toBottomOf="@+id/txtv_placeholder"
+        app:layout_constraintEnd_toEndOf="@+id/txtv_placeholder"
+        app:layout_constraintStart_toStartOf="@+id/txtv_placeholder"
+        app:layout_constraintTop_toTopOf="@+id/txtv_placeholder" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

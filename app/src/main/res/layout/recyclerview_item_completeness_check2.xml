@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginStart="@dimen/small_padding"
+    android:layout_marginEnd="@dimen/small_padding"
+    android:paddingStart="?android:attr/expandableListPreferredItemPaddingLeft"
+    android:paddingEnd="0dp"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <TextView
+        android:id="@+id/txtv_recycler_item_completeness_check_name"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        style="@style/basic_text"
+        android:layout_marginStart="@dimen/small_padding"
+        android:layout_marginEnd="@dimen/small_padding"
+        android:text="Jahr"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toStartOf="@+id/imgv_recycler_item_completeness_check_icon"
+        app:layout_constraintBottom_toTopOf="@+id/lv_recycler_item_completeness_check_months" />
+
+    <ImageView
+        android:id="@+id/imgv_recycler_item_completeness_check_icon"
+        android:layout_width="36dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/small_padding"
+        android:layout_marginEnd="@dimen/small_padding"
+        android:paddingTop="@dimen/tiny_padding"
+        android:paddingStart="@dimen/tiny_padding"
+        android:paddingEnd="@dimen/tiny_padding"
+        android:paddingBottom="@dimen/tiny_padding"
+        android:contentDescription="@string/content_description_icon_error_success"
+        android:src="@drawable/ic_error"
+        app:layout_constraintTop_toTopOf="@+id/txtv_recycler_item_completeness_check_name"
+        app:layout_constraintStart_toEndOf="@+id/txtv_recycler_item_completeness_check_name"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintBottom_toBottomOf="@+id/txtv_recycler_item_completeness_check_name" />
+
+    <ExpandableListView
+        android:id="@+id/lv_recycler_item_completeness_check_months"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:layout_constraintTop_toBottomOf="@+id/txtv_recycler_item_completeness_check_name"
+        app:layout_constraintStart_toStartOf="@+id/txtv_recycler_item_completeness_check_name"
+        app:layout_constraintEnd_toEndOf="@id/imgv_recycler_item_completeness_check_icon"
+        app:layout_constraintBottom_toBottomOf="parent" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>
