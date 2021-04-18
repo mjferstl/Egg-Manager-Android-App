@@ -14,7 +14,7 @@ import java.util.HashSet;
 import java.util.List;
 
 import mfdevelopement.eggmanager.R;
-import mfdevelopement.eggmanager.data_models.DailyBalance;
+import mfdevelopement.eggmanager.data_models.daily_balance.DailyBalance;
 import mfdevelopement.eggmanager.database.EggManagerRepository;
 
 public class FilterActivityViewModel extends AndroidViewModel {

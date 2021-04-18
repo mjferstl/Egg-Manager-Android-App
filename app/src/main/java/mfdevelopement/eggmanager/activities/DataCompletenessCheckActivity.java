@@ -25,9 +25,9 @@ import java.util.List;
 
 import mfdevelopement.eggmanager.DatabaseActions;
 import mfdevelopement.eggmanager.R;
-import mfdevelopement.eggmanager.data_models.DailyBalance;
 import mfdevelopement.eggmanager.data_models.HasDateInterface;
 import mfdevelopement.eggmanager.data_models.HasDateInterfaceObject;
+import mfdevelopement.eggmanager.data_models.daily_balance.DailyBalance;
 import mfdevelopement.eggmanager.data_models.data_check.DataCompletenessChecker;
 import mfdevelopement.eggmanager.data_models.expandable_list.GroupInfo;
 import mfdevelopement.eggmanager.dialog_fragments.DatePickerFragment;

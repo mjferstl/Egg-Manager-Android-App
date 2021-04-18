@@ -28,7 +28,7 @@ import java.util.Locale;
 import mfdevelopement.eggmanager.DatabaseActions;
 import mfdevelopement.eggmanager.R;
 import mfdevelopement.eggmanager.activities.NewEntityActivity;
-import mfdevelopement.eggmanager.data_models.DailyBalance;
+import mfdevelopement.eggmanager.data_models.daily_balance.DailyBalance;
 import mfdevelopement.eggmanager.fragments.DatabaseFragment;
 import mfdevelopement.eggmanager.viewmodels.SharedViewModel;
 
@@ -135,7 +135,7 @@ public class DailyBalanceListAdapter extends RecyclerView.Adapter<DailyBalanceLi
             }
         } else {
             // Covers the case of data not being ready yet.
-            holder.txtv_date.setText("Kein Datum");
+            holder.txtv_date.setText(context.getString(R.string.text_no_date));
         }
     }
 

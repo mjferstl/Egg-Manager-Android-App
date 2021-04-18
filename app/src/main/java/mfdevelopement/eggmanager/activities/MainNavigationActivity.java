@@ -17,7 +17,7 @@ import androidx.navigation.ui.NavigationUI;
 import com.google.android.material.navigation.NavigationView;
 
 import mfdevelopement.eggmanager.R;
-import mfdevelopement.eggmanager.data_models.DailyBalance;
+import mfdevelopement.eggmanager.data_models.daily_balance.DailyBalance;
 import mfdevelopement.eggmanager.dialog_fragments.DeleteDatabaseDialog;
 import mfdevelopement.eggmanager.dialog_fragments.SortingDialogFragment;
 import mfdevelopement.eggmanager.viewmodels.SharedViewModel;

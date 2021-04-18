@@ -10,8 +10,8 @@ import androidx.room.RoomDatabase;
 import androidx.room.migration.Migration;
 import androidx.sqlite.db.SupportSQLiteDatabase;
 
-import mfdevelopement.eggmanager.data_models.DailyBalance;
-import mfdevelopement.eggmanager.data_models.DailyBalanceDao;
+import mfdevelopement.eggmanager.data_models.daily_balance.DailyBalance;
+import mfdevelopement.eggmanager.data_models.daily_balance.DailyBalanceDao;
 
 @Database(entities = {DailyBalance.class}, version = 3)
 public abstract class EggManagerRoomDatabase extends RoomDatabase {

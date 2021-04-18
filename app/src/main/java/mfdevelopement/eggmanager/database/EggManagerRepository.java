@@ -14,8 +14,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
 
-import mfdevelopement.eggmanager.data_models.DailyBalance;
-import mfdevelopement.eggmanager.data_models.DailyBalanceDao;
+import mfdevelopement.eggmanager.data_models.daily_balance.DailyBalance;
+import mfdevelopement.eggmanager.data_models.daily_balance.DailyBalanceDao;
 
 public class EggManagerRepository {
 

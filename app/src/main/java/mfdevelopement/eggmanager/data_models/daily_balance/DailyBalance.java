@@ -1,4 +1,4 @@
-package mfdevelopement.eggmanager.data_models;
+package mfdevelopement.eggmanager.data_models.daily_balance;
 
 import android.util.Log;
 
@@ -22,6 +22,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 
+import mfdevelopement.eggmanager.data_models.HasDateInterface;
 import mfdevelopement.eggmanager.utils.DateTypeConverter;
 
 @Entity(tableName = "dailyBalanceTable")
@@ -219,13 +220,12 @@ public class DailyBalance implements Serializable, Comparable<DailyBalance>, Has
 
 
     /**
-     * create a JSONObject
+     * Create a JSONObject, which represents the {@link DailyBalance} object
      *
-     * @return JSONObject representing the DailyBalance object in JSON notation
+     * @return {@link JSONObject} representing the DailyBalance object in JSON notation
      */
     public JSONObject toJSON() {
 
-        // new JSONObject
         JSONObject jsonObject = new JSONObject();
 
         try {

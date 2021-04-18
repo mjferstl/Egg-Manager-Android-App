@@ -40,8 +40,8 @@ import java.util.Locale;
 
 import mfdevelopement.eggmanager.R;
 import mfdevelopement.eggmanager.activities.MainNavigationActivity;
-import mfdevelopement.eggmanager.data_models.DailyBalance;
 import mfdevelopement.eggmanager.data_models.DatabaseBackup;
+import mfdevelopement.eggmanager.data_models.daily_balance.DailyBalance;
 import mfdevelopement.eggmanager.list_adapters.DatabaseBackupListAdapter;
 import mfdevelopement.eggmanager.utils.AppNotificationManager;
 import mfdevelopement.eggmanager.utils.FileUtil;

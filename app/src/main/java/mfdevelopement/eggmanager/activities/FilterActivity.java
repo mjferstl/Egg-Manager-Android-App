@@ -24,7 +24,7 @@ import java.util.Locale;
 
 import mfdevelopement.eggmanager.DatabaseActions;
 import mfdevelopement.eggmanager.R;
-import mfdevelopement.eggmanager.data_models.DailyBalance;
+import mfdevelopement.eggmanager.data_models.daily_balance.DailyBalance;
 import mfdevelopement.eggmanager.list_adapters.DateFilterListAdapter;
 import mfdevelopement.eggmanager.viewmodels.FilterActivityViewModel;
 

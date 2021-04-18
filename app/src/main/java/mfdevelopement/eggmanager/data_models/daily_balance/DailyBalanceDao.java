@@ -1,4 +1,4 @@
-package mfdevelopement.eggmanager.data_models;
+package mfdevelopement.eggmanager.data_models.daily_balance;
 
 import androidx.lifecycle.LiveData;
 import androidx.room.Dao;
@@ -9,10 +9,10 @@ import androidx.room.Query;
 
 import java.util.List;
 
-import static mfdevelopement.eggmanager.data_models.DailyBalance.COL_DATE_PRIMARY_KEY;
-import static mfdevelopement.eggmanager.data_models.DailyBalance.COL_EGGS_COLLECTED_NAME;
-import static mfdevelopement.eggmanager.data_models.DailyBalance.COL_EGGS_SOLD_NAME;
-import static mfdevelopement.eggmanager.data_models.DailyBalance.COL_MONEY_EARNED;
+import static mfdevelopement.eggmanager.data_models.daily_balance.DailyBalance.COL_DATE_PRIMARY_KEY;
+import static mfdevelopement.eggmanager.data_models.daily_balance.DailyBalance.COL_EGGS_COLLECTED_NAME;
+import static mfdevelopement.eggmanager.data_models.daily_balance.DailyBalance.COL_EGGS_SOLD_NAME;
+import static mfdevelopement.eggmanager.data_models.daily_balance.DailyBalance.COL_MONEY_EARNED;
 
 @Dao
 public interface DailyBalanceDao {

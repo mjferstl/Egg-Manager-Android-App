@@ -35,6 +35,7 @@
     <string name="selected_filter_part2">\u0020gefiltert</string>
     <string name="text_empty_recyclerview">Keine Daten vorhanden.\nKlicken Sie dazu auf das + um Daten einzutragen.</string>
     <string name="text_recyclerview_not_visible">Die Daten wurden ausgeblendet</string>
+    <string name="text_no_date">Kein Datum</string>
 
     <!-- database backup activity -->
     <string name="txt_backup">Sichern Sie Ihre Daten in einer Datei auf dem Gerät. Gespeicherte Daten können Sie bei Bedarf wieder laden.</string>
