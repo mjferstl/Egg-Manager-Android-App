@@ -54,7 +54,7 @@ public class NewEntityActivity extends AppCompatActivity implements DatePickerFr
      */
     private TextView dateTextView;
     private EditText eggsCollectedEditText, eggsSoldEditText, pricePerEggEditText, moneyEarnedEditText;
-    private ImageButton btn_date_foreward, btn_date_backward;
+    private ImageButton btn_date_forward, btn_date_backward;
 
     /**
      * Date formats
@@ -126,7 +126,7 @@ public class NewEntityActivity extends AppCompatActivity implements DatePickerFr
         eggsSoldEditText = findViewById(R.id.etxt_sold_eggs);
         pricePerEggEditText = findViewById(R.id.etxt_egg_price);
         moneyEarnedEditText = findViewById(R.id.etxt_egg_money_earned);
-        btn_date_foreward = findViewById(R.id.imgbtn_date_foreward);
+        btn_date_forward = findViewById(R.id.imgbtn_date_foreward);
         btn_date_backward = findViewById(R.id.imgbtn_date_backward);
 
         locale = Locale.ENGLISH;
@@ -490,14 +490,14 @@ public class NewEntityActivity extends AppCompatActivity implements DatePickerFr
             newFragment.show(fragmentActivity.getSupportFragmentManager(), "datePicker");
         });
 
-        btn_date_foreward.setOnClickListener(v -> {
+        btn_date_forward.setOnClickListener(v -> {
             Log.d(LOG_TAG, "switch date to the next day");
             Calendar cal = Calendar.getInstance();
             Date selectedDate;
             try {
                 selectedDate = getSelectedDate();
             } catch (ParseException e) {
-                Log.e(LOG_TAG,"the selected date cannot be parsed. The current date will be used instead.");
+                Log.e(LOG_TAG, "the selected date cannot be parsed. The current date will be used instead.");
                 selectedDate = currentDate;
             }
             cal.setTime(selectedDate);

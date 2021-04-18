@@ -21,11 +21,12 @@ public class DatabaseBackupListAdapter extends RecyclerView.Adapter<DatabaseBack
     private final String LOG_TAG = "DatabaseBackupListAdapt";
     private List<DatabaseBackup> data;
     private final LayoutInflater mInflater;
-    private Context context;
+    private final Context context;
 
-    public class DatabaseBackupViewHolder extends RecyclerView.ViewHolder implements View.OnCreateContextMenuListener{
+    public class DatabaseBackupViewHolder extends RecyclerView.ViewHolder implements View.OnCreateContextMenuListener {
 
-        private TextView txtv_name, txtv_date;
+        private final TextView txtv_name;
+        private final TextView txtv_date;
 
         private DatabaseBackupViewHolder(View itemView) {
             super(itemView);

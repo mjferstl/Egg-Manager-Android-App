@@ -36,7 +36,7 @@ import mfdevelopement.eggmanager.list_adapters.DataCompletenessCheckExpandableLi
 import mfdevelopement.eggmanager.utils.DateFormatter;
 import mfdevelopement.eggmanager.viewmodels.DataCheckViewModel;
 
-public class DataCompletenessCheckActivity extends AppCompatActivity implements DatePickerFragment.OnAddDateListener {
+public class DataCompletenessCheckActivity extends AppCompatActivity implements DatePickerFragment.OnAddDateListener, DataCompletenessCheckExpandableListAdapter.OnChildAddButtonClickListener {
 
     /**
      * View model for the activity
@@ -114,14 +114,8 @@ public class DataCompletenessCheckActivity extends AppCompatActivity implements 
      */
     private void initExpandableListView() {
         ExpandableListView expandableListView = findViewById(R.id.elv_data_completeness_check);
-        expandableListAdapter = new DataCompletenessCheckExpandableListAdapter(getApplicationContext(), new ArrayList<>());
+        expandableListAdapter = new DataCompletenessCheckExpandableListAdapter(this, new ArrayList<>());
         expandableListView.setAdapter(expandableListAdapter);
-
-        // Handle clicks on the child items
-        expandableListView.setOnChildClickListener((parent, v, groupPosition, childPosition, id) -> {
-            Log.d(LOG_TAG, "user clicked on the child at groupPosition: " + groupPosition + ", childPosition: " + childPosition);
-            return false;
-        });
     }
 
     @Override
@@ -189,15 +183,9 @@ public class DataCompletenessCheckActivity extends AppCompatActivity implements 
 
             // hide the list, if it is empty
             if (expandableListAdapter.getGroupCount() == 0) {
-//                expandableListView.setVisibility(View.GONE);
-//                txtv_elv_info.setVisibility(View.GONE);
-//                txtv_info_no_data_missing.setVisibility(View.VISIBLE);
                 linearLayoutListContainer.setVisibility(View.GONE);
                 linearLayoutSuccessContainer.setVisibility(View.VISIBLE);
             } else {
-//                expandableListView.setVisibility(View.VISIBLE);
-//                txtv_elv_info.setVisibility(View.VISIBLE);
-//                txtv_info_no_data_missing.setVisibility(View.GONE);
                 linearLayoutListContainer.setVisibility(View.VISIBLE);
                 linearLayoutSuccessContainer.setVisibility(View.GONE);
             }
@@ -222,7 +210,7 @@ public class DataCompletenessCheckActivity extends AppCompatActivity implements 
             try {
                 dateList.add(DateKeyUtils.getDateByDateKey(s));
             } catch (ParseException e) {
-                e.printStackTrace();
+                throw new RuntimeException(e);
             }
         }
         return dateList;
@@ -320,6 +308,11 @@ public class DataCompletenessCheckActivity extends AppCompatActivity implements 
             txtv_end_date.setText(savedEndDate);
         }
         super.onRestoreInstanceState(savedInstanceState);
+    }
+
+    @Override
+    public void childAddClicked(int groupPosition, int childPosition) {
+        Log.d(LOG_TAG, "user clicked on add button at groupPosition: " + groupPosition + "; childPosition: " + childPosition);
     }
 
     /**

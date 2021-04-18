@@ -22,7 +22,7 @@ public class DateFilterListAdapter extends RecyclerView.Adapter<DateFilterListAd
 
     private final LayoutInflater mInflater;
 
-    private OnButtonClickListener listener;
+    private final OnButtonClickListener listener;
 
     public interface OnButtonClickListener {
         void OnButtonClicked(String buttonText, boolean isSelected);
@@ -68,7 +68,7 @@ public class DateFilterListAdapter extends RecyclerView.Adapter<DateFilterListAd
         return new DateFilterViewHolder(itemView);
     }
 
-    // Replace the contents of a view (invoked by the layout manager)
+    // Replace the content of a view (invoked by the layout manager)
     @Override
     public void onBindViewHolder(final DateFilterViewHolder holder, int position) {
         // - get element from your dataset at this position
@@ -78,13 +78,9 @@ public class DateFilterListAdapter extends RecyclerView.Adapter<DateFilterListAd
         final String buttonText = String.format("%s", dateStrings.get(position));
 
         holder.btn.setText(String.format("%s", buttonText));
-        if (buttonText.equals(currentSelection)) {
-            holder.btn.setSelected(true);
-        } else {
-            holder.btn.setSelected(false);
-        }
+        holder.btn.setSelected(buttonText.equals(currentSelection));
         holder.btn.setOnClickListener(v -> {
-            Log.d(LOG_TAG,"user clicked on button \"" + buttonText + "\"");
+            Log.d(LOG_TAG, "user clicked on button \"" + buttonText + "\"");
             if (holder.btn.isSelected()) {
                 currentSelection = "";
             } else {
