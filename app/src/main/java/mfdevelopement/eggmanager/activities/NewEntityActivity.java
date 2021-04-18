@@ -35,6 +35,7 @@ import java.util.Locale;
 import mfdevelopement.eggmanager.DatabaseActions;
 import mfdevelopement.eggmanager.R;
 import mfdevelopement.eggmanager.data_models.daily_balance.DailyBalance;
+import mfdevelopement.eggmanager.data_models.daily_balance.DateKeyUtils;
 import mfdevelopement.eggmanager.dialog_fragments.DatePickerFragment;
 import mfdevelopement.eggmanager.fragments.DatabaseFragment;
 import mfdevelopement.eggmanager.utils.DateFormatter;
@@ -58,7 +59,7 @@ public class NewEntityActivity extends AppCompatActivity implements DatePickerFr
     /**
      * Date formats
      */
-    private final SimpleDateFormat sdf_key = new SimpleDateFormat(DailyBalance.DATE_KEY_FORMAT, Locale.getDefault());
+    private final SimpleDateFormat sdf_key = new SimpleDateFormat(DateKeyUtils.DATE_KEY_FORMAT, Locale.getDefault());
     private final SimpleDateFormat sdf_weekday = new SimpleDateFormat("EE, dd.MM.yyyy", Locale.getDefault());
 
     /**

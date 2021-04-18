@@ -36,7 +36,6 @@ public class DailyBalance implements Serializable, Comparable<DailyBalance>, Has
     public static final String COL_MONEY_EARNED = "moneyEarned";
     public static final String COL_DATE_CREATED = "dateCreated";
     public static final String COL_USER_CREATED = "userCreated";
-    public static final String DATE_KEY_FORMAT = "yyyyMMdd";
     public static final int NOT_SET = 0;
 
     private static final String LOG_TAG = "DailyBalance";
@@ -69,35 +68,17 @@ public class DailyBalance implements Serializable, Comparable<DailyBalance>, Has
     private String userCreated;
 
     public DailyBalance(String dateKey, int eggsCollected, int eggsSold, double pricePerEgg) {
-        setDateKey(dateKey);
-        this.eggsCollected = eggsCollected;
-        this.eggsSold = eggsSold;
-        this.pricePerEgg = pricePerEgg;
-        this.numHens = 0;
-        this.moneyEarned = calcMoneyEarned(eggsSold, pricePerEgg);
-        this.dateCreated = getCurrentDate();
+        this(dateKey, eggsCollected, eggsSold, pricePerEgg, 0);
     }
 
     @Ignore
     public DailyBalance(String dateKey, int eggsCollected, int eggsSold, double pricePerEgg, int numHens) {
-        setDateKey(dateKey);
-        this.eggsCollected = eggsCollected;
-        this.eggsSold = eggsSold;
-        this.pricePerEgg = pricePerEgg;
-        this.numHens = numHens;
-        this.moneyEarned = calcMoneyEarned(eggsSold, pricePerEgg);
-        this.dateCreated = getCurrentDate();
+        this(dateKey, eggsCollected, eggsSold, pricePerEgg, numHens, null);
     }
 
     @Ignore
     public DailyBalance(String dateKey, int eggsCollected, int eggsSold, double pricePerEgg, int numHens, Date dateCreated) {
-        setDateKey(dateKey);
-        this.eggsCollected = eggsCollected;
-        this.eggsSold = eggsSold;
-        this.pricePerEgg = pricePerEgg;
-        this.numHens = numHens;
-        this.moneyEarned = calcMoneyEarned(eggsSold, pricePerEgg);
-        this.dateCreated = dateCreated;
+        this(dateKey, eggsCollected, eggsSold, pricePerEgg, numHens, dateCreated, null);
     }
 
     @Ignore
@@ -108,8 +89,11 @@ public class DailyBalance implements Serializable, Comparable<DailyBalance>, Has
         this.pricePerEgg = pricePerEgg;
         setNumHens(numHens);
         setMoneyEarned(calcMoneyEarned(eggsSold, pricePerEgg));
-        setDateCreated(dateCreated);
-        setUserCreated(userCreated);
+
+        if (dateCreated != null) setDateCreated(dateCreated);
+        else setDateCreated(getCurrentDate());
+
+        if (userCreated != null) setUserCreated(userCreated);
     }
 
     private double calcMoneyEarned(int eggsSold, double pricePerEgg) {
@@ -126,9 +110,9 @@ public class DailyBalance implements Serializable, Comparable<DailyBalance>, Has
     }
 
     private void setDateKey(String dateKey) {
-        if (dateKey == null || dateKey.length() != DATE_KEY_FORMAT.length()) {
+        if (dateKey == null || dateKey.length() != DateKeyUtils.DATE_KEY_FORMAT.length()) {
             Calendar cal = Calendar.getInstance();
-            SimpleDateFormat sdf = new SimpleDateFormat(DATE_KEY_FORMAT, Locale.getDefault());
+            SimpleDateFormat sdf = new SimpleDateFormat(DateKeyUtils.DATE_KEY_FORMAT, Locale.getDefault());
             this.dateKey = sdf.format(cal.getTimeInMillis());
         } else {
             this.dateKey = dateKey;
@@ -148,7 +132,7 @@ public class DailyBalance implements Serializable, Comparable<DailyBalance>, Has
     }
 
     public Date getDate() {
-        SimpleDateFormat sdf = new SimpleDateFormat(DATE_KEY_FORMAT, Locale.getDefault());
+        SimpleDateFormat sdf = new SimpleDateFormat(DateKeyUtils.DATE_KEY_FORMAT, Locale.getDefault());
         Date date;
 
         try {
@@ -194,28 +178,7 @@ public class DailyBalance implements Serializable, Comparable<DailyBalance>, Has
     }
 
     public void setUserCreated(String username) {
-        this.userCreated = username;
-    }
-
-    public static String getYearByDateKey(String dateKey) {
-        if (dateKey.length() >= 4) {
-            return dateKey.substring(0, 4).trim();
-        } else {
-            return "";
-        }
-    }
-
-    public static String getMonthByDateKey(String dateKey) {
-        if (dateKey.length() >= 6) {
-            return dateKey.substring(4, 6).trim();
-        } else {
-            return "";
-        }
-    }
-
-    public static Date getDateByDateKey(String dateKey) throws ParseException {
-        SimpleDateFormat sdfDateKeyFormat = new SimpleDateFormat(DATE_KEY_FORMAT, Locale.getDefault());
-        return sdfDateKeyFormat.parse(dateKey);
+        if (username != null) this.userCreated = username;
     }
 
 

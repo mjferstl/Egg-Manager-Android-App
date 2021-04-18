@@ -27,7 +27,7 @@ import mfdevelopement.eggmanager.DatabaseActions;
 import mfdevelopement.eggmanager.R;
 import mfdevelopement.eggmanager.data_models.HasDateInterface;
 import mfdevelopement.eggmanager.data_models.HasDateInterfaceObject;
-import mfdevelopement.eggmanager.data_models.daily_balance.DailyBalance;
+import mfdevelopement.eggmanager.data_models.daily_balance.DateKeyUtils;
 import mfdevelopement.eggmanager.data_models.data_check.DataCompletenessChecker;
 import mfdevelopement.eggmanager.data_models.expandable_list.GroupInfo;
 import mfdevelopement.eggmanager.dialog_fragments.DatePickerFragment;
@@ -222,7 +222,7 @@ public class DataCompletenessCheckActivity extends AppCompatActivity implements 
         List<Date> dateList = new ArrayList<>();
         for (String s : dateKeyList) {
             try {
-                dateList.add(DailyBalance.getDateByDateKey(s));
+                dateList.add(DateKeyUtils.getDateByDateKey(s));
             } catch (ParseException e) {
                 e.printStackTrace();
             }

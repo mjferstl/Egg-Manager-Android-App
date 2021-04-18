@@ -19,6 +19,7 @@ import java.util.concurrent.TimeUnit;
 
 import mfdevelopement.eggmanager.R;
 import mfdevelopement.eggmanager.data_models.daily_balance.DailyBalance;
+import mfdevelopement.eggmanager.data_models.daily_balance.DateKeyUtils;
 import mfdevelopement.eggmanager.database.EggManagerRepository;
 
 public class SharedViewModel extends AndroidViewModel {
@@ -177,15 +178,15 @@ public class SharedViewModel extends AndroidViewModel {
         List<Calendar> firstDayOfTheMonths = new ArrayList<>();
         for (DailyBalance db : dailyBalanceList) {
             String currentDateKey = db.getDateKey();
-            String yearMonthKey = DailyBalance.getYearByDateKey(currentDateKey) + DailyBalance.getMonthByDateKey(currentDateKey);
+            String yearMonthKey = DateKeyUtils.getYearByDateKey(currentDateKey) + DateKeyUtils.getMonthByDateKey(currentDateKey);
 
             if (!uniqueDateKeys.contains(yearMonthKey)) {
                 uniqueDateKeys.add(yearMonthKey);
 
                 Calendar calendar = Calendar.getInstance();
-                int year = Integer.parseInt(DailyBalance.getYearByDateKey(currentDateKey));
-                int month = Integer.parseInt(DailyBalance.getMonthByDateKey(currentDateKey));
-                calendar.set(year, month-1, 1, 0, 0, 0);
+                int year = Integer.parseInt(DateKeyUtils.getYearByDateKey(currentDateKey));
+                int month = Integer.parseInt(DateKeyUtils.getMonthByDateKey(currentDateKey));
+                calendar.set(year, month - 1, 1, 0, 0, 0);
                 firstDayOfTheMonths.add(calendar);
 
                 soldEggs.add(db.getEggsSold());

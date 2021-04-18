@@ -24,7 +24,7 @@ import java.util.Locale;
 
 import mfdevelopement.eggmanager.DatabaseActions;
 import mfdevelopement.eggmanager.R;
-import mfdevelopement.eggmanager.data_models.daily_balance.DailyBalance;
+import mfdevelopement.eggmanager.data_models.daily_balance.DateKeyUtils;
 import mfdevelopement.eggmanager.list_adapters.DateFilterListAdapter;
 import mfdevelopement.eggmanager.viewmodels.FilterActivityViewModel;
 
@@ -93,7 +93,7 @@ public class FilterActivity extends AppCompatActivity implements DateFilterListA
 
         List<String> yearsList = viewModel.getYearNames();
 
-        adapterYears = new DateFilterListAdapter(this, yearsList, DailyBalance.getYearByDateKey(initialFilterString));
+        adapterYears = new DateFilterListAdapter(this, yearsList, DateKeyUtils.getYearByDateKey(initialFilterString));
         recyclerViewYears.setAdapter(adapterYears);
     }
 
@@ -114,7 +114,7 @@ public class FilterActivity extends AppCompatActivity implements DateFilterListA
         // set the initial month name from the loaded filter string, if the filter string contains information about the month
         String initialMonthName = "";
         if (!initialFilterString.isEmpty() && initialFilterString.length() >= 6) {
-            int indexMonth = Integer.parseInt(DailyBalance.getMonthByDateKey(initialFilterString));
+            int indexMonth = Integer.parseInt(DateKeyUtils.getMonthByDateKey(initialFilterString));
             initialMonthName = viewModel.getMonthNameByIndex(indexMonth);
         }
         adapterMonths = new DateFilterListAdapter(this, new ArrayList<>(), initialMonthName);
@@ -131,7 +131,7 @@ public class FilterActivity extends AppCompatActivity implements DateFilterListA
         }
 
         Log.d(LOG_TAG,"initialFilterString = \"" + initialFilterString + "\"");
-        String initialYear = DailyBalance.getYearByDateKey(initialFilterString);
+        String initialYear = DateKeyUtils.getYearByDateKey(initialFilterString);
         Log.d(LOG_TAG,"year of initialFilterString = \"" + initialYear + "\"");
         List<String> monthNames = viewModel.getMonthsByYear(initialYear);
         Log.d(LOG_TAG,"initial months for initialFilterString: " + monthNames.size() + " items");

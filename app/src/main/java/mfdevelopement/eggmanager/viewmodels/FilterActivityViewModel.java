@@ -14,7 +14,7 @@ import java.util.HashSet;
 import java.util.List;
 
 import mfdevelopement.eggmanager.R;
-import mfdevelopement.eggmanager.data_models.daily_balance.DailyBalance;
+import mfdevelopement.eggmanager.data_models.daily_balance.DateKeyUtils;
 import mfdevelopement.eggmanager.database.EggManagerRepository;
 
 public class FilterActivityViewModel extends AndroidViewModel {
@@ -71,8 +71,8 @@ public class FilterActivityViewModel extends AndroidViewModel {
     public List<String> getMonthsByYear(String year) {
         List<String> months = new ArrayList<>();
         for (String yearMonth : getYearMonthNames()) {
-            if (DailyBalance.getYearByDateKey(yearMonth).equals(year)) {
-                months.add(DailyBalance.getMonthByDateKey(yearMonth));
+            if (DateKeyUtils.getYearByDateKey(yearMonth).equals(year)) {
+                months.add(DateKeyUtils.getMonthByDateKey(yearMonth));
             }
         }
 

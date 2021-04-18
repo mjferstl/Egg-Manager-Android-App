@@ -39,6 +39,7 @@ import mfdevelopement.eggmanager.activities.NewEntityActivity;
 import mfdevelopement.eggmanager.data_models.SortingItem;
 import mfdevelopement.eggmanager.data_models.SortingItemCollection;
 import mfdevelopement.eggmanager.data_models.daily_balance.DailyBalance;
+import mfdevelopement.eggmanager.data_models.daily_balance.DateKeyUtils;
 import mfdevelopement.eggmanager.dialog_fragments.DeleteDatabaseDialog;
 import mfdevelopement.eggmanager.dialog_fragments.SortingDialogFragment;
 import mfdevelopement.eggmanager.list_adapters.DailyBalanceListAdapter;
@@ -356,9 +357,9 @@ public class DatabaseFragment extends Fragment {
                         filterName = newFilterString;
                     }
                     if (newFilterString.length() >= 6) {
-                        String year = DailyBalance.getYearByDateKey(newFilterString);
+                        String year = DateKeyUtils.getYearByDateKey(newFilterString);
 
-                        int indexMonth = Integer.parseInt(DailyBalance.getMonthByDateKey(newFilterString));
+                        int indexMonth = Integer.parseInt(DateKeyUtils.getMonthByDateKey(newFilterString));
                         String month = viewModel.getMonthNameByIndex(indexMonth);
 
                         filterName = month + " " + year;
