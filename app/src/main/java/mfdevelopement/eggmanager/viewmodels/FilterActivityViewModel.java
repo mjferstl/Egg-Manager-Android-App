@@ -21,10 +21,10 @@ public class FilterActivityViewModel extends AndroidViewModel {
 
     private final String LOG_TAG = "FilterActivityViewModel";
     private List<String> yearNamesList = new ArrayList<>();
-    private List<String>  uniqueYearMonthList;
-    private List<String> monthNamesReference;
+    private List<String> uniqueYearMonthList;
+    private final List<String> monthNamesReference;
 
-    private EggManagerRepository repository;
+    private final EggManagerRepository repository;
 
     public FilterActivityViewModel(Application application) {
         super(application);

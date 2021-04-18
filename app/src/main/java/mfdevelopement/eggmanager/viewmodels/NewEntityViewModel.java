@@ -18,8 +18,8 @@ public class NewEntityViewModel extends AndroidViewModel {
 
     private final String LOG_TAG = "NewEntityViewModel";
 
-    private EggManagerRepository repository;
-    private LiveData<List<String>> ldDateKeys;
+    private final EggManagerRepository repository;
+    private final LiveData<List<String>> ldDateKeys;
 
     private final SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(getApplication());
 

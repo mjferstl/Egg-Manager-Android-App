@@ -10,16 +10,17 @@ public class JSONUtil {
     private static final String LOG_TAG = "JSONUtil";
 
     /**
-     * parse a String to a JSONArray
+     * Convert a String to a {@link JSONArray}
+     *
      * @param content String in JSON notation
-     * @return JSONArray
+     * @return {@code content} converted to a {@link JSONArray}
      */
     public static JSONArray getJSONObject(String content) {
 
         // create a new JSONObject
         JSONArray jsonArray = new JSONArray();
 
-        // convert Stirng to JSONObject
+        // convert String to JSONObject
         try {
             jsonArray = new JSONArray(content);
         } catch (JSONException e) {

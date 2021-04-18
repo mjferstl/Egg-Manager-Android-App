@@ -46,7 +46,9 @@ public class DataCompletenessCheckActivity extends AppCompatActivity implements 
     /**
      * TextViews used in the UI
      */
-    private TextView txtv_start_date, txtv_end_date, txtv_info_no_data_missing, txtv_elv_info;
+    private TextView txtv_start_date;
+    private TextView txtv_end_date;
+    private TextView txtv_elv_info;
 
     private LinearLayout linearLayoutListContainer, linearLayoutSuccessContainer;
 
@@ -64,8 +66,6 @@ public class DataCompletenessCheckActivity extends AppCompatActivity implements 
     private PICKER_ID pickerId;
 
     private DataCompletenessCheckExpandableListAdapter expandableListAdapter;
-
-    private ExpandableListView expandableListView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -106,8 +106,6 @@ public class DataCompletenessCheckActivity extends AppCompatActivity implements 
             showDatePickerDialog(txtv_end_date.getText().toString());
         });
 
-        txtv_info_no_data_missing = findViewById(R.id.txtv_data_completeness_check_no_data);
-
         txtv_elv_info = findViewById(R.id.txtv_data_completeness_check_list_info);
     }
 
@@ -115,7 +113,7 @@ public class DataCompletenessCheckActivity extends AppCompatActivity implements 
      * Initialize the {@link ExpandableListView} in the UI
      */
     private void initExpandableListView() {
-        expandableListView = findViewById(R.id.elv_data_completeness_check);
+        ExpandableListView expandableListView = findViewById(R.id.elv_data_completeness_check);
         expandableListAdapter = new DataCompletenessCheckExpandableListAdapter(getApplicationContext(), new ArrayList<>());
         expandableListView.setAdapter(expandableListAdapter);
 

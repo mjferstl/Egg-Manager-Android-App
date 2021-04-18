@@ -17,22 +17,22 @@ import mfdevelopement.eggmanager.data_models.SortingItemCollection;
 public class SortingDialogListAdapter extends BaseAdapter {
 
     private final String LOG_TAG = "SortingDialogListAdapte";
-    private List<SortingItem> mData;
+    private final List<SortingItem> sortingItemList;
 
     public SortingDialogListAdapter(SortingItemCollection list) {
-        Log.d(LOG_TAG,"creating new instance");
-        mData = list.getItems();
+        Log.d(LOG_TAG, "creating new instance");
+        sortingItemList = list.getItems();
     }
 
 
     @Override
     public int getCount() {
-        return mData.size();
+        return sortingItemList.size();
     }
 
     @Override
     public SortingItem getItem(int position) {
-        return mData.get(position);
+        return sortingItemList.get(position);
     }
 
     @Override

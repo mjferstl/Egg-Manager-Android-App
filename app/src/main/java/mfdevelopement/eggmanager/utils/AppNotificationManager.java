@@ -15,7 +15,7 @@ import mfdevelopement.eggmanager.activities.MainNavigationActivity;
 
 public class AppNotificationManager {
 
-    private Context context;
+    private final Context context;
 
     private NotificationCompat.Builder importNotificationBuilder;
     private NotificationManagerCompat notificationManager;
