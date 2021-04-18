@@ -84,7 +84,7 @@ dependencies {
     def archLifecycleVersion = '2.2.0'
     def coreTestingVersion = '2.1.0'
     def materialVersion = '1.4.0-alpha02'
-    def navigationVersion = '2.3.4'
+    def navigationVersion = '2.3.5'
 
     // Layout
     implementation 'androidx.constraintlayout:constraintlayout:2.0.4'
