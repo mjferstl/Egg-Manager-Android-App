@@ -22,6 +22,10 @@ public class DataCompletenessChecker implements ExpandableListCompatible {
 
     private final List<HasDateInterface> data;
 
+    private final SimpleDateFormat sdfYear = new SimpleDateFormat("yyyy", Locale.getDefault());
+    private final SimpleDateFormat sdfMonthYear = new SimpleDateFormat("MMMM yyyy", Locale.getDefault());
+    private final SimpleDateFormat sdfDayMonth = new SimpleDateFormat("dd. MMMM", Locale.getDefault());
+
     public DataCompletenessChecker(@NonNull Calendar startDate, @NonNull Calendar endDate, @NonNull List<HasDateInterface> databaseItems) {
         Date d = new Date();
         d.setTime(startDate.getTimeInMillis());
@@ -51,12 +55,12 @@ public class DataCompletenessChecker implements ExpandableListCompatible {
     }
 
     /**
-     * Get all missing dates within the start date and end date in data
+     * Get all missing dates within the start date and end date in the list
      *
-     * @param startDate
-     * @param endDate
-     * @param data
-     * @return
+     * @param startDate first date of the observed time range
+     * @param endDate   last date of the observed time range
+     * @param data      list of objects, which contain dates
+     * @return list of {@link Date} objects, which represent the dates, where no object with the same date has not been found in {@code data}
      */
     private List<Date> getMissingDates(Date startDate, Date endDate, List<HasDateInterface> data) {
 
@@ -78,8 +82,9 @@ public class DataCompletenessChecker implements ExpandableListCompatible {
         for (HasDateInterface di : data) {
             Calendar c = Calendar.getInstance();
             c.setTime(di.getDate());
-            if (!existingDates.contains(c.getTimeInMillis()))
+            if (!existingDates.contains(c.getTimeInMillis())) {
                 existingDates.add(c.getTimeInMillis());
+            }
         }
 
         List<Date> missingDates = new ArrayList<>();
@@ -105,30 +110,46 @@ public class DataCompletenessChecker implements ExpandableListCompatible {
         return convertToGroupInfo(missingDates);
     }
 
-    private final SimpleDateFormat sdfYear = new SimpleDateFormat("yyyy", Locale.getDefault());
-    private final SimpleDateFormat sdfDayMonth = new SimpleDateFormat("dd. MMMM", Locale.getDefault());
-
     private List<GroupInfo> convertToGroupInfo(List<Date> dateList) {
 
         List<GroupInfo> groupInfoList = new ArrayList<>();
         if (dateList.isEmpty()) return groupInfoList;
 
-        //
+        // loop over the list to get the number of different years
+        List<Integer> yearsList = new ArrayList<>();
+        Calendar c = Calendar.getInstance();
+        for (Date date : dateList) {
+            c.setTime(date);
+            if (!yearsList.contains(c.get(Calendar.YEAR))) yearsList.add(c.get(Calendar.YEAR));
+        }
+
+        // Create GroupInfo objects
         GroupInfo groupInfo = new GroupInfo("");
         Date currentDate;
-        String lastUsedYearString = "";
+        String groupName = "";
         for (int i = 0; i < dateList.size(); i++) {
 
             currentDate = dateList.get(i);
 
-            String yearString = sdfYear.format(currentDate);
-            if (i == 0 || !yearString.equals(lastUsedYearString)) {
+            // Create the name for the current group
+            // This depends on the number of groups, which will be created
+            // if the list contains data for at minimum two different years, the data will be grouped by years.
+            // Otherwise it will be grouped by months
+            String currentGroupName;
+            if (yearsList.size() > 1) {
+                currentGroupName = sdfYear.format(currentDate);
+            } else {
+                currentGroupName = sdfMonthYear.format(currentDate);
+            }
+
+            // Check if the data belongs to a new group
+            if (i == 0 || !currentGroupName.equals(groupName)) {
                 // save the created group info
                 if (i != 0) groupInfoList.add(groupInfo);
 
                 // create a ew group info
-                groupInfo = new GroupInfo(yearString);
-                lastUsedYearString = yearString;
+                groupInfo = new GroupInfo(currentGroupName);
+                groupName = currentGroupName;
             }
 
             // add the current date as child for the group info

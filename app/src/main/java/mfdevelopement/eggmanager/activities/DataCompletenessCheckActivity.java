@@ -5,6 +5,7 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.ExpandableListView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -37,10 +38,21 @@ import mfdevelopement.eggmanager.viewmodels.DataCheckViewModel;
 
 public class DataCompletenessCheckActivity extends AppCompatActivity implements DatePickerFragment.OnAddDateListener {
 
+    /**
+     * View model for the activity
+     */
     private DataCheckViewModel viewModel;
 
-    private TextView txtv_start_date, txtv_end_date, txtv_info_no_data_missing;
+    /**
+     * TextViews used in the UI
+     */
+    private TextView txtv_start_date, txtv_end_date, txtv_info_no_data_missing, txtv_elv_info;
 
+    private LinearLayout linearLayoutListContainer, linearLayoutSuccessContainer;
+
+    /**
+     * String used as identifier for logging
+     */
     private final String LOG_TAG = "DataCompletenessCheckAc";
 
     /**
@@ -49,11 +61,7 @@ public class DataCompletenessCheckActivity extends AppCompatActivity implements 
     private final String KEY_START_DATE = "startDate";
     private final String KEY_END_DATE = "endDate";
 
-    // Constants to determine the date, which the user wants to change
-    private final int START_DATE_PICKER_ID = 1;
-    private final int END_DATE_PICKER_ID = 2;
-
-    private int datePickerId;
+    private PICKER_ID pickerId;
 
     private DataCompletenessCheckExpandableListAdapter expandableListAdapter;
 
@@ -72,49 +80,90 @@ public class DataCompletenessCheckActivity extends AppCompatActivity implements 
 
         viewModel = new ViewModelProvider(this).get(DataCheckViewModel.class);
 
+        linearLayoutListContainer = findViewById(R.id.linLay_data_completeness_check_list_container);
+        linearLayoutSuccessContainer = findViewById(R.id.linLay_data_completeness_check_success_container);
+
+        //
+        initTextViews();
+        initObservers();
+        initExpandableListView();
+    }
+
+    /**
+     * Initialize the {@link TextView} objects of the UI
+     */
+    private void initTextViews() {
         txtv_start_date = findViewById(R.id.txtv_data_check_start_date);
         txtv_end_date = findViewById(R.id.txtv_data_check_end_date);
         txtv_start_date.setOnClickListener(v -> {
             Log.d(LOG_TAG, "user clicked on the start date");
-            datePickerId = START_DATE_PICKER_ID;
+            pickerId = PICKER_ID.START_DATE;
             showDatePickerDialog(txtv_start_date.getText().toString());
         });
         txtv_end_date.setOnClickListener(v -> {
             Log.d(LOG_TAG, "user clicked on the end date");
-            datePickerId = END_DATE_PICKER_ID;
+            pickerId = PICKER_ID.END_DATE;
             showDatePickerDialog(txtv_end_date.getText().toString());
         });
 
-        txtv_info_no_data_missing = findViewById(R.id.txtv_no_missing_data);
-        txtv_info_no_data_missing.setVisibility(View.GONE);
+        txtv_info_no_data_missing = findViewById(R.id.txtv_data_completeness_check_no_data);
 
-        initObservers();
-        initListView();
+        txtv_elv_info = findViewById(R.id.txtv_data_completeness_check_list_info);
     }
 
-    private void initListView() {
+    /**
+     * Initialize the {@link ExpandableListView} in the UI
+     */
+    private void initExpandableListView() {
         expandableListView = findViewById(R.id.elv_data_completeness_check);
         expandableListAdapter = new DataCompletenessCheckExpandableListAdapter(getApplicationContext(), new ArrayList<>());
         expandableListView.setAdapter(expandableListAdapter);
+
+        // Handle clicks on the child items
+        expandableListView.setOnChildClickListener((parent, v, groupPosition, childPosition, id) -> {
+            Log.d(LOG_TAG, "user clicked on the child at groupPosition: " + groupPosition + ", childPosition: " + childPosition);
+            return false;
+        });
     }
 
     @Override
     protected void onResume() {
         super.onResume();
-        updateList();
+        updateListContent();
     }
 
-    private void updateList() {
-        if (viewModel.getAllDateKeys().getValue() != null)
-            updateList(convertDateKeys(viewModel.getAllDateKeys().getValue()));
+    /**
+     * Update the content of the {@link ExpandableListView}
+     * The content for the adapter of the {@link ExpandableListView} will be queried from the {@link DataCheckViewModel}
+     */
+    private void updateListContent() {
+        if (viewModel.getAllDateKeys().getValue() != null) {
+            updateListContent(convertDateKeys(viewModel.getAllDateKeys().getValue()));
+        } else {
+            Log.e(LOG_TAG, "viewModel.getAllDateKeys().getValue() is null");
+        }
     }
 
-    private void updateList(List<Date> dateList) {
+    /**
+     * Update the content of the {@link ExpandableListView}
+     *
+     * @param dateList list of {@link Date} objects which represent the dates, where a database entry exists
+     */
+    private void updateListContent(List<Date> dateList) {
 
         if (txtv_start_date.getText().toString().isEmpty())
             txtv_start_date.setText(DateFormatter.getHumanReadableDate(dateList.get(0)));
-        if (txtv_end_date.getText().toString().isEmpty())
-            txtv_end_date.setText(DateFormatter.getHumanReadableDate(dateList.get(dateList.size() - 1)));
+        if (txtv_end_date.getText().toString().isEmpty()) {
+            Date dateListLastDate = dateList.get(dateList.size() - 1);
+            Calendar now = Calendar.getInstance();
+
+            // check if the timestamp of the last entry is beyond now
+            if (dateListLastDate.getTime() > now.getTimeInMillis()) {
+                txtv_end_date.setText(DateFormatter.getHumanReadableDate(dateListLastDate));
+            } else {
+                txtv_end_date.setText(DateFormatter.getHumanReadableDate(now));
+            }
+        }
 
         try {
             // parse the dates from the text views
@@ -123,8 +172,9 @@ public class DataCompletenessCheckActivity extends AppCompatActivity implements 
 
             // create a list with objects implementing the HasDateInterface
             List<HasDateInterface> hasDateInterfaceObjectList = new ArrayList<>();
-            for (Date d : dateList)
+            for (Date d : dateList) {
                 hasDateInterfaceObjectList.add(HasDateInterfaceObject.createFromDate(d));
+            }
 
             // Check the data for completeness within the start date and end date
             DataCompletenessChecker dcc = new DataCompletenessChecker(startDate, endDate, hasDateInterfaceObjectList);
@@ -133,13 +183,25 @@ public class DataCompletenessCheckActivity extends AppCompatActivity implements 
             // update the expandable list view
             expandableListAdapter.setData(groupInfoList);
 
+            // Update the text for the info text
+            long daysCount = 0;
+            for (GroupInfo gi : groupInfoList) daysCount += gi.getChildCount();
+            String infoText = String.format(getString(R.string.data_check_info), daysCount);
+            txtv_elv_info.setText(infoText);
+
             // hide the list, if it is empty
             if (expandableListAdapter.getGroupCount() == 0) {
-                expandableListView.setVisibility(View.GONE);
-                txtv_info_no_data_missing.setVisibility(View.VISIBLE);
+//                expandableListView.setVisibility(View.GONE);
+//                txtv_elv_info.setVisibility(View.GONE);
+//                txtv_info_no_data_missing.setVisibility(View.VISIBLE);
+                linearLayoutListContainer.setVisibility(View.GONE);
+                linearLayoutSuccessContainer.setVisibility(View.VISIBLE);
             } else {
-                expandableListView.setVisibility(View.VISIBLE);
-                txtv_info_no_data_missing.setVisibility(View.GONE);
+//                expandableListView.setVisibility(View.VISIBLE);
+//                txtv_elv_info.setVisibility(View.VISIBLE);
+//                txtv_info_no_data_missing.setVisibility(View.GONE);
+                linearLayoutListContainer.setVisibility(View.VISIBLE);
+                linearLayoutSuccessContainer.setVisibility(View.GONE);
             }
 
         } catch (ParseException e) {
@@ -150,6 +212,12 @@ public class DataCompletenessCheckActivity extends AppCompatActivity implements 
         }
     }
 
+    /**
+     * Convert a list of dateKeys to {@link Date} objects
+     *
+     * @param dateKeyList list of dateKeys
+     * @return converted dateKeys
+     */
     private List<Date> convertDateKeys(List<String> dateKeyList) {
         List<Date> dateList = new ArrayList<>();
         for (String s : dateKeyList) {
@@ -162,10 +230,18 @@ public class DataCompletenessCheckActivity extends AppCompatActivity implements 
         return dateList;
     }
 
+    /**
+     * Initialize all observers
+     */
     private void initObservers() {
-        viewModel.getAllDateKeys().observe(this, allDateKeysList -> updateList(convertDateKeys(allDateKeysList)));
+        viewModel.getAllDateKeys().observe(this, allDateKeysList -> updateListContent(convertDateKeys(allDateKeysList)));
     }
 
+    /**
+     * Show a {@link DatePickerFragment} for the user to select a date
+     *
+     * @param initialDateString initial date, which the {@link DatePickerFragment} will show
+     */
     private void showDatePickerDialog(String initialDateString) {
 
         Log.d(LOG_TAG, "showing DatePicker dialog with initial date \"" + initialDateString + "\"");
@@ -178,19 +254,22 @@ public class DataCompletenessCheckActivity extends AppCompatActivity implements 
         ft.addToBackStack(null);
         ft.commit();
 
-        Date initialDate = null;
         try {
-            initialDate = DateFormatter.parseHumanReadableDateString(initialDateString);
+            Date initialDate = DateFormatter.parseHumanReadableDateString(initialDateString);
+            DialogFragment dialogFragment = DatePickerFragment.newInstance(initialDate);
+            dialogFragment.show(getSupportFragmentManager(), "datePicker");
         } catch (ParseException e) {
             e.printStackTrace();
         }
-
-        if (initialDate != null) {
-            DialogFragment newFragment = DatePickerFragment.newInstance(initialDate);
-            newFragment.show(getSupportFragmentManager(), "datePicker");
-        }
     }
 
+    /**
+     * Convert the text of a {@link TextView} to a {@link Calendar} object
+     *
+     * @param textView {@link TextView} which contains the date as String in the format {@code DateFormatter.HUMAN_READABLE_DATE_FORMAT}
+     * @return Calendar object, which has the time set to the date parsed from {@code textView}
+     * @throws ParseException if the content of {@code textView} is not in the format {@code DateFormatter.HUMAN_READABLE_DATE_FORMAT} or cannot be parsed for other reasons
+     */
     private Calendar getDateFromTextView(TextView textView) throws ParseException {
         Calendar cal = Calendar.getInstance();
         cal.setTime(DateFormatter.parseHumanReadableDateString(textView.getText().toString()));
@@ -200,16 +279,14 @@ public class DataCompletenessCheckActivity extends AppCompatActivity implements 
     @Override
     public void onAddDateSubmit(Calendar calendar) {
         String dateSubmitted = DateFormatter.getHumanReadableDate(calendar);
-        Log.d(LOG_TAG,"date submitted: " + dateSubmitted);
+        Log.d(LOG_TAG, "date submitted: " + dateSubmitted);
 
-        if (datePickerId == START_DATE_PICKER_ID) {
+        if (pickerId == PICKER_ID.START_DATE) {
             txtv_start_date.setText(dateSubmitted);
-            updateList();
-        } else if (datePickerId == END_DATE_PICKER_ID) {
+        } else if (pickerId == PICKER_ID.END_DATE) {
             txtv_end_date.setText(dateSubmitted);
-            updateList();
-        } else
-            Log.e(LOG_TAG,"onAddDateSubmit(): datePickerId is not START_DATE_PICKER_ID or END_DATE_PICKER_ID ");
+        }
+        updateListContent();
     }
 
     private void createNewEntity(String dateString) {
@@ -245,5 +322,13 @@ public class DataCompletenessCheckActivity extends AppCompatActivity implements 
             txtv_end_date.setText(savedEndDate);
         }
         super.onRestoreInstanceState(savedInstanceState);
+    }
+
+    /**
+     * Enum to determine, which date the user wants to change
+     */
+    enum PICKER_ID {
+        START_DATE,
+        END_DATE
     }
 }

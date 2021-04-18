@@ -93,31 +93,71 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/constrLay_data_check_date_to" />
 
-    <ExpandableListView
-        android:id="@+id/elv_data_completeness_check"
+    <LinearLayout
+        android:id="@+id/linLay_data_completeness_check_list_container"
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:indicatorLeft="?android:attr/expandableListPreferredItemIndicatorLeft"
+        android:orientation="vertical"
+        app:layout_constraintBottom_toBottomOf="@+id/txtv_placeholder"
+        app:layout_constraintEnd_toEndOf="@+id/txtv_placeholder"
+        app:layout_constraintStart_toStartOf="@+id/txtv_placeholder"
+        app:layout_constraintTop_toTopOf="@+id/txtv_placeholder">
+
+        <TextView
+            android:id="@+id/txtv_data_completeness_check_list_info"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            style="@style/basic_text"
+            android:textAlignment="center"
+            android:paddingTop="@dimen/large_padding"
+            android:paddingStart="@dimen/large_padding"
+            android:paddingEnd="@dimen/large_padding"
+            android:paddingBottom="@dimen/large_padding" />
+
+        <ExpandableListView
+            android:id="@+id/elv_data_completeness_check"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:indicatorLeft="?android:attr/expandableListPreferredItemIndicatorLeft" />
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/linLay_data_completeness_check_success_container"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:orientation="vertical"
         android:visibility="gone"
         app:layout_constraintBottom_toBottomOf="@+id/txtv_placeholder"
         app:layout_constraintEnd_toEndOf="@+id/txtv_placeholder"
         app:layout_constraintStart_toStartOf="@+id/txtv_placeholder"
-        app:layout_constraintTop_toTopOf="@+id/txtv_placeholder" />
+        app:layout_constraintTop_toTopOf="@+id/txtv_placeholder">
 
-    <TextView
-        android:id="@+id/txtv_no_missing_data"
-        android:layout_width="match_parent"
-        android:layout_height="0dp"
-        style="@style/basic_text"
-        android:text="@string/data_check_no_data_missing"
-        android:lineSpacingExtra="10sp"
-        android:textAlignment="center"
-        android:paddingTop="@dimen/HUGE_padding"
-        android:paddingStart="@dimen/large_padding"
-        android:paddingEnd="@dimen/large_padding"
-        app:layout_constraintBottom_toBottomOf="@+id/txtv_placeholder"
-        app:layout_constraintEnd_toEndOf="@+id/txtv_placeholder"
-        app:layout_constraintStart_toStartOf="@+id/txtv_placeholder"
-        app:layout_constraintTop_toTopOf="@+id/txtv_placeholder" />
+        <TextView
+            android:id="@+id/txtv_data_completeness_check_no_data"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            style="@style/basic_text"
+            android:text="@string/data_check_no_data_missing"
+            android:lineSpacingExtra="10sp"
+            android:textAlignment="center"
+            android:paddingTop="@dimen/HUGE_padding"
+            android:paddingStart="@dimen/large_padding"
+            android:paddingEnd="@dimen/large_padding" />
+
+        <ImageView
+            android:id="@+id/img_data_completeness_check_success_icon"
+            android:layout_width="wrap_content"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:src="@drawable/ic_success"
+            android:layout_gravity="center"
+            android:padding="@dimen/LARGE_padding"
+            android:scaleX="2"
+            android:scaleY="2"
+            android:contentDescription="@string/content_description_icon_success" />
+
+    </LinearLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

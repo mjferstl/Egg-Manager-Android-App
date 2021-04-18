@@ -69,7 +69,7 @@ public class DataCompletenessCheckExpandableListAdapter extends BaseExpandableLi
         GroupInfo headerInfo = getGroup(groupPosition);
         if (convertView == null) {
             LayoutInflater inf = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-            convertView = inf.inflate(R.layout.recyclerview_item_completeness_check2, null);
+            convertView = inf.inflate(R.layout.list_item_group_data_completeness_check, parent, false);
         }
 
         TextView heading = convertView.findViewById(R.id.txtv_recycler_item_completeness_check_name);
@@ -84,7 +84,7 @@ public class DataCompletenessCheckExpandableListAdapter extends BaseExpandableLi
         ChildInfo childInfo = getChild(groupPosition, childPosition);
         if (convertView == null) {
             LayoutInflater inf = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-            convertView = inf.inflate(R.layout.list_item_child_data_completeness_check, null);
+            convertView = inf.inflate(R.layout.list_item_child_data_completeness_check, parent, false);
         }
 
         TextView heading = convertView.findViewById(R.id.txtv_child_name);

@@ -62,6 +62,8 @@
     <string name="from">von</string>
     <string name="to">bis</string>
     <string name="data_check_no_data_missing">Im ausgwählten Zeitraum sind für alle Tage Einträge vorhanden</string>
+    <string name="data_check_info">Im ausgewählten Zeitraum sind für %d Tage keine Einträge vorhanden</string>
+    <string name="content_description_icon_success">Symbol für eine erfolgreiche Prüfung</string>
 
     <!-- chart fragment -->
     <string name="txt_title_eggs_collected">Abgenommene Eier</string>
@@ -138,7 +140,7 @@
     <string name="content_description_icon_eggs_sold">Icon für die verkauften Eier</string>
     <string name="content_description_icon_price_per_egg">Icon für den Preis pro Ei</string>
     <string name="content_description_button_add">Button zum Hinzufügen eines Eintrags</string>
-    <string name="content_description_empty"></string>
+    <string name="content_description_empty" />
     <string name="content_description_icon_sd_card">Icon für die Speicherkarte</string>
     <string name="content_description_button_expand_collapse">Button zum Auf- und Zuklappen der fehlenden Einträge</string>
     <string name="content_description_icon_error_success">Icon, welches das Ergebnis der Datenprüfung für einen Monat bewertet</string>
