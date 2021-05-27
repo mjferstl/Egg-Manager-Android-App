@@ -17,8 +17,7 @@
         android:layout_marginTop="@dimen/small_padding"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintBottom_toTopOf="@+id/line_chart"/>
+        app:layout_constraintEnd_toEndOf="parent" />
 
     <TextView
         android:id="@+id/txtv_chart_title_extra"
@@ -30,29 +29,6 @@
         android:textSize="@dimen/textAppearanceBody1"
         app:layout_constraintStart_toStartOf="@+id/txtv_chart_title"
         app:layout_constraintTop_toBottomOf="@+id/txtv_chart_title"
-        app:layout_constraintEnd_toEndOf="@+id/txtv_chart_title"
-        app:layout_constraintBottom_toTopOf="@+id/line_chart"/>
-
-    <com.github.mikephil.charting.charts.LineChart
-        android:id="@+id/line_chart"
-        android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_marginTop="@dimen/small_padding"
-        android:layout_marginBottom="@dimen/small_padding"
-        app:layout_constraintTop_toBottomOf="@+id/txtv_chart_title_extra"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintBottom_toBottomOf="parent"/>
-
-    <com.github.mikephil.charting.charts.BarChart
-        android:id="@+id/bar_chart"
-        android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_marginTop="@dimen/small_padding"
-        android:layout_marginBottom="@dimen/small_padding"
-        app:layout_constraintTop_toBottomOf="@+id/txtv_chart_title_extra"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintBottom_toBottomOf="parent"/>
+        app:layout_constraintEnd_toEndOf="@+id/txtv_chart_title" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

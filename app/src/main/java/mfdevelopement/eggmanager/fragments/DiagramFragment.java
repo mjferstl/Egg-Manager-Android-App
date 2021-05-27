@@ -41,9 +41,9 @@ public class DiagramFragment extends Fragment {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
 
         Log.d(LOG_TAG,"starting onViewCreated()");
-        CollectedEggsChartFragment collectedEggsChartFragment = new CollectedEggsChartFragment(this);
+        ChartFragmentStateAdapter chartFragmentStateAdapter = new ChartFragmentStateAdapter(this);
         ViewPager2 viewPager = view.findViewById(R.id.charts_viewpager);
-        viewPager.setAdapter(collectedEggsChartFragment);
+        viewPager.setAdapter(chartFragmentStateAdapter);
 
         TabLayout tabLayout = view.findViewById(R.id.charts_tabs);
         new TabLayoutMediator(tabLayout, viewPager, (tab, position) -> tab.setText(tabNames.get(position))).attach();

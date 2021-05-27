@@ -19,9 +19,10 @@ import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 
 import com.github.mikephil.charting.charts.Chart;
+import com.github.mikephil.charting.data.BarDataSet;
+import com.github.mikephil.charting.data.BarEntry;
 import com.github.mikephil.charting.data.ChartData;
 import com.github.mikephil.charting.data.Entry;
-import com.github.mikephil.charting.data.LineDataSet;
 import com.github.mikephil.charting.interfaces.datasets.IDataSet;
 import com.google.android.material.snackbar.Snackbar;
 
@@ -32,15 +33,15 @@ import mfdevelopement.eggmanager.R;
 import mfdevelopement.eggmanager.activities.FilterActivity;
 import mfdevelopement.eggmanager.charts.DataSetUtils;
 import mfdevelopement.eggmanager.charts.IGenericChart;
-import mfdevelopement.eggmanager.charts.MyLineChart;
+import mfdevelopement.eggmanager.charts.MyBarChart;
 import mfdevelopement.eggmanager.viewmodels.SharedViewModel;
 
 import static mfdevelopement.eggmanager.fragments.DatabaseFragment.EXTRA_REQUEST_CODE_NAME;
 import static mfdevelopement.eggmanager.utils.FilterActivityResultHandler.handleFilterActivityResult;
 
-public class CollectedEggsChartFragment extends Fragment {
+public class SoldEggsChartFragment extends Fragment {
 
-    private static final String LOG_TAG = "CollectedEggsChartFragm";
+    private static final String LOG_TAG = "SoldEggsChartFragment";
 
     private SharedViewModel viewModel;
 
@@ -65,22 +66,21 @@ public class CollectedEggsChartFragment extends Fragment {
 
         // get references to GUI elements
         TextView txtv_title = rootView.findViewById(R.id.txtv_chart_title);
-        txtv_title.setText(getString(R.string.txt_title_eggs_collected));
+        txtv_title.setText(getString(R.string.txt_title_eggs_sold));
         TextView txtv_title_extra = rootView.findViewById(R.id.txtv_chart_title_extra);
         txtv_title_extra.setText("");
         txtv_title_extra.setVisibility(View.GONE);
 
-        // Constraint Layout
+        // Create the chart
         ConstraintLayout constraintLayout = rootView.findViewById(R.id.main_chart_container);
-
-        // Create the line chart
-        MyLineChart lineChart = new MyLineChart(this.getContext());
-        addChartView(constraintLayout, lineChart, txtv_title_extra);
-        genericChart = lineChart;
+        MyBarChart barChart = new MyBarChart(this.getContext());
+        addChartView(constraintLayout, barChart, txtv_title_extra);
+        genericChart = barChart;
 
         // Change text size of the no-data text
-        Paint pLine = lineChart.getPaint(Chart.PAINT_INFO);
+        Paint pLine = barChart.getPaint(Chart.PAINT_INFO);
         pLine.setTextSize(getResources().getDimension(R.dimen.textAppearanceSubtitle2));
+
 
         if (this.getContext() == null) {
             Log.e(LOG_TAG, "onCreateView: this.getContext() returned null");
@@ -119,7 +119,6 @@ public class CollectedEggsChartFragment extends Fragment {
         Log.d(LOG_TAG, "onResume()");
         viewModel.setDateFilter(viewModel.loadDateFilter());
     }
-
 
     @Override
     public void onCreateOptionsMenu(@NonNull Menu menu, @NonNull MenuInflater inflater) {
@@ -170,21 +169,21 @@ public class CollectedEggsChartFragment extends Fragment {
             viewModel.getFilteredDailyBalance().observe(getActivity(), dailyBalanceList -> {
 
                 if (dailyBalanceList != null && !dailyBalanceList.isEmpty()) {
-                    List<Entry> entries = viewModel.getDataEggsCollected(dailyBalanceList);
 
-                    // create a new LineDataSet containing the received data
-                    LineDataSet lineDataSet = DataSetUtils.createLineDataSet(this.getContext(), entries, getString(R.string.txt_title_eggs_collected));
+                    List<BarEntry> entries = viewModel.getDataEggsSold(dailyBalanceList);
+
+                    // create a new BarDataSet containing the received data
+                    BarDataSet barDataSet = DataSetUtils.createBarDataSet(this.getContext(), entries, getString(R.string.txt_title_eggs_sold));
 
                     // show chart (to make it visible if it's hidden)
                     genericChart.showChart();
 
                     // update the content of the chart
-                    genericChart.setChartData(lineDataSet);
+                    genericChart.setChartData(barDataSet);
 
                 } else {
                     // Hide the charts as there's nothing to show in the chart
                     genericChart.hideChart();
-
                 }
             });
 

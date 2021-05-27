@@ -18,6 +18,7 @@ import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 import mfdevelopement.eggmanager.R;
+import mfdevelopement.eggmanager.charts.ReferenceDate;
 import mfdevelopement.eggmanager.data_models.daily_balance.DailyBalance;
 import mfdevelopement.eggmanager.data_models.daily_balance.DateKeyUtils;
 import mfdevelopement.eggmanager.database.EggManagerRepository;
@@ -59,7 +60,7 @@ public class SharedViewModel extends AndroidViewModel {
         sortingOrder.setValue(mRepository.getSortingOrder());
 
         // set the reference date
-        referenceDate = getReferenceDate();
+        referenceDate = ReferenceDate.getReferenceDate();
 
         allDailyBalances = mRepository.getAllDailyBalances();
         ldEntriesCount = mRepository.getEntriesCount();
@@ -227,11 +228,5 @@ public class SharedViewModel extends AndroidViewModel {
         int diffMonth = endCalendar.get(Calendar.MONTH) - startCalendar.get(Calendar.MONTH);
 
         return diffYear * 12 + diffMonth;
-    }
-
-    public Calendar getReferenceDate() {
-        Calendar reference = Calendar.getInstance();
-        reference.set(2000, 0, 1, 0, 0, 0);
-        return reference;
     }
 }
