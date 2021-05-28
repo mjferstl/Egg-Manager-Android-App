@@ -17,9 +17,10 @@ import mfdevelopement.eggmanager.charts.axis_formatters.AxisDateFormat;
 import mfdevelopement.eggmanager.charts.axis_formatters.ChartAxisFormatterFactory;
 import mfdevelopement.eggmanager.data_models.ChartAxisLimits;
 
-public abstract class MyGenericBarChart extends BarChart implements IGenericChart {
+public abstract class MyGenericBarChart<T extends Entry> extends BarChart implements IGenericChart<T> {
 
     private int maxYLabelCount = 8;
+    private BarLineScatterCandleBubbleDataSet<T> dataSet;
 
     public MyGenericBarChart(Context context) {
         super(context);
@@ -41,7 +42,9 @@ public abstract class MyGenericBarChart extends BarChart implements IGenericChar
         this.getAxisLeft().setTextColor(ContextCompat.getColor(this.getContext(), R.color.main_text_color));
     }
 
-    public <T extends Entry> void setChartData(BarLineScatterCandleBubbleDataSet<T> dataSet) {
+    public void setChartData(BarLineScatterCandleBubbleDataSet<T> dataSet) {
+        this.dataSet = dataSet;
+
         // modify both axes
         ChartAxisLimits axisLimits = ChartUtils.calcAxisLimits(dataSet);
 
@@ -56,6 +59,11 @@ public abstract class MyGenericBarChart extends BarChart implements IGenericChar
 
         // refresh the chart
         this.invalidate();
+    }
+
+    @Override
+    public BarLineScatterCandleBubbleDataSet<T> getChartData() {
+        return this.dataSet;
     }
 
     private int calcLabelCount(ChartAxisLimits chartAxisLimits, int stepSize, int maxLabels) {

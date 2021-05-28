@@ -161,5 +161,7 @@
     <string name="preferences_pricePerEgg_cent_default">50</string>
     <string name="preferences_key_username">username</string>
     <string name="preferences_username_default">default_user</string>
+    <string name="menu_chart_style">chart style</string>
+    <string name="content_description_chart_icon">chart icon</string>
 
 </resources>

@@ -16,24 +16,31 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentTransaction;
 import androidx.lifecycle.ViewModelProvider;
 
 import com.github.mikephil.charting.charts.Chart;
 import com.github.mikephil.charting.data.BarDataSet;
 import com.github.mikephil.charting.data.BarEntry;
+import com.github.mikephil.charting.data.BarLineScatterCandleBubbleDataSet;
 import com.github.mikephil.charting.data.ChartData;
 import com.github.mikephil.charting.data.Entry;
 import com.github.mikephil.charting.interfaces.datasets.IDataSet;
 import com.google.android.material.snackbar.Snackbar;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import mfdevelopement.eggmanager.DatabaseActions;
 import mfdevelopement.eggmanager.R;
 import mfdevelopement.eggmanager.activities.FilterActivity;
+import mfdevelopement.eggmanager.charts.ChartStyle;
 import mfdevelopement.eggmanager.charts.DataSetUtils;
 import mfdevelopement.eggmanager.charts.IGenericChart;
 import mfdevelopement.eggmanager.charts.MyBarChart;
+import mfdevelopement.eggmanager.charts.MyLineChart;
+import mfdevelopement.eggmanager.data_models.TextWithIconItem;
+import mfdevelopement.eggmanager.dialog_fragments.ChartStyleDialogFragment;
 import mfdevelopement.eggmanager.viewmodels.SharedViewModel;
 
 import static mfdevelopement.eggmanager.fragments.DatabaseFragment.EXTRA_REQUEST_CODE_NAME;
@@ -47,6 +54,8 @@ public class SoldEggsChartFragment extends Fragment {
 
     private IGenericChart genericChart;
     private View rootView;
+    private ViewGroup mainView;
+    private TextView txtv_title_extra;
 
     private int databaseEntryCount = 0;
 
@@ -67,14 +76,14 @@ public class SoldEggsChartFragment extends Fragment {
         // get references to GUI elements
         TextView txtv_title = rootView.findViewById(R.id.txtv_chart_title);
         txtv_title.setText(getString(R.string.txt_title_eggs_sold));
-        TextView txtv_title_extra = rootView.findViewById(R.id.txtv_chart_title_extra);
+        txtv_title_extra = rootView.findViewById(R.id.txtv_chart_title_extra);
         txtv_title_extra.setText("");
         txtv_title_extra.setVisibility(View.GONE);
 
         // Create the chart
-        ConstraintLayout constraintLayout = rootView.findViewById(R.id.main_chart_container);
+        mainView = rootView.findViewById(R.id.main_chart_container);
         MyBarChart barChart = new MyBarChart(this.getContext());
-        addChartView(constraintLayout, barChart, txtv_title_extra);
+        addChartView(mainView, barChart, txtv_title_extra);
         genericChart = barChart;
 
         // Change text size of the no-data text
@@ -129,15 +138,89 @@ public class SoldEggsChartFragment extends Fragment {
     @Override
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
 
-        if (item.getItemId() == R.id.action_charts_filter) {// Show the filter activity if there's some data in the database
-            if (databaseEntryCount > 0) {
-                openFilterActivity();
-            } else {
-                Snackbar.make(rootView.findViewById(R.id.main_chart_container), getString(R.string.snackbar_no_data_to_filter), Snackbar.LENGTH_SHORT).show();
-            }
+        if (databaseEntryCount <= 0) {
+            Snackbar.make(rootView.findViewById(R.id.main_chart_container), getString(R.string.snackbar_no_data_to_filter), Snackbar.LENGTH_SHORT).show();
+            return true;
+        }
+
+        if (item.getItemId() == R.id.menu_date_filter) {// Show the filter activity if there's some data in the database
+            openFilterActivity();
+            return true;
+        } else if (item.getItemId() == R.id.menu_charts_style) {
+            showChartStyleDialog();
+            return true;
         }
 
         return super.onOptionsItemSelected(item);
+    }
+
+    private void showChartStyleDialog() {
+        List<TextWithIconItem> items = new ArrayList<>();
+        List<ChartStyle> chartStyleList = new ArrayList<>();
+        items.add(new TextWithIconItem("bar chart", R.drawable.ic_baseline_bar_chart_24));
+        chartStyleList.add(ChartStyle.BAR);
+        items.add(new TextWithIconItem("line chart", R.drawable.ic_baseline_line_chart_24));
+        chartStyleList.add(ChartStyle.LINE);
+        ChartStyleDialogFragment fragment = new ChartStyleDialogFragment(items);
+
+        int initialPositionSelected = 0;
+        if (genericChart instanceof MyBarChart) {
+            initialPositionSelected = 0;
+        } else if (genericChart instanceof MyLineChart) {
+            initialPositionSelected = 1;
+        }
+        fragment.setItemSelected(initialPositionSelected);
+
+        int finalInitialPositionSelected = initialPositionSelected;
+        fragment.setOnItemClickListener((textWithIconItem, position) -> {
+            Log.d(LOG_TAG, "user clicked on item at position " + position);
+            fragment.setItemSelected(position);
+            fragment.dismiss();
+            if (position != finalInitialPositionSelected) {
+                changeChartStyle(chartStyleList.get(position));
+            }
+        });
+
+        // FragmentActivity.getSupportFragmentManager()
+        final String fragmentTag = "ChartStyleDialogFragment";
+        FragmentTransaction ft = getActivity().getSupportFragmentManager().beginTransaction();
+        Fragment prev = getActivity().getSupportFragmentManager().findFragmentByTag(fragmentTag);
+        if (prev != null) {
+            ft.remove(prev);
+        }
+        ft.addToBackStack(null);
+
+        // Create and show the dialog.
+        fragment.show(ft, fragmentTag);
+    }
+
+    private void removeChart() {
+        if (genericChart == null) return;
+        if (genericChart instanceof MyBarChart) {
+            mainView.removeView((MyBarChart) genericChart);
+        } else if (genericChart instanceof MyLineChart) {
+            mainView.removeView((MyLineChart) genericChart);
+        }
+    }
+
+    private <T extends Entry> void changeChartStyle(ChartStyle chartStyle) {
+        removeChart();
+
+        BarLineScatterCandleBubbleDataSet<T> dataSet = genericChart.getChartData();
+
+        if (chartStyle == ChartStyle.BAR) {
+            MyBarChart barChart = new MyBarChart(this.getContext());
+            addChartView(mainView, barChart, txtv_title_extra);
+            genericChart = barChart;
+        } else if (chartStyle == ChartStyle.LINE) {
+            MyLineChart lineChart = new MyLineChart(this.getContext());
+            addChartView(mainView, lineChart, txtv_title_extra);
+            genericChart = lineChart;
+        } else {
+            return;
+        }
+
+        //genericChart.setChartData(dataSet);
     }
 
     private void openFilterActivity() {

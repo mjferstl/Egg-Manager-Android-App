@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_marginTop="@dimen/small_padding"
+    android:layout_marginBottom="@dimen/small_padding"
+    android:background="?attr/selectableItemBackground"
+    android:clickable="true"
+    android:focusable="true"
+    android:orientation="horizontal"
+    android:paddingStart="@dimen/small_padding"
+    android:paddingEnd="@dimen/small_padding">
+
+    <ImageView
+        android:id="@+id/imgv_chart_style_icon"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:minWidth="48dp"
+        android:minHeight="48dp"
+        app:tint="@color/gray"
+        android:contentDescription="@string/content_description_chart_icon" />
+
+    <TextView
+        android:id="@+id/txtv_chart_style"
+        android:layout_width="0dp"
+        android:layout_weight="1"
+        android:layout_height="match_parent"
+        android:layout_marginStart="@dimen/large_padding"
+        android:gravity="start|center_vertical"
+        android:text="Bar chart"
+        android:textColor="@color/gray"
+        android:textSize="@dimen/textAppearanceButton"
+        android:textStyle="bold" />
+
+</LinearLayout>

@@ -130,7 +130,7 @@ public class CollectedEggsChartFragment extends Fragment {
     @Override
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
 
-        if (item.getItemId() == R.id.action_charts_filter) {// Show the filter activity if there's some data in the database
+        if (item.getItemId() == R.id.menu_date_filter) {// Show the filter activity if there's some data in the database
             if (databaseEntryCount > 0) {
                 openFilterActivity();
             } else {

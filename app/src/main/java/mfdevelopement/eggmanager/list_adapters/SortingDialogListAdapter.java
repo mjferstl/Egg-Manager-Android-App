@@ -16,7 +16,7 @@ import mfdevelopement.eggmanager.data_models.SortingItemCollection;
 
 public class SortingDialogListAdapter extends BaseAdapter {
 
-    private final String LOG_TAG = "SortingDialogListAdapte";
+    private static final String LOG_TAG = "SortingDialogListAdapte";
     private final List<SortingItem> sortingItemList;
 
     public SortingDialogListAdapter(SortingItemCollection list) {

@@ -58,10 +58,6 @@ public class SortingDialogFragment extends DialogFragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
-//        int width = (int) (getResources().getDisplayMetrics().widthPixels);
-//        if (getDialog() != null && getDialog().getWindow() != null)
-//            getDialog().getWindow().setLayout(width, ViewGroup.LayoutParams.WRAP_CONTENT);
     }
 
     @Override

@@ -1,7 +1,6 @@
 package mfdevelopement.eggmanager.fragments;
 
 
-import android.os.Bundle;
 import android.util.Log;
 
 import androidx.annotation.NonNull;
@@ -24,7 +23,6 @@ public class ChartFragmentStateAdapter extends FragmentStateAdapter {
         Log.d(LOG_TAG, "starting createFragment() for fragment at position " + position);
 
         Fragment fragment = new Fragment();
-        Bundle args = new Bundle();
 
         switch (position) {
             case 0:

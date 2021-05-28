@@ -26,7 +26,7 @@ import mfdevelopement.eggmanager.database.EggManagerRepository;
 public class SharedViewModel extends AndroidViewModel {
 
     // String for assignment when printing out logs
-    private final String LOG_TAG = "DatabaseActivityViewMod";
+    private final String LOG_TAG = "SharedViewModel";
 
     // Repository
     private final EggManagerRepository mRepository;
@@ -200,7 +200,7 @@ public class SharedViewModel extends AndroidViewModel {
         for (int i=0; i<firstDayOfTheMonths.size(); i++) {
             long days_iterator = getDifferenceInMonths(firstDayOfTheMonths.get(i).getTimeInMillis(),referenceDate.getTimeInMillis())+1;
             entries.add(new BarEntry((float)days_iterator, soldEggs.get(i)));
-            Log.d(LOG_TAG,"BarEntry: sold eggs = " + soldEggs.get(i));
+            //Log.d(LOG_TAG,"BarEntry: sold eggs = " + soldEggs.get(i));
         }
         return entries;
     }
