@@ -1,18 +1,19 @@
 package mfdevelopement.eggmanager.charts;
 
-import com.github.mikephil.charting.data.BarLineScatterCandleBubbleDataSet;
 import com.github.mikephil.charting.data.Entry;
+import com.github.mikephil.charting.formatter.ValueFormatter;
+import com.github.mikephil.charting.interfaces.datasets.IDataSet;
 
-public interface IGenericChart<T extends Entry> {
+public interface IGenericChart {
 
     /**
      * Set the data, which should be displayed in the chart
      *
      * @param dataSet DataSet which contains the data to be displayed
      */
-    void setChartData(BarLineScatterCandleBubbleDataSet<T> dataSet);
+    <T extends Entry> void setChartData(IDataSet<T> dataSet);
 
-    BarLineScatterCandleBubbleDataSet<T> getChartData();
+    <T extends Entry> IDataSet<T> getChartData();
 
     /**
      * Hide the Chart
@@ -23,4 +24,6 @@ public interface IGenericChart<T extends Entry> {
      * Make the chart visible
      */
     void showChart();
+
+    void setXAxisValueFormatter(ValueFormatter valueFormatter);
 }

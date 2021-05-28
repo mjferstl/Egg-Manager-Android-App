@@ -3,9 +3,7 @@ package mfdevelopement.eggmanager.charts;
 import android.content.Context;
 import android.util.AttributeSet;
 
-import com.github.mikephil.charting.data.Entry;
-
-public class MyLineChart<T extends Entry> extends MyGenericLineChart<T> {
+public class MyLineChart extends MyGenericLineChart {
 
     public MyLineChart(Context context) {
         super(context);

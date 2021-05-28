@@ -8,7 +8,6 @@ import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.Transformations;
 
-import com.github.mikephil.charting.data.BarEntry;
 import com.github.mikephil.charting.data.Entry;
 
 import java.util.ArrayList;
@@ -170,9 +169,9 @@ public class SharedViewModel extends AndroidViewModel {
         return entries;
     }
 
-    public List<BarEntry> getDataEggsSold(List<DailyBalance> dailyBalanceList) {
+    public List<Entry> getDataEggsSold(List<DailyBalance> dailyBalanceList) {
 
-        List<BarEntry> entries = new ArrayList<>();
+        List<Entry> entries = new ArrayList<>();
 
         List<Integer> soldEggs = new ArrayList<>();
         List<String> uniqueDateKeys = new ArrayList<>();
@@ -199,7 +198,7 @@ public class SharedViewModel extends AndroidViewModel {
 
         for (int i=0; i<firstDayOfTheMonths.size(); i++) {
             long days_iterator = getDifferenceInMonths(firstDayOfTheMonths.get(i).getTimeInMillis(),referenceDate.getTimeInMillis())+1;
-            entries.add(new BarEntry((float)days_iterator, soldEggs.get(i)));
+            entries.add(new Entry((float) days_iterator, soldEggs.get(i)));
             //Log.d(LOG_TAG,"BarEntry: sold eggs = " + soldEggs.get(i));
         }
         return entries;

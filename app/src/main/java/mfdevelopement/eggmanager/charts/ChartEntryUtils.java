@@ -14,7 +14,7 @@ public class ChartEntryUtils {
     private ChartEntryUtils() {
     }
 
-    public static ChartAxisLimits getChartDataLimits(@NonNull List<Entry> entryList) {
+    public static <T extends Entry> ChartAxisLimits getChartDataLimits(@NonNull List<T> entryList) {
         List<Float> xValues = getXValues(entryList);
         List<Float> yValues = getYValues(entryList);
         float xMin = getMin(xValues);
@@ -24,14 +24,14 @@ public class ChartEntryUtils {
         return new ChartAxisLimits(xMin, xMax, yMin, yMax);
     }
 
-    private static List<Float> getXValues(@NonNull List<Entry> entryList) {
+    private static <T extends Entry> List<Float> getXValues(@NonNull List<T> entryList) {
         List<Float> xValues = new ArrayList<>();
         for (Entry entry : entryList)
             xValues.add(entry.getX());
         return xValues;
     }
 
-    private static List<Float> getYValues(@NonNull List<Entry> entryList) {
+    private static <T extends Entry> List<Float> getYValues(@NonNull List<T> entryList) {
         List<Float> yValues = new ArrayList<>();
         for (Entry entry : entryList)
             yValues.add(entry.getY());

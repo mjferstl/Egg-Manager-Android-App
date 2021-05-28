@@ -21,10 +21,9 @@ import androidx.lifecycle.ViewModelProvider;
 
 import com.github.mikephil.charting.charts.Chart;
 import com.github.mikephil.charting.data.BarDataSet;
-import com.github.mikephil.charting.data.BarEntry;
-import com.github.mikephil.charting.data.BarLineScatterCandleBubbleDataSet;
 import com.github.mikephil.charting.data.ChartData;
 import com.github.mikephil.charting.data.Entry;
+import com.github.mikephil.charting.data.LineDataSet;
 import com.github.mikephil.charting.interfaces.datasets.IDataSet;
 import com.google.android.material.snackbar.Snackbar;
 
@@ -39,6 +38,8 @@ import mfdevelopement.eggmanager.charts.DataSetUtils;
 import mfdevelopement.eggmanager.charts.IGenericChart;
 import mfdevelopement.eggmanager.charts.MyBarChart;
 import mfdevelopement.eggmanager.charts.MyLineChart;
+import mfdevelopement.eggmanager.charts.axis_formatters.AxisDateFormat;
+import mfdevelopement.eggmanager.charts.axis_formatters.ChartAxisFormatterFactory;
 import mfdevelopement.eggmanager.data_models.TextWithIconItem;
 import mfdevelopement.eggmanager.dialog_fragments.ChartStyleDialogFragment;
 import mfdevelopement.eggmanager.viewmodels.SharedViewModel;
@@ -204,22 +205,28 @@ public class SoldEggsChartFragment extends Fragment {
     }
 
     private <T extends Entry> void changeChartStyle(ChartStyle chartStyle) {
+        // remove the current chart
         removeChart();
 
-        BarLineScatterCandleBubbleDataSet<T> dataSet = genericChart.getChartData();
+        IDataSet<Entry> dataSet = genericChart.getChartData();
 
         if (chartStyle == ChartStyle.BAR) {
             MyBarChart barChart = new MyBarChart(this.getContext());
             addChartView(mainView, barChart, txtv_title_extra);
             genericChart = barChart;
+            BarDataSet barDataSet = DataSetUtils.convertToBarDataSet(this.getContext(), dataSet);
+            genericChart.setChartData(barDataSet);
         } else if (chartStyle == ChartStyle.LINE) {
             MyLineChart lineChart = new MyLineChart(this.getContext());
             addChartView(mainView, lineChart, txtv_title_extra);
             genericChart = lineChart;
+            LineDataSet lineDataSet = DataSetUtils.convertToLineDataSet(this.getContext(), dataSet);
+            genericChart.setChartData(lineDataSet);
         } else {
             return;
         }
 
+        genericChart.setXAxisValueFormatter(ChartAxisFormatterFactory.getInstance(AxisDateFormat.MONTH_YEAR));
         //genericChart.setChartData(dataSet);
     }
 
@@ -253,7 +260,7 @@ public class SoldEggsChartFragment extends Fragment {
 
                 if (dailyBalanceList != null && !dailyBalanceList.isEmpty()) {
 
-                    List<BarEntry> entries = viewModel.getDataEggsSold(dailyBalanceList);
+                    List<Entry> entries = viewModel.getDataEggsSold(dailyBalanceList);
 
                     // create a new BarDataSet containing the received data
                     BarDataSet barDataSet = DataSetUtils.createBarDataSet(this.getContext(), entries, getString(R.string.txt_title_eggs_sold));

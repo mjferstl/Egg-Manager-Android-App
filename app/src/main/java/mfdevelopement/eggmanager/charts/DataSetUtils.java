@@ -8,10 +8,12 @@ import androidx.core.content.ContextCompat;
 import com.github.mikephil.charting.data.BarData;
 import com.github.mikephil.charting.data.BarDataSet;
 import com.github.mikephil.charting.data.BarEntry;
-import com.github.mikephil.charting.data.DataSet;
 import com.github.mikephil.charting.data.Entry;
 import com.github.mikephil.charting.data.LineData;
 import com.github.mikephil.charting.data.LineDataSet;
+import com.github.mikephil.charting.interfaces.datasets.IBarDataSet;
+import com.github.mikephil.charting.interfaces.datasets.IDataSet;
+import com.github.mikephil.charting.interfaces.datasets.ILineDataSet;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -25,25 +27,33 @@ public class DataSetUtils {
     private static final int TEXT_SIZE = 12;
     private static final int DATA_LINE_WIDTH = 3;
 
-    public static <T extends Entry> List<Entry> getEntriesOfDataSet(DataSet<T> dataSet) {
-        List<Entry> entries = new ArrayList<>();
+    public static <T extends Entry> List<T> getEntriesOfDataSet(IDataSet<T> dataSet) {
+        List<T> entries = new ArrayList<>();
         for (int i = 0; i < dataSet.getEntryCount(); i++)
             entries.add(dataSet.getEntryForIndex(i));
         return entries;
     }
 
-    public static LineData createLineData(LineDataSet lineDataSet) {
+    public static LineData createLineData(ILineDataSet lineDataSet) {
         // line data - containing all data for a chart
         LineData lineData = new LineData();
         lineData.addDataSet(lineDataSet);
         return lineData;
     }
 
-    public static BarData createBarData(BarDataSet barDataSet) {
+    public static BarData createBarData(IBarDataSet barDataSet) {
         // bar data - containing all data for a chart
         BarData barData = new BarData();
         barData.addDataSet(barDataSet);
         return barData;
+    }
+
+    public static LineDataSet convertToLineDataSet(Context context, IDataSet<Entry> dataSet) {
+        return DataSetUtils.createLineDataSet(context, DataSetUtils.getEntriesOfDataSet(dataSet), dataSet.getLabel());
+    }
+
+    public static BarDataSet convertToBarDataSet(Context context, IDataSet<Entry> dataSet) {
+        return DataSetUtils.createBarDataSet(context, DataSetUtils.getEntriesOfDataSet(dataSet), dataSet.getLabel());
     }
 
     public static LineDataSet createLineDataSet(Context context, List<Entry> entries, String dataSetName) {
@@ -65,8 +75,12 @@ public class DataSetUtils {
         return dataSet;
     }
 
-    public static BarDataSet createBarDataSet(Context context, List<BarEntry> entries, String dataSetName) {
-        BarDataSet dataSet = new BarDataSet(entries, dataSetName);
+    public static BarDataSet createBarDataSet(Context context, List<Entry> entries, String dataSetName) {
+        List<BarEntry> barEntries = new ArrayList<>();
+        for (Entry entry : entries) {
+            barEntries.add(new BarEntry(entry.getX(), entry.getY()));
+        }
+        BarDataSet dataSet = new BarDataSet(barEntries, dataSetName);
 
         if (context == null) {
             Log.e(LOG_TAG, "createBarDataSet: context is null");
@@ -76,7 +90,7 @@ public class DataSetUtils {
         dataSet.setColor(ContextCompat.getColor(context, R.color.colorAccent));
         dataSet.setValueTextColor(ContextCompat.getColor(context, R.color.main_text_color));
         dataSet.setValueTextSize(TEXT_SIZE);            // text size of the text for each data point
-        dataSet.setDrawValues(entries.size() <= 5);     // do not show the value of each data point for large data
+        dataSet.setDrawValues(barEntries.size() <= 5);     // do not show the value of each data point for large data
         return dataSet;
     }
 }

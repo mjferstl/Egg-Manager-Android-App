@@ -4,9 +4,9 @@ import com.github.mikephil.charting.charts.BarLineChartBase;
 import com.github.mikephil.charting.components.XAxis;
 import com.github.mikephil.charting.components.YAxis;
 import com.github.mikephil.charting.data.BarLineScatterCandleBubbleData;
-import com.github.mikephil.charting.data.BarLineScatterCandleBubbleDataSet;
 import com.github.mikephil.charting.data.Entry;
 import com.github.mikephil.charting.interfaces.datasets.IBarLineScatterCandleBubbleDataSet;
+import com.github.mikephil.charting.interfaces.datasets.IDataSet;
 
 import java.util.List;
 
@@ -51,8 +51,8 @@ public class ChartUtils {
         yAxis.setDrawGridLinesBehindData(true);
     }
 
-    public static <T extends Entry> ChartAxisLimits calcAxisLimits(BarLineScatterCandleBubbleDataSet<T> dataSet) {
-        List<Entry> entriesList = DataSetUtils.getEntriesOfDataSet(dataSet);
+    public static <T extends Entry> ChartAxisLimits calcAxisLimits(IDataSet<T> dataSet) {
+        List<T> entriesList = DataSetUtils.getEntriesOfDataSet(dataSet);
 
         ChartAxisLimits axisLimits = ChartEntryUtils.getChartDataLimits(entriesList);
 

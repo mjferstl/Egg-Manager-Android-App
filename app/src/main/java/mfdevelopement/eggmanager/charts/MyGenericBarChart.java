@@ -9,18 +9,24 @@ import androidx.core.content.ContextCompat;
 import com.github.mikephil.charting.charts.BarChart;
 import com.github.mikephil.charting.components.XAxis;
 import com.github.mikephil.charting.data.BarDataSet;
-import com.github.mikephil.charting.data.BarLineScatterCandleBubbleDataSet;
+import com.github.mikephil.charting.data.BarEntry;
 import com.github.mikephil.charting.data.Entry;
+import com.github.mikephil.charting.formatter.ValueFormatter;
+import com.github.mikephil.charting.interfaces.datasets.IDataSet;
+
+import java.util.ArrayList;
+import java.util.List;
 
 import mfdevelopement.eggmanager.R;
 import mfdevelopement.eggmanager.charts.axis_formatters.AxisDateFormat;
 import mfdevelopement.eggmanager.charts.axis_formatters.ChartAxisFormatterFactory;
 import mfdevelopement.eggmanager.data_models.ChartAxisLimits;
 
-public abstract class MyGenericBarChart<T extends Entry> extends BarChart implements IGenericChart<T> {
+public abstract class MyGenericBarChart extends BarChart implements IGenericChart {
 
     private int maxYLabelCount = 8;
-    private BarLineScatterCandleBubbleDataSet<T> dataSet;
+    private IDataSet<Entry> dataSet;
+    private ValueFormatter xAxisValueFormatter = ChartAxisFormatterFactory.getInstance(AxisDateFormat.MONTH_YEAR);
 
     public MyGenericBarChart(Context context) {
         super(context);
@@ -42,8 +48,9 @@ public abstract class MyGenericBarChart<T extends Entry> extends BarChart implem
         this.getAxisLeft().setTextColor(ContextCompat.getColor(this.getContext(), R.color.main_text_color));
     }
 
-    public void setChartData(BarLineScatterCandleBubbleDataSet<T> dataSet) {
-        this.dataSet = dataSet;
+    public <T extends Entry> void setChartData(IDataSet<T> dataSet) {
+
+        this.dataSet = (IDataSet<Entry>) dataSet;
 
         // modify both axes
         ChartAxisLimits axisLimits = ChartUtils.calcAxisLimits(dataSet);
@@ -55,15 +62,21 @@ public abstract class MyGenericBarChart<T extends Entry> extends BarChart implem
         this.setChartAxisLimits(axisLimits);
 
         // add line data to the chart
-        this.setData(DataSetUtils.createBarData((BarDataSet) dataSet));
+        List<BarEntry> barEntries = new ArrayList<>();
+        for (int i = 0; i < dataSet.getEntryCount(); i++) {
+            Entry e = dataSet.getEntryForIndex(i);
+            barEntries.add(new BarEntry(e.getX(), e.getY()));
+        }
+        BarDataSet barDataSet = new BarDataSet(barEntries, dataSet.getLabel());
+        this.setData(DataSetUtils.createBarData(barDataSet));
 
         // refresh the chart
         this.invalidate();
     }
 
     @Override
-    public BarLineScatterCandleBubbleDataSet<T> getChartData() {
-        return this.dataSet;
+    public <T extends Entry> IDataSet<T> getChartData() {
+        return (IDataSet<T>) this.dataSet;
     }
 
     private int calcLabelCount(ChartAxisLimits chartAxisLimits, int stepSize, int maxLabels) {
@@ -92,7 +105,7 @@ public abstract class MyGenericBarChart<T extends Entry> extends BarChart implem
         this.getXAxis().setPosition(XAxis.XAxisPosition.BOTTOM);  // axis at the bottom of the diagram
 
         // set the format for the dates on the x axis
-        this.getXAxis().setValueFormatter(ChartAxisFormatterFactory.getInstance(AxisDateFormat.MONTH_YEAR));
+        this.getXAxis().setValueFormatter(xAxisValueFormatter);
     }
 
     public void hideChart() {
@@ -109,5 +122,10 @@ public abstract class MyGenericBarChart<T extends Entry> extends BarChart implem
 
     public void setMaxYLabelCount(int maxYLabelCount) {
         this.maxYLabelCount = maxYLabelCount;
+    }
+
+    public void setXAxisValueFormatter(ValueFormatter valueFormatter) {
+        this.xAxisValueFormatter = valueFormatter;
+        this.getXAxis().setValueFormatter(valueFormatter);
     }
 }

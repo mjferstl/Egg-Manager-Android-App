@@ -8,19 +8,21 @@ import androidx.core.content.ContextCompat;
 
 import com.github.mikephil.charting.charts.LineChart;
 import com.github.mikephil.charting.components.XAxis;
-import com.github.mikephil.charting.data.BarLineScatterCandleBubbleDataSet;
 import com.github.mikephil.charting.data.Entry;
 import com.github.mikephil.charting.data.LineDataSet;
+import com.github.mikephil.charting.formatter.ValueFormatter;
+import com.github.mikephil.charting.interfaces.datasets.IDataSet;
 
 import mfdevelopement.eggmanager.R;
 import mfdevelopement.eggmanager.charts.axis_formatters.AxisDateFormat;
 import mfdevelopement.eggmanager.charts.axis_formatters.ChartAxisFormatterFactory;
 import mfdevelopement.eggmanager.data_models.ChartAxisLimits;
 
-public abstract class MyGenericLineChart<T extends Entry> extends LineChart implements IGenericChart<T> {
+public abstract class MyGenericLineChart extends LineChart implements IGenericChart {
 
     private int maxYLabelCount = 8;
-    private BarLineScatterCandleBubbleDataSet<T> dataSet;
+    private IDataSet<Entry> dataSet;
+    private ValueFormatter xAxisValueFormatter = ChartAxisFormatterFactory.getInstance(AxisDateFormat.DAY_MONTH_YEAR);
 
     public MyGenericLineChart(Context context) {
         super(context);
@@ -42,8 +44,10 @@ public abstract class MyGenericLineChart<T extends Entry> extends LineChart impl
         this.getAxisLeft().setTextColor(ContextCompat.getColor(this.getContext(), R.color.main_text_color));
     }
 
-    public void setChartData(BarLineScatterCandleBubbleDataSet<T> dataSet) {
-        this.dataSet = dataSet;
+    public <T extends Entry> void setChartData(IDataSet<T> dataSet) {
+
+        this.dataSet = (IDataSet<Entry>) dataSet;
+
         // modify both axes
         ChartAxisLimits axisLimits = ChartUtils.calcAxisLimits(dataSet);
 
@@ -61,7 +65,7 @@ public abstract class MyGenericLineChart<T extends Entry> extends LineChart impl
     }
 
     @Override
-    public BarLineScatterCandleBubbleDataSet<T> getChartData() {
+    public IDataSet<Entry> getChartData() {
         return this.dataSet;
     }
 
@@ -91,7 +95,7 @@ public abstract class MyGenericLineChart<T extends Entry> extends LineChart impl
         this.getXAxis().setPosition(XAxis.XAxisPosition.BOTTOM);  // axis at the bottom of the diagram
 
         // set the format for the dates on the x axis
-        this.getXAxis().setValueFormatter(ChartAxisFormatterFactory.getInstance(AxisDateFormat.DAY_MONTH_YEAR));
+        this.getXAxis().setValueFormatter(xAxisValueFormatter);
     }
 
     public void hideChart() {
@@ -108,5 +112,10 @@ public abstract class MyGenericLineChart<T extends Entry> extends LineChart impl
 
     public void setMaxYLabelCount(int maxYLabelCount) {
         this.maxYLabelCount = maxYLabelCount;
+    }
+
+    public void setXAxisValueFormatter(ValueFormatter valueFormatter) {
+        this.xAxisValueFormatter = valueFormatter;
+        this.getXAxis().setValueFormatter(valueFormatter);
     }
 }

@@ -3,9 +3,7 @@ package mfdevelopement.eggmanager.charts;
 import android.content.Context;
 import android.util.AttributeSet;
 
-import com.github.mikephil.charting.data.Entry;
-
-public class MyBarChart<T extends Entry> extends MyGenericBarChart<T> {
+public class MyBarChart extends MyGenericBarChart {
     public MyBarChart(Context context) {
         super(context);
         initChart();
