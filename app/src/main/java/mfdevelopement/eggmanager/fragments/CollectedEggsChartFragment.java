@@ -1,5 +1,6 @@
 package mfdevelopement.eggmanager.fragments;
 
+import android.content.Context;
 import android.content.Intent;
 import android.graphics.Paint;
 import android.os.Bundle;
@@ -12,6 +13,9 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
+import androidx.activity.result.ActivityResultCallback;
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContract;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.constraintlayout.widget.ConstraintLayout;
@@ -42,11 +46,38 @@ public class CollectedEggsChartFragment extends Fragment {
 
     private static final String LOG_TAG = "CollectedEggsChartFragm";
 
-    private SharedViewModel viewModel;
+    private final ActivityResultContract<Integer, Integer> mContract = new ActivityResultContract<Integer, Integer>() {
+        @NonNull
+        @Override
+        public Intent createIntent(@NonNull Context context, Integer input) {
+            Intent intent = new Intent(getContext(), FilterActivity.class);
+            intent.putExtra(EXTRA_REQUEST_CODE_NAME, DatabaseActions.Request.EDIT_FILTER.ordinal());
+            return intent;
+        }
 
+        @Override
+        public Integer parseResult(int resultCode, @Nullable Intent intent) {
+            Log.d(LOG_TAG, "parseResult(): resultCode = " + resultCode);
+            // handle the return value from the FilterActivity
+            handleFilterActivityResult(resultCode, intent);
+            return resultCode;
+        }
+    };
+    private SharedViewModel viewModel;
+    private final ActivityResultLauncher<Integer> mGetContent = registerForActivityResult(mContract,
+            new ActivityResultCallback<Integer>() {
+                @Override
+                public void onActivityResult(Integer resultCode) {
+                    Log.d(LOG_TAG, "registerForActivityResult(): resultCode = " + resultCode);
+
+                    if (resultCode == DatabaseActions.Result.FILTER_OK.ordinal()) {
+                        // update the new filter string in the view model
+                        viewModel.setDateFilter(viewModel.loadDateFilter());
+                    }
+                }
+            });
     private IGenericChart genericChart;
     private View rootView;
-
     private int databaseEntryCount = 0;
 
     public View onCreateView(@NonNull LayoutInflater inflater,
@@ -120,7 +151,6 @@ public class CollectedEggsChartFragment extends Fragment {
         viewModel.setDateFilter(viewModel.loadDateFilter());
     }
 
-
     @Override
     public void onCreateOptionsMenu(@NonNull Menu menu, @NonNull MenuInflater inflater) {
         inflater.inflate(R.menu.menu_charts, menu);
@@ -142,25 +172,7 @@ public class CollectedEggsChartFragment extends Fragment {
     }
 
     private void openFilterActivity() {
-        Intent intent = new Intent(getContext(), FilterActivity.class);
-        intent.putExtra(EXTRA_REQUEST_CODE_NAME, DatabaseActions.Request.EDIT_FILTER.ordinal());
-        startActivityForResult(intent, DatabaseActions.Request.EDIT_FILTER.ordinal());
-    }
-
-    @Override
-    public void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
-
-        if (requestCode == DatabaseActions.Request.EDIT_FILTER.ordinal()) {
-
-            // handle the return value from the FilterActivity
-            handleFilterActivityResult(resultCode, data);
-
-            if (resultCode == DatabaseActions.Result.FILTER_OK.ordinal()) {
-                // update the new filter string in the view model
-                viewModel.setDateFilter(viewModel.loadDateFilter());
-            }
-        }
+        mGetContent.launch(DatabaseActions.Request.EDIT_FILTER.ordinal());
     }
 
     private void initObservers() {
@@ -179,7 +191,7 @@ public class CollectedEggsChartFragment extends Fragment {
                     genericChart.showChart();
 
                     // update the content of the chart
-                    genericChart.setChartData(lineDataSet);
+                    genericChart.setChartData(this.getContext(), lineDataSet);
 
                 } else {
                     // Hide the charts as there's nothing to show in the chart

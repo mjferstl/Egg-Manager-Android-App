@@ -11,9 +11,7 @@ import com.github.mikephil.charting.data.BarEntry;
 import com.github.mikephil.charting.data.Entry;
 import com.github.mikephil.charting.data.LineData;
 import com.github.mikephil.charting.data.LineDataSet;
-import com.github.mikephil.charting.interfaces.datasets.IBarDataSet;
 import com.github.mikephil.charting.interfaces.datasets.IDataSet;
-import com.github.mikephil.charting.interfaces.datasets.ILineDataSet;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -34,14 +32,20 @@ public class DataSetUtils {
         return entries;
     }
 
-    public static LineData createLineData(ILineDataSet lineDataSet) {
+    public static <T extends Entry> LineData createLineData(Context context, IDataSet<T> dataSet) {
+
+        LineDataSet lineDataSet = DataSetUtils.createLineDataSet(context, (List<Entry>) DataSetUtils.getEntriesOfDataSet(dataSet), dataSet.getLabel());
+
         // line data - containing all data for a chart
         LineData lineData = new LineData();
         lineData.addDataSet(lineDataSet);
         return lineData;
     }
 
-    public static BarData createBarData(IBarDataSet barDataSet) {
+    public static <T extends Entry> BarData createBarData(Context context, IDataSet<T> dataSet) {
+
+        BarDataSet barDataSet = DataSetUtils.createBarDataSet(context, (List<Entry>) DataSetUtils.getEntriesOfDataSet(dataSet), dataSet.getLabel());
+
         // bar data - containing all data for a chart
         BarData barData = new BarData();
         barData.addDataSet(barDataSet);
@@ -61,8 +65,9 @@ public class DataSetUtils {
 
         // sometimes there is no context and the resources cannot be fetched
         // but then a NullPointerException is thrown
-        if (context != null) {
+        if (context == null) {
             Log.e(LOG_TAG, "createLineDataSet: context is null");
+        } else {
             dataSet.setColor(ContextCompat.getColor(context, R.color.colorPrimary));
             dataSet.setValueTextColor(ContextCompat.getColor(context, R.color.main_text_color));
         }
@@ -84,10 +89,10 @@ public class DataSetUtils {
 
         if (context == null) {
             Log.e(LOG_TAG, "createBarDataSet: context is null");
-            return null;
+            //return null;
         }
 
-        dataSet.setColor(ContextCompat.getColor(context, R.color.colorAccent));
+        dataSet.setColor(ContextCompat.getColor(context, R.color.colorPrimary));
         dataSet.setValueTextColor(ContextCompat.getColor(context, R.color.main_text_color));
         dataSet.setValueTextSize(TEXT_SIZE);            // text size of the text for each data point
         dataSet.setDrawValues(barEntries.size() <= 5);     // do not show the value of each data point for large data

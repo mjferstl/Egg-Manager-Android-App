@@ -1,8 +1,10 @@
 package mfdevelopement.eggmanager.charts;
 
+import android.content.Context;
+
+import com.github.mikephil.charting.data.BaseDataSet;
 import com.github.mikephil.charting.data.Entry;
 import com.github.mikephil.charting.formatter.ValueFormatter;
-import com.github.mikephil.charting.interfaces.datasets.IDataSet;
 
 public interface IGenericChart {
 
@@ -11,9 +13,9 @@ public interface IGenericChart {
      *
      * @param dataSet DataSet which contains the data to be displayed
      */
-    <T extends Entry> void setChartData(IDataSet<T> dataSet);
+    <T extends Entry> void setChartData(Context context, BaseDataSet<T> dataSet);
 
-    <T extends Entry> IDataSet<T> getChartData();
+    <T extends Entry> BaseDataSet<T> getChartData();
 
     /**
      * Hide the Chart

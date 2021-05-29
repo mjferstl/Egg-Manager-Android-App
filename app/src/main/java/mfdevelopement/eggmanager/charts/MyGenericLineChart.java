@@ -8,10 +8,9 @@ import androidx.core.content.ContextCompat;
 
 import com.github.mikephil.charting.charts.LineChart;
 import com.github.mikephil.charting.components.XAxis;
+import com.github.mikephil.charting.data.BaseDataSet;
 import com.github.mikephil.charting.data.Entry;
-import com.github.mikephil.charting.data.LineDataSet;
 import com.github.mikephil.charting.formatter.ValueFormatter;
-import com.github.mikephil.charting.interfaces.datasets.IDataSet;
 
 import mfdevelopement.eggmanager.R;
 import mfdevelopement.eggmanager.charts.axis_formatters.AxisDateFormat;
@@ -21,7 +20,7 @@ import mfdevelopement.eggmanager.data_models.ChartAxisLimits;
 public abstract class MyGenericLineChart extends LineChart implements IGenericChart {
 
     private int maxYLabelCount = 8;
-    private IDataSet<Entry> dataSet;
+    private BaseDataSet<Entry> dataSet;
     private ValueFormatter xAxisValueFormatter = ChartAxisFormatterFactory.getInstance(AxisDateFormat.DAY_MONTH_YEAR);
 
     public MyGenericLineChart(Context context) {
@@ -44,9 +43,10 @@ public abstract class MyGenericLineChart extends LineChart implements IGenericCh
         this.getAxisLeft().setTextColor(ContextCompat.getColor(this.getContext(), R.color.main_text_color));
     }
 
-    public <T extends Entry> void setChartData(IDataSet<T> dataSet) {
+    @Override
+    public <T extends Entry> void setChartData(Context context, BaseDataSet<T> dataSet) {
 
-        this.dataSet = (IDataSet<Entry>) dataSet;
+        this.dataSet = (BaseDataSet<Entry>) dataSet;
 
         // modify both axes
         ChartAxisLimits axisLimits = ChartUtils.calcAxisLimits(dataSet);
@@ -58,15 +58,15 @@ public abstract class MyGenericLineChart extends LineChart implements IGenericCh
         this.setChartAxisLimits(axisLimits);
 
         // add line data to the chart
-        this.setData(DataSetUtils.createLineData((LineDataSet) dataSet));
+        this.setData(DataSetUtils.createLineData(this.getContext(), dataSet));
 
         // refresh the chart
         this.invalidate();
     }
 
     @Override
-    public IDataSet<Entry> getChartData() {
-        return this.dataSet;
+    public <T extends Entry> BaseDataSet<T> getChartData() {
+        return (BaseDataSet<T>) this.dataSet;
     }
 
     private int calcLabelCount(ChartAxisLimits chartAxisLimits, int stepSize, int maxLabels) {

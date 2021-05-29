@@ -72,6 +72,11 @@
     <string name="tab_name_collected">abgenommen</string>
     <string name="tab_name_sold">verkauft</string>
     <string name="chart_no_data_text">Keine Daten vorhanden</string>
+    <string name="menu_chart_style">Diagramm Typ</string>
+    <string name="content_description_chart_icon">chart icon</string>
+    <string name="dialog_title_chart_style">@string/menu_chart_style</string>
+    <string name="chart_style_bar">Balkendiagramm</string>
+    <string name="chart_style_line">Liniendiagramm</string>
 
     <!-- dialogs -->
     <!-- sorting dialog -->
@@ -161,8 +166,5 @@
     <string name="preferences_pricePerEgg_cent_default">50</string>
     <string name="preferences_key_username">username</string>
     <string name="preferences_username_default">default_user</string>
-    <string name="menu_chart_style">chart style</string>
-    <string name="content_description_chart_icon">chart icon</string>
-    <string name="dialog_title_chart_style">Diagramm Typ</string>
 
 </resources>

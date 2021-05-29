@@ -158,9 +158,9 @@ public class SoldEggsChartFragment extends Fragment {
     private void showChartStyleDialog() {
         List<TextWithIconItem> items = new ArrayList<>();
         List<ChartStyle> chartStyleList = new ArrayList<>();
-        items.add(new TextWithIconItem("bar chart", R.drawable.ic_baseline_bar_chart_24));
+        items.add(new TextWithIconItem(getString(R.string.chart_style_bar), R.drawable.ic_baseline_bar_chart_24));
         chartStyleList.add(ChartStyle.BAR);
-        items.add(new TextWithIconItem("line chart", R.drawable.ic_baseline_line_chart_24));
+        items.add(new TextWithIconItem(getString(R.string.chart_style_line), R.drawable.ic_baseline_line_chart_24));
         chartStyleList.add(ChartStyle.LINE);
         ChartStyleDialogFragment fragment = new ChartStyleDialogFragment(items);
 
@@ -215,13 +215,13 @@ public class SoldEggsChartFragment extends Fragment {
             addChartView(mainView, barChart, txtv_title_extra);
             genericChart = barChart;
             BarDataSet barDataSet = DataSetUtils.convertToBarDataSet(this.getContext(), dataSet);
-            genericChart.setChartData(barDataSet);
+            genericChart.setChartData(this.getContext(), barDataSet);
         } else if (chartStyle == ChartStyle.LINE) {
             MyLineChart lineChart = new MyLineChart(this.getContext());
             addChartView(mainView, lineChart, txtv_title_extra);
             genericChart = lineChart;
             LineDataSet lineDataSet = DataSetUtils.convertToLineDataSet(this.getContext(), dataSet);
-            genericChart.setChartData(lineDataSet);
+            genericChart.setChartData(this.getContext(), lineDataSet);
         } else {
             return;
         }
@@ -254,7 +254,7 @@ public class SoldEggsChartFragment extends Fragment {
 
     private void initObservers() {
         if (getActivity() == null)
-            Log.e(LOG_TAG, "initObservers(): observers cannot be initialized, because getActivity = null");
+            Log.e(LOG_TAG, "initObservers(): observers cannot be initialized, because getActivity() returned null");
         else {
             viewModel.getFilteredDailyBalance().observe(getActivity(), dailyBalanceList -> {
 
@@ -269,9 +269,10 @@ public class SoldEggsChartFragment extends Fragment {
                     genericChart.showChart();
 
                     // update the content of the chart
-                    genericChart.setChartData(barDataSet);
-
+                    barDataSet.setColor(getResources().getColor(R.color.colorPrimary));
+                    genericChart.setChartData(this.getContext(), barDataSet);
                 } else {
+                    Log.d(LOG_TAG, "initObservers(): The received daily balance list is null or empty");
                     // Hide the charts as there's nothing to show in the chart
                     genericChart.hideChart();
                 }

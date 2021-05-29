@@ -11,6 +11,8 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.content.res.AppCompatResources;
 import androidx.core.content.ContextCompat;
 
+import com.google.android.material.radiobutton.MaterialRadioButton;
+
 import java.util.List;
 
 import mfdevelopement.eggmanager.R;
@@ -61,6 +63,10 @@ public class ChartStyleListAdapter extends BaseAdapter {
 
         TextWithIconItem item = getItem(position);
 
+        MaterialRadioButton radioButton = view.findViewById(R.id.radio_chart_style);
+        radioButton.setChecked(position == positionSelected);
+        radioButton.setOnClickListener(v -> handleClick(item, position));
+
         ImageView imageView = view.findViewById(R.id.imgv_chart_style_icon);
         imageView.setImageDrawable(AppCompatResources.getDrawable(parent.getContext(), item.getImageId()));
         imageView.setColorFilter(ContextCompat.getColor(parent.getContext(), R.color.gray));
@@ -69,18 +75,20 @@ public class ChartStyleListAdapter extends BaseAdapter {
         textView.setText(item.getName());
         textView.setTextColor(ContextCompat.getColor(parent.getContext(), R.color.gray));
 
-        if (position == positionSelected) {
+        /*if (position == positionSelected) {
             imageView.setColorFilter(ContextCompat.getColor(parent.getContext(), R.color.colorAccent));
             textView.setTextColor(ContextCompat.getColor(parent.getContext(), R.color.colorAccent));
-        }
+        }*/
 
-        view.setOnClickListener(v -> {
-            if (onItemClickListener != null) {
-                onItemClickListener.onItemClicked(item, position);
-            }
-        });
+        view.setOnClickListener(v -> handleClick(item, position));
 
         return view;
+    }
+
+    private void handleClick(TextWithIconItem item, int position) {
+        if (onItemClickListener != null) {
+            onItemClickListener.onItemClicked(item, position);
+        }
     }
 
     public void setSelectedPosition(int position) {

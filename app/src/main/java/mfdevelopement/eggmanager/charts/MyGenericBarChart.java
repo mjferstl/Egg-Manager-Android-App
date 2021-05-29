@@ -9,10 +9,9 @@ import androidx.core.content.ContextCompat;
 import com.github.mikephil.charting.charts.BarChart;
 import com.github.mikephil.charting.components.XAxis;
 import com.github.mikephil.charting.data.BarDataSet;
-import com.github.mikephil.charting.data.BarEntry;
+import com.github.mikephil.charting.data.BaseDataSet;
 import com.github.mikephil.charting.data.Entry;
 import com.github.mikephil.charting.formatter.ValueFormatter;
-import com.github.mikephil.charting.interfaces.datasets.IDataSet;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -25,7 +24,7 @@ import mfdevelopement.eggmanager.data_models.ChartAxisLimits;
 public abstract class MyGenericBarChart extends BarChart implements IGenericChart {
 
     private int maxYLabelCount = 8;
-    private IDataSet<Entry> dataSet;
+    private BaseDataSet<Entry> dataSet;
     private ValueFormatter xAxisValueFormatter = ChartAxisFormatterFactory.getInstance(AxisDateFormat.MONTH_YEAR);
 
     public MyGenericBarChart(Context context) {
@@ -48,9 +47,9 @@ public abstract class MyGenericBarChart extends BarChart implements IGenericChar
         this.getAxisLeft().setTextColor(ContextCompat.getColor(this.getContext(), R.color.main_text_color));
     }
 
-    public <T extends Entry> void setChartData(IDataSet<T> dataSet) {
+    public <T extends Entry> void setChartData(Context context, BaseDataSet<T> dataSet) {
 
-        this.dataSet = (IDataSet<Entry>) dataSet;
+        this.dataSet = (BaseDataSet<Entry>) dataSet;
 
         // modify both axes
         ChartAxisLimits axisLimits = ChartUtils.calcAxisLimits(dataSet);
@@ -62,21 +61,22 @@ public abstract class MyGenericBarChart extends BarChart implements IGenericChar
         this.setChartAxisLimits(axisLimits);
 
         // add line data to the chart
-        List<BarEntry> barEntries = new ArrayList<>();
+        List<Entry> barEntries = new ArrayList<>();
         for (int i = 0; i < dataSet.getEntryCount(); i++) {
             Entry e = dataSet.getEntryForIndex(i);
-            barEntries.add(new BarEntry(e.getX(), e.getY()));
+            barEntries.add(new Entry(e.getX(), e.getY()));
         }
-        BarDataSet barDataSet = new BarDataSet(barEntries, dataSet.getLabel());
-        this.setData(DataSetUtils.createBarData(barDataSet));
+
+        BarDataSet barDataSet = DataSetUtils.createBarDataSet(context, barEntries, dataSet.getLabel());
+        this.setData(DataSetUtils.createBarData(this.getContext(), barDataSet));
 
         // refresh the chart
         this.invalidate();
     }
 
     @Override
-    public <T extends Entry> IDataSet<T> getChartData() {
-        return (IDataSet<T>) this.dataSet;
+    public <T extends Entry> BaseDataSet<T> getChartData() {
+        return (BaseDataSet<T>) this.dataSet;
     }
 
     private int calcLabelCount(ChartAxisLimits chartAxisLimits, int stepSize, int maxLabels) {
