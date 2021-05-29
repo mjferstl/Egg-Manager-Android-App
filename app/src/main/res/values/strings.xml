@@ -163,5 +163,6 @@
     <string name="preferences_username_default">default_user</string>
     <string name="menu_chart_style">chart style</string>
     <string name="content_description_chart_icon">chart icon</string>
+    <string name="dialog_title_chart_style">Diagramm Typ</string>
 
 </resources>
