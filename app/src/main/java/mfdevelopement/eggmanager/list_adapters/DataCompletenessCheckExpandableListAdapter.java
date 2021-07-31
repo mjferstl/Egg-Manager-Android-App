@@ -8,6 +8,9 @@ import android.widget.BaseExpandableListAdapter;
 import android.widget.ImageButton;
 import android.widget.TextView;
 
+import androidx.annotation.NonNull;
+
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
@@ -18,15 +21,9 @@ import mfdevelopement.eggmanager.data_models.expandable_list.GroupInfo;
 public class DataCompletenessCheckExpandableListAdapter extends BaseExpandableListAdapter {
 
     private final Context context;
-    private List<GroupInfo> groupInfoList;
-
     private final String LOG_TAG = "DataCompChckExpListAdap";
-
-    private final OnChildAddButtonClickListener listener;
-
-    public interface OnChildAddButtonClickListener {
-        void childAddClicked(int groupPosition, int childPosition);
-    }
+    private final List<OnChildAddButtonClickListener> listenerList = new ArrayList<>();
+    private List<GroupInfo> groupInfoList;
 
     public DataCompletenessCheckExpandableListAdapter(Context context, GroupInfo groupInfo) {
         this(context, Collections.singletonList(groupInfo));
@@ -35,13 +32,6 @@ public class DataCompletenessCheckExpandableListAdapter extends BaseExpandableLi
     public DataCompletenessCheckExpandableListAdapter(Context context, List<GroupInfo> groupInfoList) {
         this.context = context;
         this.groupInfoList = groupInfoList;
-
-        if (context instanceof OnChildAddButtonClickListener) {
-            listener = (OnChildAddButtonClickListener) context;
-        } else {
-            throw new ClassCastException(context.toString()
-                    + " must implement DataCompletenessCheckExpandableListAdapter.OnChildAddButtonClickListener");
-        }
     }
 
     @Override
@@ -107,7 +97,11 @@ public class DataCompletenessCheckExpandableListAdapter extends BaseExpandableLi
         heading.setText(childInfo.getName().trim());
 
         ImageButton addButton = convertView.findViewById(R.id.btn_add_database_entry);
-        addButton.setOnClickListener(v -> listener.childAddClicked(groupPosition, childPosition));
+        addButton.setOnClickListener(v -> {
+            for (OnChildAddButtonClickListener listener : listenerList) {
+                listener.childAddClicked(groupPosition, childPosition);
+            }
+        });
 
         return convertView;
     }
@@ -120,5 +114,13 @@ public class DataCompletenessCheckExpandableListAdapter extends BaseExpandableLi
     public void setData(List<GroupInfo> groupInfoList) {
         if (groupInfoList != null) this.groupInfoList = groupInfoList;
         notifyDataSetChanged();
+    }
+
+    public void addOnChildAddButtonClickListener(@NonNull OnChildAddButtonClickListener listener) {
+        listenerList.add(listener);
+    }
+
+    public interface OnChildAddButtonClickListener {
+        void childAddClicked(int groupPosition, int childPosition);
     }
 }

@@ -1,7 +1,10 @@
 package mfdevelopement.eggmanager.data_models.data_check;
 
+import android.util.Log;
+
 import androidx.annotation.NonNull;
 
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -22,9 +25,11 @@ public class DataCompletenessChecker implements ExpandableListCompatible {
 
     private final List<HasDateInterface> data;
 
-    private final SimpleDateFormat sdfYear = new SimpleDateFormat("yyyy", Locale.getDefault());
-    private final SimpleDateFormat sdfMonthYear = new SimpleDateFormat("MMMM yyyy", Locale.getDefault());
-    private final SimpleDateFormat sdfDayMonth = new SimpleDateFormat("dd. MMMM", Locale.getDefault());
+    private static final String LOG_TAG = "DataCompletenessChecker";
+
+    private static final SimpleDateFormat sdfYear = new SimpleDateFormat("yyyy", Locale.getDefault());
+    private static final SimpleDateFormat sdfMonthYear = new SimpleDateFormat("MMMM yyyy", Locale.getDefault());
+    private static final SimpleDateFormat sdfDayMonth = new SimpleDateFormat("dd. MMMM", Locale.getDefault());
 
     public DataCompletenessChecker(@NonNull Calendar startDate, @NonNull Calendar endDate, @NonNull List<HasDateInterface> databaseItems) {
         Date d = new Date();
@@ -160,5 +165,24 @@ public class DataCompletenessChecker implements ExpandableListCompatible {
         groupInfoList.add(groupInfo);
 
         return groupInfoList;
+    }
+
+    public static Calendar convertToDate(GroupInfo groupInfo) {
+        return convertToDate(groupInfo.getName(), sdfMonthYear);
+    }
+
+    public static Calendar convertToDate(ChildInfo childInfo) {
+        return convertToDate(childInfo.getName(), sdfDayMonth);
+    }
+
+    private static Calendar convertToDate(String string, SimpleDateFormat sdf) {
+        try {
+            Calendar cal = Calendar.getInstance();
+            cal.setTime(sdf.parse(string));
+            return cal;
+        } catch (ParseException e) {
+            Log.d(LOG_TAG, "Could not convert " + string + " to a date");
+            return null;
+        }
     }
 }

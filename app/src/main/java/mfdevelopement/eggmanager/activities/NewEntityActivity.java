@@ -162,6 +162,7 @@ public class NewEntityActivity extends AppCompatActivity implements DatePickerFr
 
         // fill in fields, if a item is edited
         requestCode = getIntent().getIntExtra(DatabaseFragment.EXTRA_REQUEST_CODE_NAME, DatabaseActions.Request.NEW_ENTITY.ordinal());
+        //String requestDate = getIntent().getStringExtra(DatabaseFragment.EXTRA_ENTITY_DATE);
         Log.d(LOG_TAG, "activity startet with request code " + requestCode);
         if (requestCode == DatabaseActions.Request.EDIT_ENTITY.ordinal()) {
             loadedDailyBalance = (DailyBalance) getIntent().getSerializableExtra(DatabaseFragment.EXTRA_DAILY_BALANCE);

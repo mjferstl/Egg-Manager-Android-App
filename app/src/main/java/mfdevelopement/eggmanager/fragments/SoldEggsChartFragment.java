@@ -204,7 +204,7 @@ public class SoldEggsChartFragment extends Fragment {
         }
     }
 
-    private <T extends Entry> void changeChartStyle(ChartStyle chartStyle) {
+    private void changeChartStyle(ChartStyle chartStyle) {
         // remove the current chart
         removeChart();
 

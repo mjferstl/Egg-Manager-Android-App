@@ -1,5 +1,6 @@
 package mfdevelopement.eggmanager.list_adapters;
 
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -75,11 +76,6 @@ public class ChartStyleListAdapter extends BaseAdapter {
         textView.setText(item.getName());
         textView.setTextColor(ContextCompat.getColor(parent.getContext(), R.color.gray));
 
-        /*if (position == positionSelected) {
-            imageView.setColorFilter(ContextCompat.getColor(parent.getContext(), R.color.colorAccent));
-            textView.setTextColor(ContextCompat.getColor(parent.getContext(), R.color.colorAccent));
-        }*/
-
         view.setOnClickListener(v -> handleClick(item, position));
 
         return view;
@@ -88,6 +84,8 @@ public class ChartStyleListAdapter extends BaseAdapter {
     private void handleClick(TextWithIconItem item, int position) {
         if (onItemClickListener != null) {
             onItemClickListener.onItemClicked(item, position);
+        } else {
+            Log.d(LOG_TAG, "no OnItemClickListener has been set yet");
         }
     }
 

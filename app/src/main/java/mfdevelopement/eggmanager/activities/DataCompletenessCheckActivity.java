@@ -29,6 +29,7 @@ import mfdevelopement.eggmanager.data_models.HasDateInterface;
 import mfdevelopement.eggmanager.data_models.HasDateInterfaceObject;
 import mfdevelopement.eggmanager.data_models.daily_balance.DateKeyUtils;
 import mfdevelopement.eggmanager.data_models.data_check.DataCompletenessChecker;
+import mfdevelopement.eggmanager.data_models.expandable_list.ChildInfo;
 import mfdevelopement.eggmanager.data_models.expandable_list.GroupInfo;
 import mfdevelopement.eggmanager.dialog_fragments.DatePickerFragment;
 import mfdevelopement.eggmanager.fragments.DatabaseFragment;
@@ -36,7 +37,7 @@ import mfdevelopement.eggmanager.list_adapters.DataCompletenessCheckExpandableLi
 import mfdevelopement.eggmanager.utils.DateFormatter;
 import mfdevelopement.eggmanager.viewmodels.DataCheckViewModel;
 
-public class DataCompletenessCheckActivity extends AppCompatActivity implements DatePickerFragment.OnAddDateListener, DataCompletenessCheckExpandableListAdapter.OnChildAddButtonClickListener {
+public class DataCompletenessCheckActivity extends AppCompatActivity implements DatePickerFragment.OnAddDateListener {
 
     /**
      * View model for the activity
@@ -115,6 +116,21 @@ public class DataCompletenessCheckActivity extends AppCompatActivity implements 
     private void initExpandableListView() {
         ExpandableListView expandableListView = findViewById(R.id.elv_data_completeness_check);
         expandableListAdapter = new DataCompletenessCheckExpandableListAdapter(this, new ArrayList<>());
+        expandableListAdapter.addOnChildAddButtonClickListener((groupPosition, childPosition) -> {
+            GroupInfo gi = expandableListAdapter.getGroup(groupPosition);
+            Calendar groupDate = DataCompletenessChecker.convertToDate(gi);
+
+            ChildInfo ci = expandableListAdapter.getChild(groupPosition, childPosition);
+            Calendar childDate = DataCompletenessChecker.convertToDate(ci);
+
+            Calendar cal = Calendar.getInstance();
+            cal.set(groupDate.get(Calendar.YEAR), groupDate.get(Calendar.MONTH), childDate.get(Calendar.DAY_OF_MONTH));
+
+            String dateKey = DateFormatter.getHumanReadableDate(cal);
+
+            // Create a new entity
+            createNewEntity(dateKey);
+        });
         expandableListView.setAdapter(expandableListAdapter);
     }
 
@@ -308,11 +324,6 @@ public class DataCompletenessCheckActivity extends AppCompatActivity implements 
             txtv_end_date.setText(savedEndDate);
         }
         super.onRestoreInstanceState(savedInstanceState);
-    }
-
-    @Override
-    public void childAddClicked(int groupPosition, int childPosition) {
-        Log.d(LOG_TAG, "user clicked on add button at groupPosition: " + groupPosition + "; childPosition: " + childPosition);
     }
 
     /**

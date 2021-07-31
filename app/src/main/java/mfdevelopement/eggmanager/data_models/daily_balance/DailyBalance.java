@@ -119,6 +119,11 @@ public class DailyBalance implements Serializable, Comparable<DailyBalance>, Has
         }
     }
 
+    public static String convertToDateKey(Calendar calendar) {
+        SimpleDateFormat sdf = new SimpleDateFormat(DateKeyUtils.DATE_KEY_FORMAT, Locale.getDefault());
+        return sdf.format(calendar.getTime());
+    }
+
     public int getEggsCollected() {
         return this.eggsCollected;
     }

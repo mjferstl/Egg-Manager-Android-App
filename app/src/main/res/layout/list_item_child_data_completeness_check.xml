@@ -4,7 +4,9 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:paddingStart="?android:attr/expandableListPreferredItemPaddingLeft"
-    android:paddingEnd="@dimen/small_padding">
+    android:paddingEnd="@dimen/small_padding"
+    android:paddingTop="@dimen/small_padding"
+    android:paddingBottom="@dimen/small_padding">
 
     <TextView
         android:id="@+id/txtv_child_name"
@@ -13,7 +15,7 @@
         android:layout_height="wrap_content"
         android:paddingStart="?android:attr/expandableListPreferredItemPaddingLeft"
         android:paddingEnd="0dp"
-        android:text="02. Januar"
+        android:text="@string/txt_example_day_month"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toStartOf="@+id/btn_add_database_entry"
@@ -25,7 +27,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:src="@drawable/ic_add_white_24dp"
-        android:tint="@color/main_text_color"
+        android:layout_marginEnd="@dimen/small_padding"
         android:paddingStart="@dimen/small_padding"
         android:paddingEnd="@dimen/small_padding"
         android:paddingTop="@dimen/small_padding"
@@ -34,6 +36,7 @@
         app:layout_constraintStart_toEndOf="@+id/txtv_child_name"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        android:contentDescription="@string/content_description_button_add" />
+        android:contentDescription="@string/content_description_button_add"
+        app:tint="@color/main_text_color" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
