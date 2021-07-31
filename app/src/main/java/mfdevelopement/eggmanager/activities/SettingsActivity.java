@@ -13,7 +13,7 @@ import mfdevelopement.eggmanager.R;
 
 public class SettingsActivity extends AppCompatActivity {
 
-    private final String LOG_TAG = "SettingsActivity";
+    //private final String LOG_TAG = "SettingsActivity";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

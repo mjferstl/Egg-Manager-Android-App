@@ -1,5 +1,6 @@
 package mfdevelopement.eggmanager.fragments;
 
+import android.app.Activity;
 import android.content.Intent;
 import android.graphics.Paint;
 import android.os.Bundle;
@@ -12,8 +13,9 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
 import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentTransaction;
@@ -45,19 +47,31 @@ import mfdevelopement.eggmanager.dialog_fragments.ChartStyleDialogFragment;
 import mfdevelopement.eggmanager.viewmodels.SharedViewModel;
 
 import static mfdevelopement.eggmanager.fragments.DatabaseFragment.EXTRA_REQUEST_CODE_NAME;
-import static mfdevelopement.eggmanager.utils.FilterActivityResultHandler.handleFilterActivityResult;
 
 public class SoldEggsChartFragment extends Fragment {
 
+    /**
+     * String for logging
+     */
     private static final String LOG_TAG = "SoldEggsChartFragment";
-
+    /**
+     * ActivityResultLauncher to start another activity
+     * call with mStartActivityWithIntent.launch(new Intent())
+     */
+    private final ActivityResultLauncher<Intent> mStartActivityWithIntent = registerForActivityResult(new ActivityResultContracts.StartActivityForResult(),
+            result -> {
+                if (result.getResultCode() == Activity.RESULT_OK) {
+                    Log.d(LOG_TAG, "received RESULT_OK as activity result");
+                    //Intent intent = result.getData();
+                    // Handle the Intent
+                    // nothing to handle yet
+                }
+            });
     private SharedViewModel viewModel;
-
     private IGenericChart genericChart;
     private View rootView;
     private ViewGroup mainView;
     private TextView txtv_title_extra;
-
     private int databaseEntryCount = 0;
 
     public View onCreateView(@NonNull LayoutInflater inflater,
@@ -233,23 +247,8 @@ public class SoldEggsChartFragment extends Fragment {
     private void openFilterActivity() {
         Intent intent = new Intent(getContext(), FilterActivity.class);
         intent.putExtra(EXTRA_REQUEST_CODE_NAME, DatabaseActions.Request.EDIT_FILTER.ordinal());
-        startActivityForResult(intent, DatabaseActions.Request.EDIT_FILTER.ordinal());
-    }
 
-    @Override
-    public void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
-
-        if (requestCode == DatabaseActions.Request.EDIT_FILTER.ordinal()) {
-
-            // handle the return value from the FilterActivity
-            handleFilterActivityResult(resultCode, data);
-
-            if (resultCode == DatabaseActions.Result.FILTER_OK.ordinal()) {
-                // update the new filter string in the view model
-                viewModel.setDateFilter(viewModel.loadDateFilter());
-            }
-        }
+        mStartActivityWithIntent.launch(intent);
     }
 
     private void initObservers() {

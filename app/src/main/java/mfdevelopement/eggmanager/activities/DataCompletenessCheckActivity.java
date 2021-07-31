@@ -1,5 +1,6 @@
 package mfdevelopement.eggmanager.activities;
 
+import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
@@ -9,6 +10,8 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
@@ -40,32 +43,40 @@ import mfdevelopement.eggmanager.viewmodels.DataCheckViewModel;
 public class DataCompletenessCheckActivity extends AppCompatActivity implements DatePickerFragment.OnAddDateListener {
 
     /**
-     * View model for the activity
-     */
-    private DataCheckViewModel viewModel;
-
-    /**
-     * TextViews used in the UI
-     */
-    private TextView txtv_start_date;
-    private TextView txtv_end_date;
-    private TextView txtv_elv_info;
-
-    private LinearLayout linearLayoutListContainer, linearLayoutSuccessContainer;
-
-    /**
      * String used as identifier for logging
      */
     private final String LOG_TAG = "DataCompletenessCheckAc";
-
     /**
      * Strings which are used for storing the UI data during orientation changes etc.
      */
     private final String KEY_START_DATE = "startDate";
     private final String KEY_END_DATE = "endDate";
 
+    /**
+     * ActivityResultLauncher to start another activity
+     * call with mStartActivityWithIntent.launch(new Intent())
+     */
+    private final ActivityResultLauncher<Intent> mStartActivityWithIntent = registerForActivityResult(new ActivityResultContracts.StartActivityForResult(),
+            result -> {
+                if (result.getResultCode() == Activity.RESULT_OK) {
+                    Log.d(LOG_TAG, "received RESULT_OK as activity result");
+                    //Intent intent = result.getData();
+                    // Handle the Intent
+                    // nothing to handle yet
+                }
+            });
+    /**
+     * View model for the activity
+     */
+    private DataCheckViewModel viewModel;
+    /**
+     * TextViews used in the UI
+     */
+    private TextView txtv_start_date;
+    private TextView txtv_end_date;
+    private TextView txtv_elv_info;
+    private LinearLayout linearLayoutListContainer, linearLayoutSuccessContainer;
     private PICKER_ID pickerId;
-
     private DataCompletenessCheckExpandableListAdapter expandableListAdapter;
 
     @Override
@@ -293,9 +304,10 @@ public class DataCompletenessCheckActivity extends AppCompatActivity implements 
 
     private void createNewEntity(String dateString) {
         Intent intent = new Intent(this, NewEntityActivity.class);
-        intent.putExtra(DatabaseFragment.EXTRA_REQUEST_CODE_NAME, DatabaseActions.Request.NEW_ENTITY.ordinal());
+        intent.putExtra(DatabaseFragment.EXTRA_REQUEST_CODE_NAME, DatabaseActions.Request.NEW_ENTITY.id);
         intent.putExtra(DatabaseFragment.EXTRA_ENTITY_DATE, dateString);
-        startActivityForResult(intent, DatabaseActions.Request.NEW_ENTITY.ordinal());
+
+        mStartActivityWithIntent.launch(intent);
     }
 
     @Override

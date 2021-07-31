@@ -58,7 +58,7 @@ public class FilterActivity extends AppCompatActivity implements DateFilterListA
         // get the view model
         viewModel = new ViewModelProvider(this).get(FilterActivityViewModel.class);
 
-        // initialize the oberservers for handling LiveData
+        // initialize the observers for handling LiveData
         initObservers();
 
         // initialize the GUI
@@ -216,9 +216,9 @@ public class FilterActivity extends AppCompatActivity implements DateFilterListA
      */
     private void endActivity(DatabaseActions.Result action, @Nullable Intent data) {
         if (data != null)
-            setResult(action.ordinal(), data);
+            setResult((int) action.id, data);
         else
-            setResult(action.ordinal());
+            setResult((int) action.id);
         super.onBackPressed();
     }
 

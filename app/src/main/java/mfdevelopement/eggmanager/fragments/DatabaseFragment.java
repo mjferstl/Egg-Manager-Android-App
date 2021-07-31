@@ -13,8 +13,8 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
+import androidx.activity.result.ActivityResultLauncher;
 import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
 import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.fragment.app.DialogFragment;
 import androidx.fragment.app.Fragment;
@@ -36,6 +36,8 @@ import mfdevelopement.eggmanager.activities.DataCompletenessCheckActivity;
 import mfdevelopement.eggmanager.activities.FilterActivity;
 import mfdevelopement.eggmanager.activities.MainNavigationActivity;
 import mfdevelopement.eggmanager.activities.NewEntityActivity;
+import mfdevelopement.eggmanager.activity_contracts.CreateNewEntityContract;
+import mfdevelopement.eggmanager.activity_contracts.OpenFilterActivityContract;
 import mfdevelopement.eggmanager.data_models.SortingItem;
 import mfdevelopement.eggmanager.data_models.SortingItemCollection;
 import mfdevelopement.eggmanager.data_models.daily_balance.DailyBalance;
@@ -45,29 +47,69 @@ import mfdevelopement.eggmanager.dialog_fragments.SortingDialogFragment;
 import mfdevelopement.eggmanager.list_adapters.DailyBalanceListAdapter;
 import mfdevelopement.eggmanager.viewmodels.SharedViewModel;
 
-import static mfdevelopement.eggmanager.utils.FilterActivityResultHandler.handleFilterActivityResult;
-
 public class DatabaseFragment extends Fragment {
-
-    private SharedViewModel viewModel;
-    private DailyBalanceListAdapter adapter;
 
     public static final String EXTRA_REQUEST_CODE_NAME = "requestCode";
     public static final String EXTRA_DAILY_BALANCE = "extraDailyBalance";
     public static final String EXTRA_ENTITY_DATE = "dailyBalanceDate";
     private final String LOG_TAG = "DatabaseFragment";
-
+    private SharedViewModel viewModel;
+    private DailyBalanceListAdapter adapter;
     private TextView txtv_summary_eggs_collected, txtv_summary_eggs_sold, txtv_summary_money_earned;
     private TextView txtv_summary_extra_info;
     private TextView txtv_empty_recyclerview;
     private ConstraintLayout linLay_summary;
 
     private View rootView;
+
+    /**
+     * Handle the results when creating a new entity
+     */
+    private final ActivityResultLauncher<Long> createNewEntityResultLauncher = registerForActivityResult(new CreateNewEntityContract(), result -> {
+        if (result == DatabaseActions.Result.NEW_ENTITY.id) {
+            Log.d(LOG_TAG, "user created a new entity");
+            showSnackbarText(getString(R.string.new_entity_saved));
+        }
+    });
+
+    /**
+     * Variable to store the context
+     */
     private Context mainContext;
-
     private int entriesCount;
-
     private RecyclerView recyclerView;
+    private final ActivityResultLauncher<Void> showFilterActivity = registerForActivityResult(new OpenFilterActivityContract(), result -> {
+        if (result == DatabaseActions.Result.FILTER_OK.id) {
+            Log.v(LOG_TAG, "filter has been set successfully");
+
+            String filterString = viewModel.getDateFilter();
+
+            // show a Snackbar to inform the user about the new filter
+            if (filterString.isEmpty()) {
+                showSnackbarText("Daten nicht gefiltert");
+            } else {
+                String filterName = "";
+                if (filterString.length() == 4) {
+                    filterName = filterString;
+                }
+                if (filterString.length() >= 6) {
+                    String year = DateKeyUtils.getYearByDateKey(filterString);
+
+                    int indexMonth = Integer.parseInt(DateKeyUtils.getMonthByDateKey(filterString));
+                    String month = viewModel.getMonthNameByIndex(indexMonth);
+
+                    filterName = month + " " + year;
+                }
+
+                if (!filterName.isEmpty())
+                    showSnackbarText("Daten nach " + filterName + " gefiltert");
+            }
+        } else if (result == DatabaseActions.Result.FILTER_CANCEL.id) {
+            Log.v(LOG_TAG, "Editing the filter has been cancelled");
+        } else if (result == DatabaseActions.Result.FILTER_REMOVED.id) {
+            Log.v(LOG_TAG, "filter has been removed");
+        }
+    });
 
     @Override
     public void onAttach(@NonNull Context context) {
@@ -93,7 +135,7 @@ public class DatabaseFragment extends Fragment {
         // when the user changes the sorting order, then the recycler view needs to be updated manually
         ((MainNavigationActivity) getActivity()).setSortingOrderChangedListener(this::reverseRecyclerView);
 
-        // this framgent has its own options menu
+        // this fragment has its own options menu
         setHasOptionsMenu(true);
 
         // get all GUI elements
@@ -111,7 +153,7 @@ public class DatabaseFragment extends Fragment {
         // make sure the filter is up to date, e.g. when the user switched to this fragment
         viewModel.setDateFilter(viewModel.loadDateFilter());
 
-        // initalize floating action button
+        // initialize floating action button
         initFab();
 
         // set all observers for receiving LiveData from the database
@@ -125,11 +167,7 @@ public class DatabaseFragment extends Fragment {
         super.onResume();
         if (adapter != null)
             adapter.setItemsUnselected();
-
-        // update the data filter string
-        updateDataFilter();
     }
-
 
     private void updateEggsCollected(int numEggs) {
         Log.d(LOG_TAG, "updateEggsCollected(): updating number of collected eggs. New value: " + numEggs);
@@ -275,9 +313,10 @@ public class DatabaseFragment extends Fragment {
 
     private void openFilterActivity() {
         Intent intent = new Intent(mainContext, FilterActivity.class);
-        intent.putExtra(EXTRA_REQUEST_CODE_NAME, DatabaseActions.Request.EDIT_FILTER.ordinal());
+        intent.putExtra(EXTRA_REQUEST_CODE_NAME, DatabaseActions.Request.EDIT_FILTER.id);
         //setupExitSlideAnimation();
-        startActivityForResult(intent, DatabaseActions.Request.EDIT_FILTER.ordinal());
+
+        showFilterActivity.launch(null);
     }
 
     private void openCompletenessCheckActivity() {
@@ -323,78 +362,19 @@ public class DatabaseFragment extends Fragment {
         adapter.setDailyBalances(currentList);
     }
 
-    @Override
-    public void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
-
-        Log.d(LOG_TAG, "onActivityResult::requestCode=" + requestCode + ",resultCode=" + resultCode);
-
-        String snackbarText = "";
-
-        if (requestCode == DatabaseActions.Request.NEW_ENTITY.ordinal() && resultCode == DatabaseActions.Result.NEW_ENTITY.ordinal()) {
-            snackbarText = getString(R.string.new_entity_saved);
-        } else if (requestCode == DatabaseActions.Request.EDIT_ENTITY.ordinal() && resultCode == DatabaseActions.Result.ENTITY_EDITED.ordinal()) {
-            snackbarText = getString(R.string.changes_saved);
-        }
-        // results from FilterActivity
-        else if (requestCode == DatabaseActions.Request.EDIT_FILTER.ordinal()) {
-            handleFilterActivityResult(resultCode, data);
-
-            if (resultCode == DatabaseActions.Result.FILTER_OK.ordinal()) {
-
-                Log.d(LOG_TAG, "filtered list of daily balanced with filter key \"" + viewModel.loadDateFilter() + "\"");
-                updateDataFilter();
-
-                // get the new filter string
-                String newFilterString = viewModel.getDateFilter();
-
-                // show a Snackbar to inform the user about the new filter
-                if (newFilterString.isEmpty()) {
-                    snackbarText = "Daten nicht gefiltert";
-                } else {
-                    String filterName = "";
-                    if (newFilterString.length() == 4) {
-                        filterName = newFilterString;
-                    }
-                    if (newFilterString.length() >= 6) {
-                        String year = DateKeyUtils.getYearByDateKey(newFilterString);
-
-                        int indexMonth = Integer.parseInt(DateKeyUtils.getMonthByDateKey(newFilterString));
-                        String month = viewModel.getMonthNameByIndex(indexMonth);
-
-                        filterName = month + " " + year;
-                    }
-
-                    if (!filterName.isEmpty())
-                        snackbarText = "Daten nach " + filterName + " gefiltert";
-                }
-            } else if (resultCode == DatabaseActions.Result.FILTER_REMOVED.ordinal()) {
-                updateDataFilter();
-                Log.d(LOG_TAG, "user removed the filter");
-            }
-            if (getActivity() != null)
-                getActivity().invalidateOptionsMenu();
-        }
-
+    private void showSnackbarText(@NonNull String text) {
         // create a snackbar and display it
-        if (!snackbarText.isEmpty())
-            Snackbar.make(rootView.findViewById(R.id.main_container), snackbarText, Snackbar.LENGTH_SHORT).show();
-    }
-
-    /**
-     * update the filter string for the displayed data in the view model
-     * load the filter string from the repository to update the filter string in the view model
-     */
-    private void updateDataFilter() {
-        viewModel.setDateFilter(viewModel.loadDateFilter());
+        if (text != null && !text.isEmpty())
+            Snackbar.make(rootView.findViewById(R.id.main_container), text, Snackbar.LENGTH_SHORT).show();
     }
 
     private void initFab() {
         FloatingActionButton fab = rootView.findViewById(R.id.fab);
         fab.setOnClickListener(view -> {
             Intent intent = new Intent(mainContext, NewEntityActivity.class);
-            intent.putExtra(EXTRA_REQUEST_CODE_NAME, DatabaseActions.Request.NEW_ENTITY.ordinal());
-            startActivityForResult(intent, DatabaseActions.Request.NEW_ENTITY.ordinal());
+            intent.putExtra(EXTRA_REQUEST_CODE_NAME, DatabaseActions.Request.NEW_ENTITY.id);
+
+            createNewEntityResultLauncher.launch(DatabaseActions.Request.NEW_ENTITY.id);
         });
     }
 

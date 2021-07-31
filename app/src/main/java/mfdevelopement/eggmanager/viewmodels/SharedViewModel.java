@@ -106,6 +106,7 @@ public class SharedViewModel extends AndroidViewModel {
     }
 
     public String getDateFilter() {
+        this.dataFilter.setValue(this.loadDateFilter());
         return this.dataFilter.getValue();
     }
 
