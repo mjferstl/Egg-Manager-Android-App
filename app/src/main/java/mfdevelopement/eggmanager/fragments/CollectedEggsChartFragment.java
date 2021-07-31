@@ -154,6 +154,9 @@ public class CollectedEggsChartFragment extends Fragment {
     @Override
     public void onCreateOptionsMenu(@NonNull Menu menu, @NonNull MenuInflater inflater) {
         inflater.inflate(R.menu.menu_charts, menu);
+        MenuItem item = menu.findItem(R.id.menu_charts_style);
+        item.setVisible(false);
+
         super.onCreateOptionsMenu(menu, inflater);
     }
 
