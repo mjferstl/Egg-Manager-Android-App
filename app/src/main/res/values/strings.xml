@@ -88,6 +88,8 @@
 
     <!-- delete database dialog -->
     <string name="dialog_title_delete_database">Alle Einträge entfernen</string>
+    <string name="dialog_title_delete_item">Eintrag löschen</string>
+    <string name="dialog_message_delete_item">"Möchten Sie den Eintrag löschen?"</string>
 
     <!-- hints -->
     <string name="hint_eggs_collected">gelegt</string>

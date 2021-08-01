@@ -44,7 +44,7 @@ public class FilterActivity extends AppCompatActivity implements DateFilterListA
         setContentView(R.layout.activity_filter);
         //setupEnterFadeAnimation();
 
-        Log.d(LOG_TAG,"starting onCreate()");
+        Log.d(LOG_TAG, "starting onCreate()");
 
         // get reference to the toolbar
         Toolbar toolbar = findViewById(R.id.toolbar_filter_activity);
@@ -64,7 +64,7 @@ public class FilterActivity extends AppCompatActivity implements DateFilterListA
         // initialize the GUI
         initGUI();
 
-        Log.d(LOG_TAG,"finished onCreate()");
+        Log.d(LOG_TAG, "finished onCreate()");
     }
 
     private void setupEnterFadeAnimation() {
@@ -79,15 +79,15 @@ public class FilterActivity extends AppCompatActivity implements DateFilterListA
     }
 
     private void initRecyclerViewYears() {
-        Log.d(LOG_TAG,"starting initRecyclerViewYears()");
+        Log.d(LOG_TAG, "starting initRecyclerViewYears()");
         RecyclerView recyclerViewYears = findViewById(R.id.filter_activity_recycler_view_years);
-        recyclerViewYears.setLayoutManager(new GridLayoutManager(this,2));
+        recyclerViewYears.setLayoutManager(new GridLayoutManager(this, 2));
 
         // check if the initial filter string is valid
         String initialFilterString = viewModel.getFilterString();
-        Log.d(LOG_TAG,"initial filter key: " + initialFilterString);
+        Log.d(LOG_TAG, "initial filter key: " + initialFilterString);
         if (initialFilterString == null) {
-            Log.e(LOG_TAG,"cannot initialize GUI because initialFilterString is NULL");
+            Log.e(LOG_TAG, "cannot initialize GUI because initialFilterString is NULL");
             return;
         }
 
@@ -98,15 +98,15 @@ public class FilterActivity extends AppCompatActivity implements DateFilterListA
     }
 
     private void initRecyclerViewMonths() {
-        Log.d(LOG_TAG,"starting initRecyclerViewMonths()");
+        Log.d(LOG_TAG, "starting initRecyclerViewMonths()");
         RecyclerView recyclerViewMonths = findViewById(R.id.filter_activity_recycler_view_months);
-        recyclerViewMonths.setLayoutManager(new GridLayoutManager(this,2));
+        recyclerViewMonths.setLayoutManager(new GridLayoutManager(this, 2));
 
         // load the last saved filter string
         String initialFilterString = viewModel.getFilterString();
-        Log.d(LOG_TAG,"initial filter key: " + initialFilterString);
+        Log.d(LOG_TAG, "initial filter key: " + initialFilterString);
         if (initialFilterString == null) {
-            Log.e(LOG_TAG,"cannot initialize GUI because initialFilterString is NULL");
+            Log.e(LOG_TAG, "cannot initialize GUI because initialFilterString is NULL");
             return;
         }
 
@@ -124,17 +124,17 @@ public class FilterActivity extends AppCompatActivity implements DateFilterListA
         linLayMonths = findViewById(R.id.linLay_filter_activity_months);
         if (initialFilterString.isEmpty() || initialFilterString.length() < 4) {
             linLayMonths.setVisibility(View.GONE);
-            Log.d(LOG_TAG,"hiding recycler view containing month names, because initialFilterString is empty or has less than 4 characters");
+            Log.d(LOG_TAG, "hiding recycler view containing month names, because initialFilterString is empty or has less than 4 characters");
             return;
         } else {
             linLayMonths.setVisibility(View.VISIBLE);
         }
 
-        Log.d(LOG_TAG,"initialFilterString = \"" + initialFilterString + "\"");
+        Log.d(LOG_TAG, "initialFilterString = \"" + initialFilterString + "\"");
         String initialYear = DateKeyUtils.getYearByDateKey(initialFilterString);
-        Log.d(LOG_TAG,"year of initialFilterString = \"" + initialYear + "\"");
+        Log.d(LOG_TAG, "year of initialFilterString = \"" + initialYear + "\"");
         List<String> monthNames = viewModel.getMonthsByYear(initialYear);
-        Log.d(LOG_TAG,"initial months for initialFilterString: " + monthNames.size() + " items");
+        Log.d(LOG_TAG, "initial months for initialFilterString: " + monthNames.size() + " items");
 
         // add adapter to the recycler view
         adapterMonths.setDatesList(monthNames, false);
@@ -144,11 +144,11 @@ public class FilterActivity extends AppCompatActivity implements DateFilterListA
      * Method to initialize all observers for getting live data from the database
      */
     private void initObservers() {
-        Log.d(LOG_TAG,"initializing observers");
+        Log.d(LOG_TAG, "initializing observers");
         viewModel.getAllDateKeys().observe(this, stringList -> {
             List<String> yearNamesList = new ArrayList<>();
             for (String dateString : stringList) {
-                yearNamesList.add(dateString.substring(0,4));
+                yearNamesList.add(dateString.substring(0, 4));
             }
             viewModel.setYearNames(yearNamesList);
             viewModel.setYearMonthNames(stringList);
@@ -158,6 +158,7 @@ public class FilterActivity extends AppCompatActivity implements DateFilterListA
 
     /**
      * Method to create the options menu specified in the menu_filter.xml
+     *
      * @param menu Menu
      * @return boolean
      */
@@ -237,7 +238,7 @@ public class FilterActivity extends AppCompatActivity implements DateFilterListA
         // add optional month index to the filter string
         int monthIndex = viewModel.getMonthIndexByName(monthSelection);
         if (monthIndex != 0) {
-            filterString = filterString + String.format(Locale.getDefault(),"%02d", monthIndex);
+            filterString = filterString + String.format(Locale.getDefault(), "%02d", monthIndex);
         }
 
         return filterString;
@@ -246,16 +247,17 @@ public class FilterActivity extends AppCompatActivity implements DateFilterListA
     /**
      * Actions, when a filter button is clicked
      * When the text of the filter button is an integer, then the user has clicked on a button containing a year
-     * Depedning on the current state of the button (selected or unselected), the list with the corresponding
+     * Depending on the current state of the button (selected or unselected), the list with the corresponding
      * months is shown or hidden
+     *
      * @param buttonText String containing the text of the clicked button
      * @param isSelected boolean which indicates, if the button is selected
      */
     @Override
     public void OnButtonClicked(String buttonText, boolean isSelected) {
-        Log.d(LOG_TAG,"user clicked on button with text " + buttonText + ". Button is selected: " + isSelected);
+        Log.d(LOG_TAG, "user clicked on button with text " + buttonText + ". Button is selected: " + isSelected);
         if (isInt(buttonText)) {
-            Log.d(LOG_TAG,"user selected a button containing a year");
+            Log.d(LOG_TAG, "user selected a button containing a year");
 
             // if the user selected the button, then update the months list
             // if the user unselected the button, then remove all items from the recycler view and hide the months list
@@ -271,6 +273,7 @@ public class FilterActivity extends AppCompatActivity implements DateFilterListA
 
     /**
      * Check if an string can be converted to an integer
+     *
      * @param string String to be converted
      * @return boolean which indicateds, if the string represents an integer
      */

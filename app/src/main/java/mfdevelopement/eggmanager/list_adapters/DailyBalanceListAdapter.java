@@ -6,8 +6,6 @@ import android.content.Context;
 import android.util.Log;
 import android.view.ActionMode;
 import android.view.LayoutInflater;
-import android.view.Menu;
-import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
@@ -34,23 +32,7 @@ public class DailyBalanceListAdapter extends RecyclerView.Adapter<DailyBalanceLi
     private final List<OnItemActionClickListener> onItemActionClickListeners = new ArrayList<>();
     private List<DailyBalance> mDailyBalances;
     private ActionMode actionMode;
-    private final ActionMode.Callback actionModeCallback = new ActionMode.Callback() {
-
-        // Called when the action mode is created; startActionMode() was called
-        @Override
-        public boolean onCreateActionMode(ActionMode mode, Menu menu) {
-            // Inflate a menu resource providing context menu items
-            MenuInflater inflater = mode.getMenuInflater();
-            inflater.inflate(R.menu.context_menu_database_entry, menu);
-            return true;
-        }
-
-        // Called each time the action mode is shown. Always called after onCreateActionMode, but
-        // may be called multiple times if the mode is invalidated.
-        @Override
-        public boolean onPrepareActionMode(ActionMode mode, Menu menu) {
-            return false; // Return false if nothing is done
-        }
+    private final ActionMode.Callback actionModeCallback = new DatabaseActionModeCallback() {
 
         // Called when the user selects a contextual menu item
         @Override
@@ -135,19 +117,19 @@ public class DailyBalanceListAdapter extends RecyclerView.Adapter<DailyBalanceLi
 
     private void showDeleteDialog(int itemPosition) {
         new AlertDialog.Builder(this.context)
-                .setTitle("Eintrag löschen")
-                .setMessage("Möchten Sie den Eintrag löschen?")
+                .setTitle(context.getString(R.string.dialog_title_delete_item))
+                .setMessage(context.getString(R.string.dialog_message_delete_item))
 
                 // Specifying a sortingOrderChangedListener allows you to take an action before dismissing the dialog.
                 // The dialog is automatically dismissed when a dialog button is clicked.
                 .setPositiveButton(android.R.string.ok, (dialog, which) -> {
-                    // Continue with delete operation
-
+                    // call the method of all listeners until one handles it
                     for (OnItemActionClickListener listener : onItemActionClickListeners) {
                         boolean handled = listener.onDeleteClicked(itemPosition);
                         if (handled) break;
                     }
 
+                    // dataset could have changed
                     notifyDataSetChanged();
                 })
 
