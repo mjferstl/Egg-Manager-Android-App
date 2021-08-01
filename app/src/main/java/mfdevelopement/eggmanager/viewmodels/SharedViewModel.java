@@ -18,7 +18,9 @@ import java.util.concurrent.TimeUnit;
 
 import mfdevelopement.eggmanager.R;
 import mfdevelopement.eggmanager.charts.ReferenceDate;
+import mfdevelopement.eggmanager.coroutines.MyCoroutines;
 import mfdevelopement.eggmanager.data_models.daily_balance.DailyBalance;
+import mfdevelopement.eggmanager.data_models.daily_balance.DailyBalanceUpgradeHelper;
 import mfdevelopement.eggmanager.data_models.daily_balance.DateKeyUtils;
 import mfdevelopement.eggmanager.database.EggManagerRepository;
 
@@ -72,12 +74,30 @@ public class SharedViewModel extends AndroidViewModel {
         ldFilteredEggsSold = Transformations.switchMap(dataFilter, mRepository::getFilteredEggsSold);
     }
 
+    public void upgradeDailyBalancesInDatabase(List<DailyBalance> dailyBalanceList) {
+        upgradeMigration3_4(dailyBalanceList);
+    }
+
+    private void upgradeMigration3_4(List<DailyBalance> dailyBalanceList) {
+        MyCoroutines.Companion.doAsync(() -> {
+            for (DailyBalance db : dailyBalanceList) {
+                if (!DailyBalanceUpgradeHelper.hasValidDate(db)) {
+                    db.setDate(db.getDate());
+                    this.insert(db);
+                }
+            }
+            Log.d(LOG_TAG, "");
+            return null;
+        });
+    }
+
     public LiveData<List<DailyBalance>> getAllDailyBalances() {
         return allDailyBalances;
     }
 
     /**
      * Get the entries of the database. Filtered by the saved filter string
+     *
      * @return LiveData containing a List of DailyBalance objects
      */
     public LiveData<List<DailyBalance>> getFilteredDailyBalance() {

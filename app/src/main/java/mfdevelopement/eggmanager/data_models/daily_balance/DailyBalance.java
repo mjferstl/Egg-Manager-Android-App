@@ -29,6 +29,7 @@ import mfdevelopement.eggmanager.utils.DateTypeConverter;
 public class DailyBalance implements Serializable, Comparable<DailyBalance>, HasDateInterface {
 
     public static final String COL_DATE_PRIMARY_KEY = "dateKey";
+    public static final String COL_DATE_KEY = "date";
     public static final String COL_EGGS_COLLECTED_NAME = "eggsCollected";
     public static final String COL_EGGS_SOLD_NAME = "eggsSold";
     public static final String COL_PRICE_PER_EGG = "pricePerEgg";
@@ -44,6 +45,9 @@ public class DailyBalance implements Serializable, Comparable<DailyBalance>, Has
     @NonNull
     @ColumnInfo(name = COL_DATE_PRIMARY_KEY)
     private String dateKey;
+
+    @ColumnInfo(name = COL_DATE_KEY)
+    private Date date;
 
     @ColumnInfo(name = COL_EGGS_COLLECTED_NAME, defaultValue = "0")
     private final int eggsCollected;
@@ -84,6 +88,7 @@ public class DailyBalance implements Serializable, Comparable<DailyBalance>, Has
     @Ignore
     public DailyBalance(String dateKey, int eggsCollected, int eggsSold, double pricePerEgg, int numHens, Date dateCreated, String userCreated) {
         setDateKey(dateKey);
+        setDateByDateKey();
         this.eggsCollected = eggsCollected;
         this.eggsSold = eggsSold;
         this.pricePerEgg = pricePerEgg;
@@ -94,6 +99,23 @@ public class DailyBalance implements Serializable, Comparable<DailyBalance>, Has
         else setDateCreated(getCurrentDate());
 
         if (userCreated != null) setUserCreated(userCreated);
+    }
+
+    @Ignore
+    public DailyBalance(String dateKey, int eggsCollected, int eggsSold, double pricePerEgg, int numHens, Date dateCreated, String userCreated, Date date) {
+        setDateKey(dateKey);
+        this.eggsCollected = eggsCollected;
+        this.eggsSold = eggsSold;
+        this.pricePerEgg = pricePerEgg;
+        setNumHens(numHens);
+        setMoneyEarned(calcMoneyEarned(eggsSold, pricePerEgg));
+
+        if (dateCreated != null) setDateCreated(dateCreated);
+        else setDateCreated(getCurrentDate());
+
+        if (userCreated != null) setUserCreated(userCreated);
+
+        this.date = date;
     }
 
     private double calcMoneyEarned(int eggsSold, double pricePerEgg) {
@@ -119,9 +141,22 @@ public class DailyBalance implements Serializable, Comparable<DailyBalance>, Has
         }
     }
 
+    private void setDateByDateKey() {
+        // newer way of solving things
+        try {
+            this.date = DateKeyUtils.getDateByDateKey(dateKey);
+        } catch (ParseException e) {
+            Log.e(LOG_TAG, "Could not parse the dateKey " + dateKey + " to a date");
+        }
+    }
+
     public static String convertToDateKey(Calendar calendar) {
         SimpleDateFormat sdf = new SimpleDateFormat(DateKeyUtils.DATE_KEY_FORMAT, Locale.getDefault());
         return sdf.format(calendar.getTime());
+    }
+
+    public void setDate(@NonNull Date date) {
+        this.date = date;
     }
 
     public int getEggsCollected() {
@@ -137,15 +172,18 @@ public class DailyBalance implements Serializable, Comparable<DailyBalance>, Has
     }
 
     public Date getDate() {
-        SimpleDateFormat sdf = new SimpleDateFormat(DateKeyUtils.DATE_KEY_FORMAT, Locale.getDefault());
-        Date date;
+        if (this.date != null) return this.date;
 
         try {
-            date = sdf.parse(this.dateKey);
+            this.date = DateKeyUtils.getDateByDateKey(this.dateKey);
+            return this.date;
         } catch (ParseException e) {
-            date = new Date();
+            return new Date();
         }
-        return date;
+    }
+
+    protected Date getDateRaw() {
+        return this.date;
     }
 
     public int getNumHens() {

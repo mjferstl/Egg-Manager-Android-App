@@ -7,18 +7,11 @@ import java.util.Date;
 public class DateTypeConverter {
     @TypeConverter
     public Date fromTimestamp(Long value) {
-        if (value == null)
-            return null;
-        else
-            return new Date(value);
+        return (value == null) ? null : new Date(value);
     }
 
     @TypeConverter
     public Long dateToTimestamp(Date date) {
-        if (date == null) {
-            return null;
-        } else {
-            return date.getTime();
-        }
+        return (date == null) ? null : date.getTime();
     }
 }

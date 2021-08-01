@@ -427,6 +427,8 @@ public class DatabaseFragment extends Fragment {
 
                 // update the summary
                 updateSummary();
+
+                viewModel.upgradeDailyBalancesInDatabase(dailyBalanceList);
             }
         });
 
