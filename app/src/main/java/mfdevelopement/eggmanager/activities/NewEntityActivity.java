@@ -77,7 +77,7 @@ public class NewEntityActivity extends AppCompatActivity implements DatePickerFr
     /**
      * Number for storing the type of request from the calling activity
      */
-    private int requestCode;
+    private long requestCode;
 
     /**
      * Variable for storing an object of DailyBalance
@@ -161,9 +161,9 @@ public class NewEntityActivity extends AppCompatActivity implements DatePickerFr
 
 
         // fill in fields, if a item is edited
-        requestCode = getIntent().getIntExtra(DatabaseFragment.EXTRA_REQUEST_CODE_NAME, (int) DatabaseActions.Request.NEW_ENTITY.id);
+        requestCode = getIntent().getLongExtra(DatabaseFragment.EXTRA_REQUEST_CODE_NAME, DatabaseActions.Request.NEW_ENTITY.id);
         //String requestDate = getIntent().getStringExtra(DatabaseFragment.EXTRA_ENTITY_DATE);
-        Log.d(LOG_TAG, "activity startet with request code " + requestCode);
+        Log.d(LOG_TAG, "activity started with request code " + requestCode);
         if (requestCode == DatabaseActions.Request.EDIT_ENTITY.id) {
             loadedDailyBalance = (DailyBalance) getIntent().getSerializableExtra(DatabaseFragment.EXTRA_DAILY_BALANCE);
             if (loadedDailyBalance == null) {
@@ -190,9 +190,7 @@ public class NewEntityActivity extends AppCompatActivity implements DatePickerFr
                 int loadedEggsSold = loadedDailyBalance.getEggsSold();
                 eggsSoldEditText.setText(String.valueOf(loadedEggsSold));
                 double calcedPricePerEgg = loadedMoneyEarned / loadedEggsSold;
-                Log.d(LOG_TAG, "moneyEarnedEditText has content: " + moneyEarnedEditText.getText().toString());
                 pricePerEggEditText.setText(String.format(locale, PRICE_FORMAT, calcedPricePerEgg));
-                Log.d(LOG_TAG, "moneyEarnedEditText has content: " + moneyEarnedEditText.getText().toString());
             }
 
             // get the date from the dateKey String and update the TextView containing the date

@@ -36,7 +36,8 @@ import mfdevelopement.eggmanager.activities.DataCompletenessCheckActivity;
 import mfdevelopement.eggmanager.activities.FilterActivity;
 import mfdevelopement.eggmanager.activities.MainNavigationActivity;
 import mfdevelopement.eggmanager.activities.NewEntityActivity;
-import mfdevelopement.eggmanager.activity_contracts.CreateNewEntityContract;
+import mfdevelopement.eggmanager.activity_contracts.NewEntityContract;
+import mfdevelopement.eggmanager.activity_contracts.NewEntityIntentAdapter;
 import mfdevelopement.eggmanager.activity_contracts.OpenFilterActivityContract;
 import mfdevelopement.eggmanager.data_models.SortingItem;
 import mfdevelopement.eggmanager.data_models.SortingItemCollection;
@@ -65,7 +66,7 @@ public class DatabaseFragment extends Fragment {
     /**
      * Handle the results when creating a new entity
      */
-    private final ActivityResultLauncher<Long> createNewEntityResultLauncher = registerForActivityResult(new CreateNewEntityContract(), result -> {
+    private final ActivityResultLauncher<NewEntityIntentAdapter> newEntityResultLauncher = registerForActivityResult(new NewEntityContract(), result -> {
         if (result == DatabaseActions.Result.NEW_ENTITY.id) {
             Log.d(LOG_TAG, "user created a new entity");
             showSnackbarText(getString(R.string.new_entity_saved));
@@ -76,15 +77,21 @@ public class DatabaseFragment extends Fragment {
      * Variable to store the context
      */
     private Context mainContext;
+    /**
+     * Number of entries visible to the user
+     */
     private int entriesCount;
+
     private RecyclerView recyclerView;
     private final ActivityResultLauncher<Void> showFilterActivity = registerForActivityResult(new OpenFilterActivityContract(), result -> {
+
+        // Update the filter string
+        String filterString = viewModel.getDateFilter();
+
         if (result == DatabaseActions.Result.FILTER_OK.id) {
             Log.v(LOG_TAG, "filter has been set successfully");
 
-            String filterString = viewModel.getDateFilter();
-
-            // show a Snackbar to inform the user about the new filter
+            // show a snackbar to inform the user about the new filter
             if (filterString.isEmpty()) {
                 showSnackbarText("Daten nicht gefiltert");
             } else {
@@ -334,7 +341,28 @@ public class DatabaseFragment extends Fragment {
     }
 
     private void initRecyclerView() {
-        adapter = new DailyBalanceListAdapter(getActivity(), viewModel);
+        adapter = new DailyBalanceListAdapter(getActivity());
+        adapter.addOnItemActionClickListener(new DailyBalanceListAdapter.OnItemActionClickListener() {
+            @Override
+            public boolean onEditClicked(int position) {
+                Log.v(LOG_TAG, "user wants to edit the item at position " + position);
+
+                // Get the element
+                DailyBalance data = adapter.getItem(position);
+
+                // start the activity to edit the database item
+                newEntityResultLauncher.launch(new NewEntityIntentAdapter(data));
+                return true;
+            }
+
+            @Override
+            public boolean onDeleteClicked(int position) {
+                Log.v(LOG_TAG, "user wants to delete the item at position " + position);
+
+                viewModel.delete(adapter.getItem(position));
+                return true;
+            }
+        });
         recyclerView.setAdapter(adapter);
         recyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
         showTextEmptyRecyclerview(true);
@@ -364,7 +392,7 @@ public class DatabaseFragment extends Fragment {
 
     private void showSnackbarText(@NonNull String text) {
         // create a snackbar and display it
-        if (text != null && !text.isEmpty())
+        if (!text.isEmpty())
             Snackbar.make(rootView.findViewById(R.id.main_container), text, Snackbar.LENGTH_SHORT).show();
     }
 
@@ -374,7 +402,7 @@ public class DatabaseFragment extends Fragment {
             Intent intent = new Intent(mainContext, NewEntityActivity.class);
             intent.putExtra(EXTRA_REQUEST_CODE_NAME, DatabaseActions.Request.NEW_ENTITY.id);
 
-            createNewEntityResultLauncher.launch(DatabaseActions.Request.NEW_ENTITY.id);
+            newEntityResultLauncher.launch(new NewEntityIntentAdapter());
         });
     }
 

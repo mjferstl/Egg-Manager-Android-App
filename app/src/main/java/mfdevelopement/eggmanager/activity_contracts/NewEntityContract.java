@@ -9,19 +9,14 @@ import androidx.activity.result.contract.ActivityResultContract;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
-import mfdevelopement.eggmanager.activities.NewEntityActivity;
-import mfdevelopement.eggmanager.fragments.DatabaseFragment;
+public class NewEntityContract extends ActivityResultContract<NewEntityIntentAdapter, Integer> {
 
-public class CreateNewEntityContract extends ActivityResultContract<Long, Integer> {
-
-    private final String LOG_TAG = "CreateNewEntity";
+    private final String LOG_TAG = "NewEntityContract";
 
     @NonNull
     @Override
-    public Intent createIntent(@NonNull Context context, @NonNull Long requestCode) {
-        Intent intent = new Intent(context, NewEntityActivity.class);
-        intent.putExtra(DatabaseFragment.EXTRA_REQUEST_CODE_NAME, requestCode);
-        return intent;
+    public Intent createIntent(@NonNull Context context, @NonNull NewEntityIntentAdapter adapter) {
+        return adapter.toIntent(context);
     }
 
     @Override
