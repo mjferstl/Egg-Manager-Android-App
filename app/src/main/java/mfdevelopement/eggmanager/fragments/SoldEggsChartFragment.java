@@ -80,7 +80,7 @@ public class SoldEggsChartFragment extends Fragment {
         rootView = inflater.inflate(R.layout.content_chart, container, false);
 
         // get reference to view model
-        viewModel = new ViewModelProvider(this).get(SharedViewModel.class);
+        viewModel = new ViewModelProvider(this.getActivity()).get(SharedViewModel.class);
 
         // make sure the filter is up to date, e.g. when the user switched to this fragment
         viewModel.setDateFilter(viewModel.loadDateFilter());
@@ -255,7 +255,7 @@ public class SoldEggsChartFragment extends Fragment {
         if (getActivity() == null)
             Log.e(LOG_TAG, "initObservers(): observers cannot be initialized, because getActivity() returned null");
         else {
-            viewModel.getFilteredDailyBalance().observe(getActivity(), dailyBalanceList -> {
+            viewModel.getFilteredDailyBalance().observe(getViewLifecycleOwner(), dailyBalanceList -> {
 
                 if (dailyBalanceList != null && !dailyBalanceList.isEmpty()) {
 

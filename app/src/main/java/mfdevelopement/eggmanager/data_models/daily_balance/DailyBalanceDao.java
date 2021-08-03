@@ -37,7 +37,7 @@ public interface DailyBalanceDao {
     LiveData<List<DailyBalance>> getAscendingItems();
 
     @Query("SELECT * from " + tableName + " ORDER BY " + COL_DATE_PRIMARY_KEY + " ASC")
-    List<DailyBalance> getAscendingItemsList();
+    LiveData<DailyBalance> getAscendingItemsList();
 
     @Query("SELECT SUM(" + COL_EGGS_SOLD_NAME + ") FROM " + tableName + " WHERE "+ COL_DATE_PRIMARY_KEY + " LIKE :dateFilter || '%' ")
     LiveData<Integer> getFilteredEggsSold(String dateFilter);
@@ -52,7 +52,7 @@ public interface DailyBalanceDao {
     LiveData<List<String>> getDateKeysLiveData();
 
     @Query("SELECT " + COL_DATE_PRIMARY_KEY + " FROM " + tableName)
-    List<String> getDateKeysList();
+    LiveData<List<String>> getDateKeysList();
 
     @Query("SELECT * FROM " + tableName + " WHERE " + COL_DATE_PRIMARY_KEY + " LIKE :dateKey || '%' ORDER BY " + COL_DATE_PRIMARY_KEY + " ASC")
     List<DailyBalance> getDailyBalancesByDateKey(String dateKey);

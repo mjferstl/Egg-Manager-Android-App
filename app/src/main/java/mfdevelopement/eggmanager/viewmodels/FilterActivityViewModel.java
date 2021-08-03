@@ -6,6 +6,7 @@ import android.util.Log;
 
 import androidx.lifecycle.AndroidViewModel;
 import androidx.lifecycle.LiveData;
+import androidx.lifecycle.MutableLiveData;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -21,7 +22,7 @@ public class FilterActivityViewModel extends AndroidViewModel {
 
     private final String LOG_TAG = "FilterActivityViewModel";
     private List<String> yearNamesList = new ArrayList<>();
-    private List<String> uniqueYearMonthList;
+    private LiveData<List<String>> uniqueYearMonthList;
     private final List<String> monthNamesReference;
 
     private final EggManagerRepository repository;
@@ -53,7 +54,10 @@ public class FilterActivityViewModel extends AndroidViewModel {
         Collections.sort(uniqueNames);
         Collections.reverse(uniqueNames);
 
-        uniqueYearMonthList = uniqueNames;
+        MutableLiveData<List<String>> liveData = new MutableLiveData<>();
+        liveData.setValue(uniqueNames);
+
+        uniqueYearMonthList = liveData;
     }
 
     public List<String> getYearNames() {
@@ -62,9 +66,9 @@ public class FilterActivityViewModel extends AndroidViewModel {
 
     private List<String> getYearMonthNames() {
         if (uniqueYearMonthList != null) {
-            return uniqueYearMonthList;
+            return uniqueYearMonthList.getValue();
         } else {
-            return repository.getDateKeysList();
+            return repository.getDateKeysList().getValue();
         }
     }
 

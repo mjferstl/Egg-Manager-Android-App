@@ -16,6 +16,7 @@ import java.util.Calendar;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
+import kotlinx.coroutines.Dispatchers;
 import mfdevelopement.eggmanager.R;
 import mfdevelopement.eggmanager.charts.ReferenceDate;
 import mfdevelopement.eggmanager.coroutines.MyCoroutines;
@@ -86,9 +87,8 @@ public class SharedViewModel extends AndroidViewModel {
                     this.insert(db);
                 }
             }
-            Log.d(LOG_TAG, "");
             return null;
-        });
+        }, Dispatchers.getIO());
     }
 
     public LiveData<List<DailyBalance>> getAllDailyBalances() {

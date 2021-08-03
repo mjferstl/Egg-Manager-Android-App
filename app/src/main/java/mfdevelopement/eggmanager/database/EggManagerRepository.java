@@ -3,17 +3,16 @@ package mfdevelopement.eggmanager.database;
 import android.app.Application;
 import android.content.Context;
 import android.content.SharedPreferences;
-import android.os.AsyncTask;
 import android.util.Log;
 
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.Transformations;
 
-import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.ExecutionException;
 
+import kotlinx.coroutines.Dispatchers;
+import mfdevelopement.eggmanager.coroutines.MyCoroutines;
 import mfdevelopement.eggmanager.data_models.daily_balance.DailyBalance;
 import mfdevelopement.eggmanager.data_models.daily_balance.DailyBalanceDao;
 
@@ -62,34 +61,27 @@ public class EggManagerRepository {
         return ldEntriesCount;
     }
 
-    public List<DailyBalance> getAllDataList() {
-        List<DailyBalance> dailyBalances;
-
-        try {
-            dailyBalances = new getAllData(dailyBalanceDao).execute().get();
-        } catch (ExecutionException e) {
-            e.printStackTrace();
-            Log.e(LOG_TAG,"getAllDataList::ExecutionException");
-            return null;
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-            Log.e(LOG_TAG,"getAllDataList::InterruptedException");
-            return null;
-        }
-
-        return dailyBalances;
-    }
-
     public void insert(DailyBalance dailyBalance) {
-        new insertAsyncTask(dailyBalanceDao).execute(dailyBalance);
+        MyCoroutines.Companion.doAsync(() -> {
+            dailyBalanceDao.insert(dailyBalance);
+            return null;
+        }, Dispatchers.getIO());
     }
 
     public void delete(DailyBalance dailyBalance) {
-        new deleteAsyncTask(dailyBalanceDao).execute(dailyBalance);
+        MyCoroutines.Companion.doAsync(() -> {
+            dailyBalanceDao.delete(dailyBalance);
+            return null;
+        }, Dispatchers.getIO());
     }
 
     public void deleteAll() {
-        new deleteAllAsyncTask(dailyBalanceDao).execute();
+        MyCoroutines.Companion.doAsync(() -> {
+            Log.d(LOG_TAG, "Starting to delete all items");
+            dailyBalanceDao.deleteAll();
+            Log.d(LOG_TAG, "All items deleted.");
+            return null;
+        }, Dispatchers.getIO());
     }
 
     public LiveData<List<DailyBalance>> getFilteredDailyBalance(String dateFilter) {
@@ -112,120 +104,14 @@ public class EggManagerRepository {
         return ldFilteredEggsCollected;
     }
 
-    public LiveData<List<String>> getDateKeys() { return ldDateKeys; }
+    public LiveData<List<String>> getDateKeys() {
+        return ldDateKeys;
+    }
 
-    public List<String> getDateKeysList() {
-        List<String> dateKeys = new ArrayList<>();
-        try {
-            dateKeys = new getAllDateKeys(dailyBalanceDao).execute().get();
-        } catch (ExecutionException | InterruptedException e) {
-            e.printStackTrace();
-        }
+    public LiveData<List<String>> getDateKeysList() {
+        LiveData<List<String>> dateKeys;
+        dateKeys = dailyBalanceDao.getDateKeysList();
         return dateKeys;
-    }
-
-    public List<DailyBalance> getDailyBalancesByDateKey(String dateKeyPattern) {
-        List<DailyBalance> dailyBalanceList = new ArrayList<>();
-
-        try {
-            dailyBalanceList = new getDailyBalanceByDateKeyAsyncTask(dailyBalanceDao).execute(dateKeyPattern).get();
-        } catch (ExecutionException | InterruptedException e) {
-            e.printStackTrace();
-        }
-
-        return dailyBalanceList;
-    }
-
-    private static class insertAsyncTask extends AsyncTask<DailyBalance, Void, Void> {
-
-        private DailyBalanceDao mAsyncTaskDao;
-
-        insertAsyncTask(DailyBalanceDao dao) {
-            mAsyncTaskDao = dao;
-        }
-
-        @Override
-        protected Void doInBackground(final DailyBalance... params) {
-            mAsyncTaskDao.insert(params[0]);
-            return null;
-        }
-    }
-
-    private static class deleteAsyncTask extends AsyncTask<DailyBalance, Void, Void> {
-
-        private DailyBalanceDao mAsyncTaskDao;
-
-        deleteAsyncTask(DailyBalanceDao dao) {
-            mAsyncTaskDao = dao;
-        }
-
-        @Override
-        protected Void doInBackground(final DailyBalance... params) {
-            mAsyncTaskDao.delete(params[0]);
-            return null;
-        }
-    }
-
-    /**
-     * Async Task to deere
-     */
-    private static class deleteAllAsyncTask extends AsyncTask<Void, Void, Void> {
-
-        private DailyBalanceDao mAsyncTaskDao;
-
-        deleteAllAsyncTask(DailyBalanceDao dao) {
-            mAsyncTaskDao = dao;
-        }
-
-        @Override
-        protected Void doInBackground(Void... voids) {
-            Log.d(LOG_TAG, "Starting to delete all items");
-            mAsyncTaskDao.deleteAll();
-            Log.d(LOG_TAG, "All items deleted.");
-            return null;
-        }
-    }
-
-    private static class getDailyBalanceByDateKeyAsyncTask extends AsyncTask<String, Void, List<DailyBalance>> {
-
-        private DailyBalanceDao mAsyncTaskDao;
-
-        getDailyBalanceByDateKeyAsyncTask(DailyBalanceDao dao) {
-            mAsyncTaskDao = dao;
-        }
-
-        @Override
-        protected List<DailyBalance> doInBackground(final String... params) {
-            return mAsyncTaskDao.getDailyBalancesByDateKey(params[0]);
-        }
-    }
-
-    private static class getAllData extends AsyncTask<Void, Void, List<DailyBalance>> {
-
-        private DailyBalanceDao mAsyncTaskDao;
-
-        getAllData(DailyBalanceDao dao) {
-            mAsyncTaskDao = dao;
-        }
-
-        @Override
-        protected List<DailyBalance> doInBackground(Void... voids) {
-            return mAsyncTaskDao.getAscendingItemsList();
-        }
-    }
-
-    private static class getAllDateKeys extends AsyncTask<Void, Void, List<String>> {
-
-        private DailyBalanceDao mAsyncTaskDao;
-
-        getAllDateKeys(DailyBalanceDao dao) {
-            mAsyncTaskDao = dao;
-        }
-
-        @Override
-        protected List<String> doInBackground(Void... voids) {
-            return mAsyncTaskDao.getDateKeysList();
-        }
     }
 
     public void setDataFilter(String filterString) {
