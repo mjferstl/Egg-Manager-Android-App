@@ -38,12 +38,16 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
 
+import kotlinx.coroutines.Dispatchers;
 import mfdevelopement.eggmanager.R;
 import mfdevelopement.eggmanager.activities.MainNavigationActivity;
+import mfdevelopement.eggmanager.coroutines.MyCoroutines;
 import mfdevelopement.eggmanager.data_models.DatabaseBackup;
 import mfdevelopement.eggmanager.data_models.daily_balance.DailyBalance;
+import mfdevelopement.eggmanager.data_models.daily_balance.DailyBalanceJsonAdapter;
 import mfdevelopement.eggmanager.list_adapters.DatabaseBackupListAdapter;
-import mfdevelopement.eggmanager.utils.AppNotificationManager;
+import mfdevelopement.eggmanager.utils.DatabaseBackupCreateNotificationManager;
+import mfdevelopement.eggmanager.utils.DatabaseBackupImportNotificationManager;
 import mfdevelopement.eggmanager.utils.FileUtil;
 import mfdevelopement.eggmanager.utils.JSONUtil;
 import mfdevelopement.eggmanager.viewmodels.SharedViewModel;
@@ -137,7 +141,7 @@ public class DatabaseBackupFragment extends Fragment {
 
         RecyclerView recyclerView = mainRoot.findViewById(R.id.recv_database_backup);
         adapter = new DatabaseBackupListAdapter(getContext(), backupList);
-        recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
+        recyclerView.setLayoutManager(new LinearLayoutManager(getContext(), LinearLayoutManager.VERTICAL, false));
         recyclerView.setAdapter(adapter);
     }
 
@@ -147,12 +151,12 @@ public class DatabaseBackupFragment extends Fragment {
 
         LinearLayout linearLayoutRecyclerView = mainRoot.findViewById(R.id.linLay_database_backup_recv);
         LinearLayout linearLayoutRecyclerViewEmpty = mainRoot.findViewById(R.id.linLay_database_backup_recv_empty);
-        TextView txtv_recv_empty = mainRoot.findViewById(R.id.txtv_database_backup_recv_empty);
+        TextView txtvRecvEmpty = mainRoot.findViewById(R.id.txtv_database_backup_recv_empty);
 
         if (adapter.getItemCount() == 0) {
             linearLayoutRecyclerView.setVisibility(View.GONE);
             linearLayoutRecyclerViewEmpty.setVisibility(View.VISIBLE);
-            txtv_recv_empty.setOnClickListener(v -> showDialogCreateBackup());
+            txtvRecvEmpty.setOnClickListener(v -> showDialogCreateBackup());
         } else {
             linearLayoutRecyclerView.setVisibility(View.VISIBLE);
             linearLayoutRecyclerViewEmpty.setVisibility(View.GONE);
@@ -306,16 +310,40 @@ public class DatabaseBackupFragment extends Fragment {
                 if (allDailyBalances == null)
                     Snackbar.make(mainRoot.findViewById(idSnackbarContainer), getString(R.string.snackbar_error_loading_data_from_database), Snackbar.LENGTH_LONG).show();
                 else {
-                    // create a JSONArray
-                    JSONArray jsonArray = createJsonArrayFromDailyBalance(allDailyBalances);
+                    // Write file in a coroutine
+                    MyCoroutines.Companion.doAsync(() -> {
 
-                    // save the JSONArray to file as a String
-                    DatabaseBackup backup = new DatabaseBackup();
-                    backup.setBackupName(backupName);
-                    new createBackupAsyncTask((MainNavigationActivity) getActivity()).execute(backup.getFilename(), jsonArray.toString());
+                        // Create a new backup
+                        DatabaseBackup backup = new DatabaseBackup();
+                        backup.setBackupName(backupName);
+
+                        // Create a notification
+                        DatabaseBackupCreateNotificationManager notificationManager = new DatabaseBackupCreateNotificationManager(getContext());
+                        notificationManager.showFileCreateNotification(backup.getFilename());
+
+                        // Create a JSONArray and write it to the file
+                        JSONArray jsonArray = createJsonArrayFromDailyBalance(allDailyBalances);
+                        int status = FileUtil.writeContentToFile(getContext(), backup.getFilename(), jsonArray.toString());
+
+                        // Update the notification
+                        String msg = String.format(Locale.getDefault(), "Datensicherung \"%s\" mit %d Einträgen erstellt.", backup.getBackupName(), allDailyBalances.size());
+                        notificationManager.setFileCreateNotificationFinished(msg);
+
+                        if (status == 0) {
+                            if (getActivity() != null) {
+                                ((MainNavigationActivity) getActivity()).onBackupCreated(backup.getFilename());
+                                updateRecyclerView();
+                            } else {
+                                Log.d(LOG_TAG, "createNewBackup(): getActivity returned null");
+                            }
+                        } else {
+                            Log.e(LOG_TAG, "Could not create backup file " + backup.getFilename());
+                        }
+                        return null;
+                    }, Dispatchers.getIO());
                 }
             } else {
-                // inform the user, that no write persmission is granted
+                // inform the user, that no write permission is granted
                 Snackbar.make(mainRoot.findViewById(R.id.database_import_export_container), getString(R.string.snackbar_permission_ext_storage_denied), Snackbar.LENGTH_SHORT).show();
             }
         } else {
@@ -390,7 +418,6 @@ public class DatabaseBackupFragment extends Fragment {
         }
     }
 
-
     /**
      * Initialize the Floating Action Button
      */
@@ -411,59 +438,19 @@ public class DatabaseBackupFragment extends Fragment {
     }
 
 
-    private static class createBackupAsyncTask extends AsyncTask<String, Void, String> {
-
-        private WeakReference<MainNavigationActivity> weakReference;
-        private final String LOG_TAG = "createBackupAsyncTask";
-
-        createBackupAsyncTask(MainNavigationActivity context) {
-            weakReference = new WeakReference<>(context);
-        }
-
-        @Override
-        protected String doInBackground(String... strings) {
-
-            MainNavigationActivity activity = weakReference.get();
-            if (activity == null || activity.isFinishing()) {
-                Log.e(LOG_TAG, "activity == null or activity is finishing");
-                return "";
-            }
-
-            String filename = strings[0];
-            String content = strings[1];
-            int status = FileUtil.writeContentToFile(activity.getBaseContext(), filename, content);
-
-            if (status == 0)
-                return filename;
-            else
-                return "";
-        }
-
-        @Override
-        protected void onPostExecute(String filename) {
-            super.onPostExecute(filename);
-
-            MainNavigationActivity activity = weakReference.get();
-            if (activity == null || activity.isFinishing())
-                return;
-
-            Log.d(LOG_TAG,"sending name of the created file \"" + filename + "\" to the main activity");
-            activity.onBackupCreated(filename);
-        }
-    }
-
+    // TODO: replace by coroutine
     private static class importBackupAsyncTask extends AsyncTask<String, Void, Integer> {
 
         private WeakReference<MainNavigationActivity> weakReference;
         private final String LOG_TAG = "importBackupAsyncTask";
 
-        private AppNotificationManager appNotificationManager;
+        private final DatabaseBackupImportNotificationManager appNotificationManager;
 
         private final SimpleDateFormat sdf_date = new SimpleDateFormat("dd.MM.yyyy", Locale.ENGLISH);
 
         importBackupAsyncTask(MainNavigationActivity context) {
             weakReference = new WeakReference<>(context);
-            appNotificationManager = new AppNotificationManager(context);
+            appNotificationManager = new DatabaseBackupImportNotificationManager(context);
             appNotificationManager.createNotificationChannel();
         }
 
