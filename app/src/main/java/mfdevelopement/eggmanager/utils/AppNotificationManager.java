@@ -27,7 +27,9 @@ public abstract class AppNotificationManager {
 
     protected final String LOG_TAG = "AppNotificationManager";
 
+    // TODO: Move to another class
     public static final String INTENT_ACTION_OPEN_DATABASE = "OpenDatabaseFragment";
+    // TODO: Move to another class
     public static final String INTENT_ACTION_OPEN_BACKUP = "OpenDatabaseBackupFragment";
 
     public AppNotificationManager(Context context) {
@@ -35,7 +37,7 @@ public abstract class AppNotificationManager {
         createNotificationChannel();
     }
 
-    public void createNotificationChannel() {
+    private void createNotificationChannel() {
         // Create the NotificationChannel, but only on API 26+ because
         // the NotificationChannel class is new and not in the support library
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
