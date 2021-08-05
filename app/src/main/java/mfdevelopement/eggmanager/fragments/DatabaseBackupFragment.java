@@ -451,7 +451,6 @@ public class DatabaseBackupFragment extends Fragment {
         importBackupAsyncTask(MainNavigationActivity context) {
             weakReference = new WeakReference<>(context);
             appNotificationManager = new DatabaseBackupImportNotificationManager(context);
-            appNotificationManager.createNotificationChannel();
         }
 
         @Override
