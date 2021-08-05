@@ -4,7 +4,7 @@ import android.app.NotificationChannel;
 import android.content.Context;
 import android.os.Build;
 
-public class AppNotificationManager {
+public abstract class AppNotificationManager {
 
     /**
      * Enum containing the IDs of the different notification types
