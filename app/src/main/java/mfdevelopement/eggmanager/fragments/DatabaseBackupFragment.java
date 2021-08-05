@@ -231,7 +231,8 @@ public class DatabaseBackupFragment extends Fragment {
 
         for (int i = 0; i < dailyBalanceList.size(); i++) {
             try {
-                jsonArray.put(i, dailyBalanceList.get(i).toJSON());
+                DailyBalanceJsonAdapter adapter = new DailyBalanceJsonAdapter(dailyBalanceList.get(i));
+                jsonArray.put(i, adapter.toJSON());
             } catch (JSONException e) {
                 e.printStackTrace();
                 Log.e(LOG_TAG, "createJsonArrayFromDailyBalance(): Error encountered while creating JSONArray");
