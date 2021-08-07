@@ -49,7 +49,6 @@ public class SharedViewModel extends AndroidViewModel {
     // Calendar containing the reference date
     private final Calendar referenceDate;
 
-
     // Constructor
     public SharedViewModel(Application application) {
         super(application);
