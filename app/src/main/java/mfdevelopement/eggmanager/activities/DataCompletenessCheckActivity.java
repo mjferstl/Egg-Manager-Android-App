@@ -26,7 +26,7 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 
-import mfdevelopement.eggmanager.DatabaseActions;
+import mfdevelopement.eggmanager.IntentCodes;
 import mfdevelopement.eggmanager.R;
 import mfdevelopement.eggmanager.data_models.HasDateInterface;
 import mfdevelopement.eggmanager.data_models.HasDateInterfaceObject;
@@ -304,7 +304,7 @@ public class DataCompletenessCheckActivity extends AppCompatActivity implements 
 
     private void createNewEntity(String dateString) {
         Intent intent = new Intent(this, NewEntityActivity.class);
-        intent.putExtra(DatabaseFragment.EXTRA_REQUEST_CODE_NAME, DatabaseActions.Request.NEW_ENTITY.id);
+        intent.putExtra(DatabaseFragment.EXTRA_REQUEST_CODE_NAME, IntentCodes.Request.NEW_ENTITY.id);
         intent.putExtra(DatabaseFragment.EXTRA_ENTITY_DATE, dateString);
 
         mStartActivityWithIntent.launch(intent);

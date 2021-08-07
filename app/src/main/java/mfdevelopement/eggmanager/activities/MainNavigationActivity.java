@@ -16,14 +16,12 @@ import androidx.navigation.ui.NavigationUI;
 
 import com.google.android.material.navigation.NavigationView;
 
+import mfdevelopement.eggmanager.IntentCodes;
 import mfdevelopement.eggmanager.R;
 import mfdevelopement.eggmanager.data_models.daily_balance.DailyBalance;
 import mfdevelopement.eggmanager.dialog_fragments.DeleteDatabaseDialog;
 import mfdevelopement.eggmanager.dialog_fragments.SortingDialogFragment;
 import mfdevelopement.eggmanager.viewmodels.SharedViewModel;
-
-import static mfdevelopement.eggmanager.utils.AppNotificationManager.INTENT_ACTION_OPEN_BACKUP;
-import static mfdevelopement.eggmanager.utils.AppNotificationManager.INTENT_ACTION_OPEN_DATABASE;
 
 public class MainNavigationActivity extends AppCompatActivity
         implements SortingDialogFragment.OnSortingItemClickListener, DeleteDatabaseDialog.DialogButtonClickedListener {
@@ -101,9 +99,9 @@ public class MainNavigationActivity extends AppCompatActivity
         if (getIntent() != null && getIntent().getAction() != null) {
             String requestedFragment = getIntent().getAction();
 
-            if (requestedFragment.equals(INTENT_ACTION_OPEN_DATABASE))
+            if (requestedFragment.equals(IntentCodes.NotificationActions.OPEN_MAIN_ACTIVITY.actionName))
                 navController.navigate(R.id.nav_main_database);
-            else if (requestedFragment.equals(INTENT_ACTION_OPEN_BACKUP))
+            else if (requestedFragment.equals(IntentCodes.NotificationActions.OPEN_BACKUP_ACTIVITY.actionName))
                 navController.navigate(R.id.nav_backup);
         }
 

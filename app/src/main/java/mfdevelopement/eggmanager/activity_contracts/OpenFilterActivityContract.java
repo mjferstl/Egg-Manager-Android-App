@@ -9,7 +9,7 @@ import androidx.activity.result.contract.ActivityResultContract;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
-import mfdevelopement.eggmanager.DatabaseActions;
+import mfdevelopement.eggmanager.IntentCodes;
 import mfdevelopement.eggmanager.activities.FilterActivity;
 import mfdevelopement.eggmanager.fragments.DatabaseFragment;
 
@@ -22,7 +22,7 @@ public class OpenFilterActivityContract extends ActivityResultContract<Void, Int
     public Intent createIntent(@NonNull Context context, Void v) {
         Log.v(LOG_TAG, "creating an intent for starting FilterActivity");
         Intent intent = new Intent(context, FilterActivity.class);
-        intent.putExtra(DatabaseFragment.EXTRA_REQUEST_CODE_NAME, DatabaseActions.Request.EDIT_FILTER.id);
+        intent.putExtra(DatabaseFragment.EXTRA_REQUEST_CODE_NAME, IntentCodes.Request.EDIT_FILTER.id);
         return intent;
     }
 

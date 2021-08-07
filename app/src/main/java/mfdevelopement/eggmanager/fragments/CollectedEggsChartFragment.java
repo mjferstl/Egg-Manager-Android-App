@@ -31,7 +31,7 @@ import com.google.android.material.snackbar.Snackbar;
 
 import java.util.List;
 
-import mfdevelopement.eggmanager.DatabaseActions;
+import mfdevelopement.eggmanager.IntentCodes;
 import mfdevelopement.eggmanager.R;
 import mfdevelopement.eggmanager.activities.FilterActivity;
 import mfdevelopement.eggmanager.charts.DataSetUtils;
@@ -51,7 +51,7 @@ public class CollectedEggsChartFragment extends Fragment {
         @Override
         public Intent createIntent(@NonNull Context context, Integer input) {
             Intent intent = new Intent(getContext(), FilterActivity.class);
-            intent.putExtra(EXTRA_REQUEST_CODE_NAME, DatabaseActions.Request.EDIT_FILTER.ordinal());
+            intent.putExtra(EXTRA_REQUEST_CODE_NAME, IntentCodes.Request.EDIT_FILTER.ordinal());
             return intent;
         }
 
@@ -70,7 +70,7 @@ public class CollectedEggsChartFragment extends Fragment {
                 public void onActivityResult(Integer resultCode) {
                     Log.d(LOG_TAG, "registerForActivityResult(): resultCode = " + resultCode);
 
-                    if (resultCode == DatabaseActions.Result.FILTER_OK.ordinal()) {
+                    if (resultCode == IntentCodes.Result.FILTER_OK.ordinal()) {
                         // update the new filter string in the view model
                         viewModel.setDateFilter(viewModel.loadDateFilter());
                     }
@@ -86,7 +86,7 @@ public class CollectedEggsChartFragment extends Fragment {
         rootView = inflater.inflate(R.layout.content_chart, container, false);
 
         // get reference to view model
-        viewModel = new ViewModelProvider(this.getActivity()).get(SharedViewModel.class);
+        viewModel = new ViewModelProvider(this).get(SharedViewModel.class);
 
         // make sure the filter is up to date, e.g. when the user switched to this fragment
         viewModel.setDateFilter(viewModel.loadDateFilter());
@@ -175,7 +175,7 @@ public class CollectedEggsChartFragment extends Fragment {
     }
 
     private void openFilterActivity() {
-        mGetContent.launch(DatabaseActions.Request.EDIT_FILTER.ordinal());
+        mGetContent.launch(IntentCodes.Request.EDIT_FILTER.ordinal());
     }
 
     private void initObservers() {

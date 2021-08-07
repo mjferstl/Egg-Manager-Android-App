@@ -20,7 +20,7 @@ import mfdevelopement.eggmanager.database.EggManagerRepository;
 
 public class FilterActivityViewModel extends AndroidViewModel {
 
-    private final String LOG_TAG = "FilterActivityViewModel";
+    private static final String LOG_TAG = "FilterActivityViewModel";
     private List<String> yearNamesList = new ArrayList<>();
     private LiveData<List<String>> uniqueYearMonthList;
     private final List<String> monthNamesReference;
@@ -65,7 +65,7 @@ public class FilterActivityViewModel extends AndroidViewModel {
     }
 
     private List<String> getYearMonthNames() {
-        if (uniqueYearMonthList != null) {
+        if (this.uniqueYearMonthList != null && this.uniqueYearMonthList.getValue() != null) {
             return uniqueYearMonthList.getValue();
         } else {
             return repository.getDateKeysList().getValue();

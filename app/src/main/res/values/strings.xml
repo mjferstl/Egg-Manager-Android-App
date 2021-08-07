@@ -43,9 +43,13 @@
     <string name="heading_found_backups">Vorhandene Datensicherungen</string>
     <string name="dialog_button_backup_create">Erstellen</string>
     <string name="dialog_button_cancel">Abbruch</string>
-    <string name="notification_import_title_prefix">Import des Backups</string>
+    <!-- notifications -->
+    <string name="notification_import_title_prefix">Import des Backups \"%s\"</string>
     <string name="notification_import_finished">Import abgeschlossen</string>
     <string name="notification_importing_backup">Backup wird eingelesen</string>
+    <string name="notification_backup_create_title">Datensicherung</string>
+    <string name="notification_backup_create_string_formatter">Datensicherung \"%s\" wird erstellt…</string>
+    <string name="notification_backup_create_finished_text">Datensicherung erstellt</string>
 
     <!-- new entity activity -->
     <string name="symbol_price_per_piece">&#8364;/St.</string>

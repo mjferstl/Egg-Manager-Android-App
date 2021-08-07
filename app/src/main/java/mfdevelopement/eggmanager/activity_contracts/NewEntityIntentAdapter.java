@@ -5,7 +5,7 @@ import android.content.Intent;
 
 import androidx.annotation.NonNull;
 
-import mfdevelopement.eggmanager.DatabaseActions;
+import mfdevelopement.eggmanager.IntentCodes;
 import mfdevelopement.eggmanager.activities.NewEntityActivity;
 import mfdevelopement.eggmanager.data_models.daily_balance.DailyBalance;
 import mfdevelopement.eggmanager.fragments.DatabaseFragment;
@@ -26,7 +26,7 @@ public class NewEntityIntentAdapter {
      * Default constructor for creating an intent to create a new database entity
      */
     public NewEntityIntentAdapter() {
-        this(DatabaseActions.Request.NEW_ENTITY);
+        this(IntentCodes.Request.NEW_ENTITY);
     }
 
     /**
@@ -34,7 +34,7 @@ public class NewEntityIntentAdapter {
      *
      * @param request type of request
      */
-    public NewEntityIntentAdapter(final DatabaseActions.Request request) {
+    public NewEntityIntentAdapter(final IntentCodes.Request request) {
         this.requestCode = request.id;
     }
 
@@ -45,7 +45,7 @@ public class NewEntityIntentAdapter {
      * @param data DailyBalance object to edit
      */
     public NewEntityIntentAdapter(@NonNull final DailyBalance data) {
-        this.requestCode = DatabaseActions.Request.EDIT_ENTITY.id;
+        this.requestCode = IntentCodes.Request.EDIT_ENTITY.id;
         this.dailyBalance = data;
     }
 
@@ -55,7 +55,7 @@ public class NewEntityIntentAdapter {
      * @param request type of request
      * @param data    DailyBalance object to pass to the activity
      */
-    public NewEntityIntentAdapter(final DatabaseActions.Request request, @NonNull final DailyBalance data) {
+    public NewEntityIntentAdapter(final IntentCodes.Request request, @NonNull final DailyBalance data) {
         this.requestCode = request.id;
         this.dailyBalance = data;
     }

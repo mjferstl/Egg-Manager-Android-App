@@ -22,7 +22,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 
-import mfdevelopement.eggmanager.DatabaseActions;
+import mfdevelopement.eggmanager.IntentCodes;
 import mfdevelopement.eggmanager.R;
 import mfdevelopement.eggmanager.data_models.daily_balance.DateKeyUtils;
 import mfdevelopement.eggmanager.list_adapters.DateFilterListAdapter;
@@ -179,14 +179,14 @@ public class FilterActivity extends AppCompatActivity implements DateFilterListA
             viewModel.setFilterString(newFilterString);
 
             // finish the activity with a result code
-            endActivity(DatabaseActions.Result.FILTER_OK, new Intent().setData(Uri.parse(newFilterString)));
+            endActivity(IntentCodes.Result.FILTER_OK, new Intent().setData(Uri.parse(newFilterString)));
             return true;
         } else if (itemId == R.id.action_remove_filter) {
             viewModel.setFilterString("");
-            endActivity(DatabaseActions.Result.FILTER_REMOVED, null);
+            endActivity(IntentCodes.Result.FILTER_REMOVED, null);
             return true;
         } else if (itemId == android.R.id.home) {// action when clicking on the home up button
-            endActivity(DatabaseActions.Result.FILTER_CANCEL, null);
+            endActivity(IntentCodes.Result.FILTER_CANCEL, null);
             return true;
         }
         return false;
@@ -212,10 +212,10 @@ public class FilterActivity extends AppCompatActivity implements DateFilterListA
     /**
      * Method for ending the activity
      *
-     * @param action {@link DatabaseActions.Result}
+     * @param action {@link IntentCodes.Result}
      * @param data   Intent containing data to be sent to the caller activity
      */
-    private void endActivity(DatabaseActions.Result action, @Nullable Intent data) {
+    private void endActivity(IntentCodes.Result action, @Nullable Intent data) {
         if (data != null)
             setResult((int) action.id, data);
         else
@@ -225,7 +225,7 @@ public class FilterActivity extends AppCompatActivity implements DateFilterListA
 
     @Override
     public void onBackPressed() {
-        endActivity(DatabaseActions.Result.FILTER_CANCEL, null);
+        endActivity(IntentCodes.Result.FILTER_CANCEL, null);
     }
 
     private String parseSelectedFilter() {

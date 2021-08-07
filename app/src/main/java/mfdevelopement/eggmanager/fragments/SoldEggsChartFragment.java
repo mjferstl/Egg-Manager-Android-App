@@ -32,7 +32,7 @@ import com.google.android.material.snackbar.Snackbar;
 import java.util.ArrayList;
 import java.util.List;
 
-import mfdevelopement.eggmanager.DatabaseActions;
+import mfdevelopement.eggmanager.IntentCodes;
 import mfdevelopement.eggmanager.R;
 import mfdevelopement.eggmanager.activities.FilterActivity;
 import mfdevelopement.eggmanager.charts.ChartStyle;
@@ -80,7 +80,7 @@ public class SoldEggsChartFragment extends Fragment {
         rootView = inflater.inflate(R.layout.content_chart, container, false);
 
         // get reference to view model
-        viewModel = new ViewModelProvider(this.getActivity()).get(SharedViewModel.class);
+        viewModel = new ViewModelProvider(this).get(SharedViewModel.class);
 
         // make sure the filter is up to date, e.g. when the user switched to this fragment
         viewModel.setDateFilter(viewModel.loadDateFilter());
@@ -178,7 +178,7 @@ public class SoldEggsChartFragment extends Fragment {
         chartStyleList.add(ChartStyle.LINE);
         ChartStyleDialogFragment fragment = new ChartStyleDialogFragment(items);
 
-        int initialPositionSelected = 0;
+        int initialPositionSelected = -1;
         if (genericChart instanceof MyBarChart) {
             initialPositionSelected = 0;
         } else if (genericChart instanceof MyLineChart) {
@@ -198,6 +198,11 @@ public class SoldEggsChartFragment extends Fragment {
 
         // FragmentActivity.getSupportFragmentManager()
         final String fragmentTag = "ChartStyleDialogFragment";
+        if (getActivity() == null) {
+            Log.e(LOG_TAG, "showChartStyleDialog(): getActivity() == null");
+            return;
+        }
+
         FragmentTransaction ft = getActivity().getSupportFragmentManager().beginTransaction();
         Fragment prev = getActivity().getSupportFragmentManager().findFragmentByTag(fragmentTag);
         if (prev != null) {
@@ -246,7 +251,7 @@ public class SoldEggsChartFragment extends Fragment {
 
     private void openFilterActivity() {
         Intent intent = new Intent(getContext(), FilterActivity.class);
-        intent.putExtra(EXTRA_REQUEST_CODE_NAME, DatabaseActions.Request.EDIT_FILTER.ordinal());
+        intent.putExtra(EXTRA_REQUEST_CODE_NAME, IntentCodes.Request.EDIT_FILTER.ordinal());
 
         mStartActivityWithIntent.launch(intent);
     }

@@ -3,7 +3,6 @@ package mfdevelopement.eggmanager.fragments;
 import android.Manifest;
 import android.content.DialogInterface;
 import android.content.pm.PackageManager;
-import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Environment;
 import android.util.Log;
@@ -31,7 +30,6 @@ import org.json.JSONArray;
 import org.json.JSONException;
 
 import java.io.File;
-import java.lang.ref.WeakReference;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -46,10 +44,10 @@ import mfdevelopement.eggmanager.data_models.DatabaseBackup;
 import mfdevelopement.eggmanager.data_models.daily_balance.DailyBalance;
 import mfdevelopement.eggmanager.data_models.daily_balance.DailyBalanceJsonAdapter;
 import mfdevelopement.eggmanager.list_adapters.DatabaseBackupListAdapter;
-import mfdevelopement.eggmanager.utils.DatabaseBackupCreateNotificationManager;
-import mfdevelopement.eggmanager.utils.DatabaseBackupImportNotificationManager;
 import mfdevelopement.eggmanager.utils.FileUtil;
 import mfdevelopement.eggmanager.utils.JSONUtil;
+import mfdevelopement.eggmanager.utils.notifications.DatabaseBackupCreateNotificationManager;
+import mfdevelopement.eggmanager.utils.notifications.DatabaseBackupImportNotificationManager;
 import mfdevelopement.eggmanager.viewmodels.SharedViewModel;
 
 public class DatabaseBackupFragment extends Fragment {
@@ -182,15 +180,69 @@ public class DatabaseBackupFragment extends Fragment {
      * @param backup DatabaseBackup
      */
     private void importBackup(DatabaseBackup backup) {
-        Log.d(LOG_TAG,"importBackup()");
+        Log.d(LOG_TAG, "importBackup()");
 
         // load the backup in an async task
-        new importBackupAsyncTask((MainNavigationActivity) getActivity()).execute(backup.getFilename());
+        //new importBackupAsyncTask((MainNavigationActivity) getActivity()).execute();
+
+        MyCoroutines.Companion.doAsync(() -> {
+            importDataTask(backup);
+            return null;
+        }, Dispatchers.getIO());
+    }
+
+    private void importDataTask(DatabaseBackup databaseBackup) {
+        final String logIdentifier = "importBackup():Coroutine: ";
+
+        // Create a notification
+        DatabaseBackupImportNotificationManager notificationManager = new DatabaseBackupImportNotificationManager(this.getContext());
+        notificationManager.showImportNotification(databaseBackup.getBackupName());
+        final int maxProgress = 5;
+
+        // read the content of the file
+        File file = new File(publicDataDir, databaseBackup.getFilename());
+        String content = FileUtil.readFile(file);
+        // Update notification progress
+        notificationManager.updateImportNotification(1, maxProgress);
+
+        // convert String to JSONObject
+        JSONArray jsonArray = JSONUtil.getJSONObject(content);
+        // Update notification progress
+        notificationManager.updateImportNotification(2, maxProgress);
+
+        // check if data was loaded
+        if (jsonArray == null) {
+            Log.e(LOG_TAG, logIdentifier + "jsonArray == null");
+            return;
+        }
+        if (jsonArray.length() == 0) {
+            Log.e(LOG_TAG, logIdentifier + "jsonArray.length() == 0");
+            return;
+        }
+
+        // import data to the database. If data exists, it gets overwritten
+        List<DailyBalance> dailyBalances = DailyBalance.getDailyBalanceFromJSON(jsonArray);
+        // Update notification progress
+        notificationManager.updateImportNotification(3, maxProgress);
+
+        // Load the entries into the database
+        Log.d(LOG_TAG, logIdentifier + "backup contains " + dailyBalances.size() + " entries.");
+        Log.d(LOG_TAG, logIdentifier + "starting the import...");
+
+        for (int i = 0; i < dailyBalances.size(); i++) {
+            viewModel.insert(dailyBalances.get(i));
+            float progress = 3 + ((i + 1) / (float) dailyBalances.size() * 2); // Multiplied by 2, as the database insert is represented as 2/5 of the doing
+            notificationManager.updateImportNotification(progress, maxProgress);
+        }
+
+        Log.d(LOG_TAG, String.format(logIdentifier + "import of %d items finished", dailyBalances.size()));
+        notificationManager.setImportNotificationFinished("Import abgeschlossen.\n" + dailyBalances.size() + " Einträge importiert.");
     }
 
 
     /**
      * check if the permission to write to the external storage is given
+     *
      * @return flag, if the permission is granted
      */
     private boolean isWritePermissionGranted() {
@@ -318,7 +370,7 @@ public class DatabaseBackupFragment extends Fragment {
                         backup.setBackupName(backupName);
 
                         // Create a notification
-                        DatabaseBackupCreateNotificationManager notificationManager = new DatabaseBackupCreateNotificationManager(getContext());
+                        DatabaseBackupCreateNotificationManager notificationManager = new DatabaseBackupCreateNotificationManager(this.getContext());
                         notificationManager.showFileCreateNotification(backup.getFilename());
 
                         // Create a JSONArray and write it to the file
@@ -374,6 +426,7 @@ public class DatabaseBackupFragment extends Fragment {
             if (files == null) {
                 Log.e(LOG_TAG,"Files[]  is null");
             } else {
+                SimpleDateFormat simpleDateFormat = new SimpleDateFormat("dd.MM.yyyy HH:mm", stringFormatLocale);
                 for (File file : files) {
 
                     // file name of the current file
@@ -381,8 +434,6 @@ public class DatabaseBackupFragment extends Fragment {
 
                     // check if the file is a EggManager backup file
                     if (DatabaseBackup.isEggManagerBackupFile(fileName)) {
-
-                        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("dd.MM.yyyy HH:mm", stringFormatLocale);
                         Log.d(LOG_TAG, "backup file: " + fileName + ", last modified: " + simpleDateFormat.format(file.lastModified()) + ", size: " + file.length() + " bytes");
 
                         // add the date to the list
@@ -392,7 +443,6 @@ public class DatabaseBackupFragment extends Fragment {
 
                 // sort in descending order
                 Collections.sort(backupFiles);
-
                 Log.d(LOG_TAG, "Found " + backupFiles.size() + " backup files");
             }
         } else {
@@ -429,74 +479,10 @@ public class DatabaseBackupFragment extends Fragment {
         });
     }
 
-
     /**
      * Initialize observers for receiving LiveData
      */
     private void initObservers() {
         viewModel.getAllDailyBalances().observe(getViewLifecycleOwner(), dailyBalanceList -> allDailyBalances = dailyBalanceList);
-    }
-
-
-    // TODO: replace by coroutine
-    private static class importBackupAsyncTask extends AsyncTask<String, Void, Integer> {
-
-        private WeakReference<MainNavigationActivity> weakReference;
-        private final String LOG_TAG = "importBackupAsyncTask";
-
-        private final DatabaseBackupImportNotificationManager appNotificationManager;
-
-        private final SimpleDateFormat sdf_date = new SimpleDateFormat("dd.MM.yyyy", Locale.ENGLISH);
-
-        importBackupAsyncTask(MainNavigationActivity context) {
-            weakReference = new WeakReference<>(context);
-            appNotificationManager = new DatabaseBackupImportNotificationManager(context);
-        }
-
-        @Override
-        protected Integer doInBackground(String... strings) {
-            String filename = strings[0];
-
-            MainNavigationActivity activity = weakReference.get();
-
-            // read the content of the file
-            File file = new File(publicDataDir, filename);
-            String content = FileUtil.readFile(file);
-
-            // convert String to JSONObject
-            JSONArray jsonArray = JSONUtil.getJSONObject(content);
-
-            // check if data was loaded
-            if (jsonArray == null || jsonArray.length() == 0)
-                return 0;
-
-            // import data to the database. If data exists, it gets overwritten
-            List<DailyBalance> dailyBalances = DailyBalance.getDailyBalanceFromJSON(jsonArray);
-
-            Log.d(LOG_TAG,"backup contains " + dailyBalances.size() + " entries");
-
-            appNotificationManager.showImportNotification(filename);
-
-            for (int i = 0; i < dailyBalances.size(); i++) {
-                Log.d(LOG_TAG, "Date of loaded data: " + sdf_date.format(dailyBalances.get(i).getDate()));
-                activity.updateDailyBalance(dailyBalances.get(i));
-                appNotificationManager.updateImportNotification(((i+1)*100)/dailyBalances.size());
-            }
-
-            return dailyBalances.size();
-        }
-
-        @Override
-        protected void onPostExecute(Integer numItems) {
-            super.onPostExecute(numItems);
-
-            Log.d(LOG_TAG, String.format("import of %s items finished", numItems));
-
-            if (numItems > 0) {
-                appNotificationManager.setImportNotificationFinished("Import abgeschlossen.\n" + numItems + " Einträge eingelesen.");
-            } else {
-                appNotificationManager.setImportNotificationFinished("Fehler beim Einlesen der Daten. Keine neuen Daten importiert.");
-            }
-        }
     }
 }

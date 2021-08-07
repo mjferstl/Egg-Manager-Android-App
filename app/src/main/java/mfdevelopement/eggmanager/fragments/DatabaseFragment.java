@@ -30,7 +30,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
 
-import mfdevelopement.eggmanager.DatabaseActions;
+import mfdevelopement.eggmanager.IntentCodes;
 import mfdevelopement.eggmanager.R;
 import mfdevelopement.eggmanager.activities.DataCompletenessCheckActivity;
 import mfdevelopement.eggmanager.activities.FilterActivity;
@@ -67,7 +67,7 @@ public class DatabaseFragment extends Fragment {
      * Handle the results when creating a new entity
      */
     private final ActivityResultLauncher<NewEntityIntentAdapter> newEntityResultLauncher = registerForActivityResult(new NewEntityContract(), result -> {
-        if (result == DatabaseActions.Result.NEW_ENTITY.id) {
+        if (result == IntentCodes.Result.NEW_ENTITY.id) {
             Log.d(LOG_TAG, "user created a new entity");
             showSnackbarText(getString(R.string.new_entity_saved));
         }
@@ -88,7 +88,7 @@ public class DatabaseFragment extends Fragment {
         // Update the filter string
         String filterString = viewModel.getDateFilter();
 
-        if (result == DatabaseActions.Result.FILTER_OK.id) {
+        if (result == IntentCodes.Result.FILTER_OK.id) {
             Log.v(LOG_TAG, "filter has been set successfully");
 
             // show a snackbar to inform the user about the new filter
@@ -111,9 +111,9 @@ public class DatabaseFragment extends Fragment {
                 if (!filterName.isEmpty())
                     showSnackbarText("Daten nach " + filterName + " gefiltert");
             }
-        } else if (result == DatabaseActions.Result.FILTER_CANCEL.id) {
+        } else if (result == IntentCodes.Result.FILTER_CANCEL.id) {
             Log.v(LOG_TAG, "Editing the filter has been cancelled");
-        } else if (result == DatabaseActions.Result.FILTER_REMOVED.id) {
+        } else if (result == IntentCodes.Result.FILTER_REMOVED.id) {
             Log.v(LOG_TAG, "filter has been removed");
         }
     });
@@ -320,7 +320,7 @@ public class DatabaseFragment extends Fragment {
 
     private void openFilterActivity() {
         Intent intent = new Intent(mainContext, FilterActivity.class);
-        intent.putExtra(EXTRA_REQUEST_CODE_NAME, DatabaseActions.Request.EDIT_FILTER.id);
+        intent.putExtra(EXTRA_REQUEST_CODE_NAME, IntentCodes.Request.EDIT_FILTER.id);
         //setupExitSlideAnimation();
 
         showFilterActivity.launch(null);
@@ -400,7 +400,7 @@ public class DatabaseFragment extends Fragment {
         FloatingActionButton fab = rootView.findViewById(R.id.fab);
         fab.setOnClickListener(view -> {
             Intent intent = new Intent(mainContext, NewEntityActivity.class);
-            intent.putExtra(EXTRA_REQUEST_CODE_NAME, DatabaseActions.Request.NEW_ENTITY.id);
+            intent.putExtra(EXTRA_REQUEST_CODE_NAME, IntentCodes.Request.NEW_ENTITY.id);
 
             newEntityResultLauncher.launch(new NewEntityIntentAdapter());
         });
