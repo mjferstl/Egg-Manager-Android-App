@@ -13,6 +13,17 @@
     tools:context=".activities.FilterActivity"
     tools:showIn="@layout/activity_filter">
 
+    <ProgressBar
+        android:id="@+id/progress_loading_filter"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:indeterminate="true"
+        android:visibility="visible"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.5"></ProgressBar>
+
     <LinearLayout
         android:id="@+id/linLay_filter_activity_years"
         android:layout_width="match_parent"

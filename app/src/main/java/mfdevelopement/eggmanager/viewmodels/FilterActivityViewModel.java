@@ -64,17 +64,13 @@ public class FilterActivityViewModel extends AndroidViewModel {
         return yearNamesList;
     }
 
-    private List<String> getYearMonthNames() {
-        if (this.uniqueYearMonthList != null && this.uniqueYearMonthList.getValue() != null) {
-            return uniqueYearMonthList.getValue();
-        } else {
-            return repository.getDateKeysList().getValue();
-        }
+    public LiveData<List<String>> getYearMonthNames() {
+        return uniqueYearMonthList;
     }
 
-    public List<String> getMonthsByYear(String year) {
+    public List<String> getMonthsByYear(String year, List<String> yearMonthList) {
         List<String> months = new ArrayList<>();
-        for (String yearMonth : getYearMonthNames()) {
+        for (String yearMonth : yearMonthList) {
             if (DateKeyUtils.getYearByDateKey(yearMonth).equals(year)) {
                 months.add(DateKeyUtils.getMonthByDateKey(yearMonth));
             }

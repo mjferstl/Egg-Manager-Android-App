@@ -10,6 +10,7 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.LinearLayout;
+import android.widget.ProgressBar;
 
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
@@ -36,6 +37,8 @@ public class FilterActivity extends AppCompatActivity implements DateFilterListA
     private FilterActivityViewModel viewModel;
 
     private LinearLayout linLayMonths;
+
+    private ProgressBar progressBar;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -74,9 +77,12 @@ public class FilterActivity extends AppCompatActivity implements DateFilterListA
     }
 
     private void initGUI() {
+        progressBar = findViewById(R.id.progress_loading_filter);
         initRecyclerViewYears();
         initRecyclerViewMonths();
     }
+
+    private LinearLayout linLayYears;
 
     private void initRecyclerViewYears() {
         Log.d(LOG_TAG, "starting initRecyclerViewYears()");
@@ -95,6 +101,10 @@ public class FilterActivity extends AppCompatActivity implements DateFilterListA
 
         adapterYears = new DateFilterListAdapter(this, yearsList, DateKeyUtils.getYearByDateKey(initialFilterString));
         recyclerViewYears.setAdapter(adapterYears);
+
+        // Hide the layout, until the data has been loaded
+        linLayYears = findViewById(R.id.linLay_filter_activity_years);
+        linLayYears.setVisibility(View.GONE);
     }
 
     private void initRecyclerViewMonths() {
@@ -133,12 +143,20 @@ public class FilterActivity extends AppCompatActivity implements DateFilterListA
         Log.d(LOG_TAG, "initialFilterString = \"" + initialFilterString + "\"");
         String initialYear = DateKeyUtils.getYearByDateKey(initialFilterString);
         Log.d(LOG_TAG, "year of initialFilterString = \"" + initialYear + "\"");
-        List<String> monthNames = viewModel.getMonthsByYear(initialYear);
-        Log.d(LOG_TAG, "initial months for initialFilterString: " + monthNames.size() + " items");
-
-        // add adapter to the recycler view
-        adapterMonths.setDatesList(monthNames, false);
     }
+
+    private void updateLinLayMonthsVisibility() {
+        if (linLayYears.getVisibility() == View.GONE || linLayYears.getVisibility() == View.INVISIBLE) {
+            linLayMonths.setVisibility(View.GONE);
+            return;
+        }
+
+        if (!adapterYears.getCurrentSelection().equals("")) {
+            linLayMonths.setVisibility(View.VISIBLE);
+        }
+    }
+
+    private List<String> yearMonthList = new ArrayList<>();
 
     /**
      * Method to initialize all observers for getting live data from the database
@@ -153,6 +171,16 @@ public class FilterActivity extends AppCompatActivity implements DateFilterListA
             viewModel.setYearNames(yearNamesList);
             viewModel.setYearMonthNames(stringList);
             adapterYears.setDatesList(viewModel.getYearNames(), false);
+        });
+
+        viewModel.getYearMonthNames().observe(this, stringList -> {
+            yearMonthList = stringList;
+            List<String> monthNames = viewModel.getMonthsByYear(DateKeyUtils.getYearByDateKey(viewModel.getFilterString()), stringList);
+            // Update the Recycler View adapter
+            adapterMonths.setDatesList(monthNames, false);
+            // Hide the progress bar, when the filters are loaded
+            progressBar.setVisibility(View.GONE);
+            linLayYears.setVisibility(View.VISIBLE);
         });
     }
 
@@ -263,11 +291,12 @@ public class FilterActivity extends AppCompatActivity implements DateFilterListA
             // if the user unselected the button, then remove all items from the recycler view and hide the months list
             if (isSelected) {
                 linLayMonths.setVisibility(View.VISIBLE);
-                adapterMonths.setDatesList(viewModel.getMonthsByYear(buttonText), true);
+                adapterMonths.setDatesList(viewModel.getMonthsByYear(buttonText, yearMonthList), true);
             } else {
                 linLayMonths.setVisibility(View.GONE);
                 adapterMonths.setDatesList(new ArrayList<>(), true);
             }
+            updateLinLayMonthsVisibility();
         }
     }
 
@@ -275,7 +304,7 @@ public class FilterActivity extends AppCompatActivity implements DateFilterListA
      * Check if an string can be converted to an integer
      *
      * @param string String to be converted
-     * @return boolean which indicateds, if the string represents an integer
+     * @return boolean to indicate, if the string represents an integer
      */
     private boolean isInt(String string) {
         try {

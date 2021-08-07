@@ -3,6 +3,7 @@ package mfdevelopement.eggmanager.data_models.daily_balance;
 import android.util.Log;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.room.ColumnInfo;
 import androidx.room.Entity;
 import androidx.room.Ignore;
@@ -149,12 +150,7 @@ public class DailyBalance implements Serializable, Comparable<DailyBalance>, Has
         }
     }
 
-    public static String convertToDateKey(Calendar calendar) {
-        SimpleDateFormat sdf = new SimpleDateFormat(DateKeyUtils.DATE_KEY_FORMAT, Locale.getDefault());
-        return sdf.format(calendar.getTime());
-    }
-
-    public void setDate(@NonNull Date date) {
+    public void setDate(@Nullable Date date) {
         this.date = date;
     }
 
@@ -177,7 +173,7 @@ public class DailyBalance implements Serializable, Comparable<DailyBalance>, Has
             this.date = DateKeyUtils.getDateByDateKey(this.dateKey);
             return this.date;
         } catch (ParseException e) {
-            return new Date();
+            return null;
         }
     }
 
