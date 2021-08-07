@@ -23,7 +23,7 @@ import java.util.List;
 import java.util.Locale;
 
 import mfdevelopement.eggmanager.data_models.HasDateInterface;
-import mfdevelopement.eggmanager.utils.DateTypeConverter;
+import mfdevelopement.eggmanager.utils.type_converter.DateTypeConverter;
 
 @Entity(tableName = "dailyBalanceTable")
 public class DailyBalance implements Serializable, Comparable<DailyBalance>, HasDateInterface {

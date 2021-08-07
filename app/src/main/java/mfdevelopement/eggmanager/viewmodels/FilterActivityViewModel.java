@@ -126,7 +126,7 @@ public class FilterActivityViewModel extends AndroidViewModel {
             Log.d(LOG_TAG,"fetched all dateKeys from the database. Got " + yearsList.size() + " items");
             for (int i=0; i<yearsList.size(); i++) {
                 try {
-                    int test = Integer.parseInt(yearsList.get(i));
+                    Integer.parseInt(yearsList.get(i));
                 } catch (ParseException e) {
                     Log.e(LOG_TAG,"Error when parsing string to int with \"" + yearsList.get(i) + "\"");
                     yearsList.remove(i);

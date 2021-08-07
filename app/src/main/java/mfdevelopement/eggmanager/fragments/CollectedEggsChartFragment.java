@@ -1,7 +1,5 @@
 package mfdevelopement.eggmanager.fragments;
 
-import android.content.Context;
-import android.content.Intent;
 import android.graphics.Paint;
 import android.os.Bundle;
 import android.util.Log;
@@ -13,11 +11,8 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
-import androidx.activity.result.ActivityResultCallback;
 import androidx.activity.result.ActivityResultLauncher;
-import androidx.activity.result.contract.ActivityResultContract;
 import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
 import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
@@ -33,51 +28,44 @@ import java.util.List;
 
 import mfdevelopement.eggmanager.IntentCodes;
 import mfdevelopement.eggmanager.R;
-import mfdevelopement.eggmanager.activities.FilterActivity;
+import mfdevelopement.eggmanager.activity_contracts.OpenFilterActivityContract;
 import mfdevelopement.eggmanager.charts.DataSetUtils;
 import mfdevelopement.eggmanager.charts.IGenericChart;
 import mfdevelopement.eggmanager.charts.MyLineChart;
 import mfdevelopement.eggmanager.viewmodels.SharedViewModel;
 
-import static mfdevelopement.eggmanager.fragments.DatabaseFragment.EXTRA_REQUEST_CODE_NAME;
-import static mfdevelopement.eggmanager.utils.FilterActivityResultHandler.handleFilterActivityResult;
-
 public class CollectedEggsChartFragment extends Fragment {
 
+    /**
+     * String used as identifier for logging
+     */
     private static final String LOG_TAG = "CollectedEggsChartFragm";
 
-    private final ActivityResultContract<Integer, Integer> mContract = new ActivityResultContract<Integer, Integer>() {
-        @NonNull
-        @Override
-        public Intent createIntent(@NonNull Context context, Integer input) {
-            Intent intent = new Intent(getContext(), FilterActivity.class);
-            intent.putExtra(EXTRA_REQUEST_CODE_NAME, IntentCodes.Request.EDIT_FILTER.ordinal());
-            return intent;
-        }
-
-        @Override
-        public Integer parseResult(int resultCode, @Nullable Intent intent) {
-            Log.d(LOG_TAG, "parseResult(): resultCode = " + resultCode);
-            // handle the return value from the FilterActivity
-            handleFilterActivityResult(resultCode, intent);
-            return resultCode;
-        }
-    };
+    /**
+     * {@link androidx.lifecycle.ViewModel} used in this fragment
+     */
     private SharedViewModel viewModel;
-    private final ActivityResultLauncher<Integer> mGetContent = registerForActivityResult(mContract,
-            new ActivityResultCallback<Integer>() {
-                @Override
-                public void onActivityResult(Integer resultCode) {
-                    Log.d(LOG_TAG, "registerForActivityResult(): resultCode = " + resultCode);
+    private final ActivityResultLauncher<Long> showFilterActivity = registerForActivityResult(new OpenFilterActivityContract(), resultCode -> {
 
-                    if (resultCode == IntentCodes.Result.FILTER_OK.ordinal()) {
-                        // update the new filter string in the view model
-                        viewModel.setDateFilter(viewModel.loadDateFilter());
-                    }
-                }
-            });
+        Log.d(LOG_TAG, "registerForActivityResult(): resultCode = " + resultCode);
+
+        if (resultCode == IntentCodes.Result.FILTER_OK.id) {
+            // update the new filter string in the view model
+            viewModel.setDateFilter(viewModel.loadDateFilter());
+        }
+    });
+
     private IGenericChart genericChart;
+
+    /**
+     * Root view of the activity
+     * Needed for Snackbars
+     */
     private View rootView;
+
+    /**
+     * Variable to store the number of elements, which are received from the database
+     */
     private int databaseEntryCount = 0;
 
     public View onCreateView(@NonNull LayoutInflater inflater,
@@ -124,6 +112,14 @@ public class CollectedEggsChartFragment extends Fragment {
         return rootView;
     }
 
+    /**
+     * Add a {@link Chart} to a view
+     *
+     * @param parent    parent view to add the chart to
+     * @param chart     {@link Chart} to add
+     * @param viewAbove {@link View}, under which the {@link Chart} will be placed
+     * @param <T>       Type of the Chart
+     */
     private <T extends ChartData<? extends IDataSet<? extends Entry>>> void addChartView(ViewGroup parent, Chart<T> chart, View viewAbove) {
         // Create the layout params
         // The view will be at the bottom of the other views
@@ -175,7 +171,7 @@ public class CollectedEggsChartFragment extends Fragment {
     }
 
     private void openFilterActivity() {
-        mGetContent.launch(IntentCodes.Request.EDIT_FILTER.ordinal());
+        showFilterActivity.launch(IntentCodes.Request.EDIT_FILTER.id);
     }
 
     private void initObservers() {
@@ -195,11 +191,9 @@ public class CollectedEggsChartFragment extends Fragment {
 
                     // update the content of the chart
                     genericChart.setChartData(this.getContext(), lineDataSet);
-
                 } else {
                     // Hide the charts as there's nothing to show in the chart
                     genericChart.hideChart();
-
                 }
             });
 

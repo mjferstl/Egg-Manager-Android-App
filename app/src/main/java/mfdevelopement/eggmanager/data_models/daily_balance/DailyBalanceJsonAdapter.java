@@ -7,7 +7,7 @@ import org.json.JSONObject;
 
 import java.util.Date;
 
-import mfdevelopement.eggmanager.utils.DateTypeConverter;
+import mfdevelopement.eggmanager.utils.type_converter.DateTypeConverter;
 
 import static mfdevelopement.eggmanager.data_models.daily_balance.DailyBalance.COL_DATE_CREATED;
 import static mfdevelopement.eggmanager.data_models.daily_balance.DailyBalance.COL_DATE_KEY;

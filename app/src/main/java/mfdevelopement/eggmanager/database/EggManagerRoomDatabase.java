@@ -13,7 +13,7 @@ import androidx.sqlite.db.SupportSQLiteDatabase;
 
 import mfdevelopement.eggmanager.data_models.daily_balance.DailyBalance;
 import mfdevelopement.eggmanager.data_models.daily_balance.DailyBalanceDao;
-import mfdevelopement.eggmanager.utils.DateTypeConverter;
+import mfdevelopement.eggmanager.utils.type_converter.DateTypeConverter;
 
 @Database(entities = {DailyBalance.class}, version = 4)
 @TypeConverters({DateTypeConverter.class})

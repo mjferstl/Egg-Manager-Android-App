@@ -83,7 +83,7 @@ public class DatabaseFragment extends Fragment {
     private int entriesCount;
 
     private RecyclerView recyclerView;
-    private final ActivityResultLauncher<Void> showFilterActivity = registerForActivityResult(new OpenFilterActivityContract(), result -> {
+    private final ActivityResultLauncher<Long> showFilterActivity = registerForActivityResult(new OpenFilterActivityContract(), result -> {
 
         // Update the filter string
         String filterString = viewModel.getDateFilter();

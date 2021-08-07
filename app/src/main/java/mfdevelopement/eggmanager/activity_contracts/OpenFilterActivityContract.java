@@ -13,16 +13,17 @@ import mfdevelopement.eggmanager.IntentCodes;
 import mfdevelopement.eggmanager.activities.FilterActivity;
 import mfdevelopement.eggmanager.fragments.DatabaseFragment;
 
-public class OpenFilterActivityContract extends ActivityResultContract<Void, Integer> {
+public class OpenFilterActivityContract extends ActivityResultContract<Long, Integer> {
 
     private final String LOG_TAG = "OpenFilterActivityContr";
 
     @NonNull
     @Override
-    public Intent createIntent(@NonNull Context context, Void v) {
+    public Intent createIntent(@NonNull Context context, @Nullable Long requestCode) {
         Log.v(LOG_TAG, "creating an intent for starting FilterActivity");
         Intent intent = new Intent(context, FilterActivity.class);
-        intent.putExtra(DatabaseFragment.EXTRA_REQUEST_CODE_NAME, IntentCodes.Request.EDIT_FILTER.id);
+        if (requestCode == null) requestCode = IntentCodes.Request.EDIT_FILTER.id;
+        intent.putExtra(DatabaseFragment.EXTRA_REQUEST_CODE_NAME, requestCode);
         return intent;
     }
 

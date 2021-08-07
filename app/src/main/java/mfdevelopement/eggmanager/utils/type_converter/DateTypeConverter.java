@@ -1,4 +1,4 @@
-package mfdevelopement.eggmanager.utils;
+package mfdevelopement.eggmanager.utils.type_converter;
 
 import androidx.room.TypeConverter;
 
