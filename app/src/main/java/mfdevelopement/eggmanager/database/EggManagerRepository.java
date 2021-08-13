@@ -3,18 +3,23 @@ package mfdevelopement.eggmanager.database;
 import android.app.Application;
 import android.content.Context;
 import android.content.SharedPreferences;
-import android.util.Log;
 
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.Transformations;
+import androidx.work.Data;
+import androidx.work.OneTimeWorkRequest;
+import androidx.work.WorkManager;
+import androidx.work.WorkRequest;
 
 import java.util.List;
 
-import kotlinx.coroutines.Dispatchers;
-import mfdevelopement.eggmanager.coroutines.MyCoroutines;
 import mfdevelopement.eggmanager.data_models.daily_balance.DailyBalance;
 import mfdevelopement.eggmanager.data_models.daily_balance.DailyBalanceDao;
+import mfdevelopement.eggmanager.data_models.daily_balance.DailyBalanceWorkerDataUtil;
+import mfdevelopement.eggmanager.workmanager.CleanupDatabaseWorker;
+import mfdevelopement.eggmanager.workmanager.DeleteDailyBalanceWorker;
+import mfdevelopement.eggmanager.workmanager.InsertToDatabaseWorker;
 
 public class EggManagerRepository {
 
@@ -62,26 +67,25 @@ public class EggManagerRepository {
     }
 
     public void insert(DailyBalance dailyBalance) {
-        MyCoroutines.Companion.doAsync(() -> {
-            dailyBalanceDao.insert(dailyBalance);
-            return null;
-        }, Dispatchers.getIO());
+        Data inputData = DailyBalanceWorkerDataUtil.convertToData(dailyBalance);
+        WorkRequest workRequest = new OneTimeWorkRequest.Builder(InsertToDatabaseWorker.class)
+                .setInputData(inputData)
+                .build();
+        WorkManager.getInstance(application.getBaseContext()).enqueue(workRequest);
     }
 
     public void delete(DailyBalance dailyBalance) {
-        MyCoroutines.Companion.doAsync(() -> {
-            dailyBalanceDao.delete(dailyBalance);
-            return null;
-        }, Dispatchers.getIO());
+        Data inputData = DailyBalanceWorkerDataUtil.convertToData(dailyBalance);
+        WorkRequest workRequest = new OneTimeWorkRequest.Builder(DeleteDailyBalanceWorker.class)
+                .setInputData(inputData)
+                .build();
+        WorkManager.getInstance(application.getBaseContext()).enqueue(workRequest);
     }
 
     public void deleteAll() {
-        MyCoroutines.Companion.doAsync(() -> {
-            Log.d(LOG_TAG, "Starting to delete all items");
-            dailyBalanceDao.deleteAll();
-            Log.d(LOG_TAG, "All items deleted.");
-            return null;
-        }, Dispatchers.getIO());
+        WorkRequest workRequest = new OneTimeWorkRequest.Builder(CleanupDatabaseWorker.class)
+                .build();
+        WorkManager.getInstance(application.getBaseContext()).enqueue(workRequest);
     }
 
     public LiveData<List<DailyBalance>> getFilteredDailyBalance(String dateFilter) {

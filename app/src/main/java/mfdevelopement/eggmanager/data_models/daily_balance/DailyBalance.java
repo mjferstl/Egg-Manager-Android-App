@@ -71,38 +71,27 @@ public class DailyBalance implements Serializable, Comparable<DailyBalance>, Has
     @ColumnInfo(name = COL_USER_CREATED)
     private String userCreated;
 
-    public DailyBalance(String dateKey, int eggsCollected, int eggsSold, double pricePerEgg) {
+    public DailyBalance(@NonNull String dateKey, int eggsCollected, int eggsSold, double pricePerEgg) {
         this(dateKey, eggsCollected, eggsSold, pricePerEgg, 0);
     }
 
     @Ignore
-    public DailyBalance(String dateKey, int eggsCollected, int eggsSold, double pricePerEgg, int numHens) {
+    public DailyBalance(@NonNull String dateKey, int eggsCollected, int eggsSold, double pricePerEgg, int numHens) {
         this(dateKey, eggsCollected, eggsSold, pricePerEgg, numHens, null);
     }
 
     @Ignore
-    public DailyBalance(String dateKey, int eggsCollected, int eggsSold, double pricePerEgg, int numHens, Date dateCreated) {
+    public DailyBalance(@NonNull String dateKey, int eggsCollected, int eggsSold, double pricePerEgg, int numHens, Date dateCreated) {
         this(dateKey, eggsCollected, eggsSold, pricePerEgg, numHens, dateCreated, null);
     }
 
     @Ignore
-    public DailyBalance(String dateKey, int eggsCollected, int eggsSold, double pricePerEgg, int numHens, Date dateCreated, String userCreated) {
-        setDateKey(dateKey);
-        setDateByDateKey();
-        this.eggsCollected = eggsCollected;
-        this.eggsSold = eggsSold;
-        this.pricePerEgg = pricePerEgg;
-        setNumHens(numHens);
-        setMoneyEarned(calcMoneyEarned(eggsSold, pricePerEgg));
-
-        if (dateCreated != null) setDateCreated(dateCreated);
-        else setDateCreated(getCurrentDate());
-
-        if (userCreated != null) setUserCreated(userCreated);
+    public DailyBalance(@NonNull String dateKey, int eggsCollected, int eggsSold, double pricePerEgg, int numHens, Date dateCreated, String userCreated) {
+        this(dateKey, eggsCollected, eggsSold, pricePerEgg, numHens, dateCreated, userCreated, null);
     }
 
     @Ignore
-    public DailyBalance(String dateKey, int eggsCollected, int eggsSold, double pricePerEgg, int numHens, Date dateCreated, String userCreated, Date date) {
+    public DailyBalance(@NonNull String dateKey, int eggsCollected, int eggsSold, double pricePerEgg, int numHens, Date dateCreated, String userCreated, @Nullable Date date) {
         setDateKey(dateKey);
         this.eggsCollected = eggsCollected;
         this.eggsSold = eggsSold;
@@ -115,7 +104,7 @@ public class DailyBalance implements Serializable, Comparable<DailyBalance>, Has
 
         if (userCreated != null) setUserCreated(userCreated);
 
-        this.date = date;
+        if (date != null) this.date = date;
     }
 
     private double calcMoneyEarned(int eggsSold, double pricePerEgg) {
