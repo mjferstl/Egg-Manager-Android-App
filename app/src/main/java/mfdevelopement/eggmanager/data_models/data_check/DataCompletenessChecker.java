@@ -3,6 +3,7 @@ package mfdevelopement.eggmanager.data_models.data_check;
 import android.util.Log;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -30,6 +31,7 @@ public class DataCompletenessChecker implements ExpandableListCompatible {
     private static final SimpleDateFormat sdfYear = new SimpleDateFormat("yyyy", Locale.getDefault());
     private static final SimpleDateFormat sdfMonthYear = new SimpleDateFormat("MMMM yyyy", Locale.getDefault());
     private static final SimpleDateFormat sdfDayMonth = new SimpleDateFormat("dd. MMMM", Locale.getDefault());
+    private static final SimpleDateFormat sdfDayMonthYear = new SimpleDateFormat("dd. MMMM yyyy", Locale.getDefault());
 
     public DataCompletenessChecker(@NonNull Calendar startDate, @NonNull Calendar endDate, @NonNull List<HasDateInterface> databaseItems) {
         Date d = new Date();
@@ -167,19 +169,47 @@ public class DataCompletenessChecker implements ExpandableListCompatible {
         return groupInfoList;
     }
 
-    public static Calendar convertToDate(GroupInfo groupInfo) {
-        return convertToDate(groupInfo.getName(), sdfMonthYear);
+    public static @Nullable
+    Calendar convertToDate(@NonNull GroupInfo groupInfo) {
+        Calendar date = convertToDate(groupInfo.getName(), sdfMonthYear);
+        if (date == null) {
+            Log.d(LOG_TAG, "Could not convert \"" + groupInfo.getName() + "\" using format \"" + sdfMonthYear.toPattern() + "\". Trying to convert to year instead.");
+            date = convertToDate(groupInfo.getName(), sdfYear);
+        }
+        return date;
     }
 
-    public static Calendar convertToDate(ChildInfo childInfo) {
-        return convertToDate(childInfo.getName(), sdfDayMonth);
+    public static @Nullable
+    Calendar convertToDate(@NonNull GroupInfo groupInfo, @NonNull ChildInfo childInfo) {
+        if (convertToDate(groupInfo.getName(), sdfYear) != null) {
+            // This is a year
+            // So the child contains the information about day and month
+            return convertToDate(childInfo.getName() + " " + groupInfo.getName(), sdfDayMonthYear);
+        } else if (convertToDate(groupInfo.getName(), sdfMonthYear) != null) {
+            // The group is a month and a year
+            // Get the year from the name and add it to the child name to get the complete date
+            Calendar calMonthYear = convertToDate(groupInfo.getName(), sdfMonthYear);
+            if (calMonthYear != null) {
+                String yearString = String.valueOf(calMonthYear.get(Calendar.YEAR));
+                return convertToDate(childInfo.getName() + " " + yearString, sdfDayMonthYear);
+            }
+        } else {
+            Log.e(LOG_TAG, "This case is not handeled! groupInfo.getName() = " + groupInfo.getName() + "; childInfo.getName() = " + childInfo.getName());
+        }
+        return null;
     }
 
-    private static Calendar convertToDate(String string, SimpleDateFormat sdf) {
+    private static @Nullable
+    Calendar convertToDate(@NonNull String string, @NonNull SimpleDateFormat sdf) {
         try {
             Calendar cal = Calendar.getInstance();
-            cal.setTime(sdf.parse(string));
-            return cal;
+            Date parsedDate = sdf.parse(string);
+            if (parsedDate != null) {
+                cal.setTime(parsedDate);
+                return cal;
+            } else {
+                return null;
+            }
         } catch (ParseException e) {
             Log.d(LOG_TAG, "Could not convert " + string + " to a date");
             return null;
