@@ -44,9 +44,9 @@ import mfdevelopement.eggmanager.data_models.DatabaseBackup;
 import mfdevelopement.eggmanager.data_models.daily_balance.DailyBalance;
 import mfdevelopement.eggmanager.data_models.daily_balance.DailyBalanceJsonAdapter;
 import mfdevelopement.eggmanager.list_adapters.DatabaseBackupListAdapter;
+import mfdevelopement.eggmanager.utils.BackupCreateCoroutine;
 import mfdevelopement.eggmanager.utils.FileUtil;
 import mfdevelopement.eggmanager.utils.JSONUtil;
-import mfdevelopement.eggmanager.utils.notifications.DatabaseBackupCreateNotificationManager;
 import mfdevelopement.eggmanager.utils.notifications.DatabaseBackupImportNotificationManager;
 import mfdevelopement.eggmanager.viewmodels.SharedViewModel;
 
@@ -362,8 +362,22 @@ public class DatabaseBackupFragment extends Fragment {
                 if (allDailyBalances == null)
                     Snackbar.make(mainRoot.findViewById(idSnackbarContainer), getString(R.string.snackbar_error_loading_data_from_database), Snackbar.LENGTH_LONG).show();
                 else {
+                    BackupCreateCoroutine cor = new BackupCreateCoroutine();
+                    cor.addBackupCreateListener(new BackupCreateCoroutine.BackupCreateListener() {
+                        @Override
+                        public void onSuccess() {
+                            Log.d(LOG_TAG, "Successfully created backup file " + backupName);
+                            updateRecyclerView();
+                        }
+
+                        @Override
+                        public void onFailure() {
+                            Log.e(LOG_TAG, "Could not create backup file " + backupName);
+                        }
+                    });
+                    cor.create(backupName, allDailyBalances, getContext());
                     // Write file in a coroutine
-                    MyCoroutines.Companion.doAsync(() -> {
+                    /*MyCoroutines.Companion.doAsync(() -> {
 
                         // Create a new backup
                         DatabaseBackup backup = new DatabaseBackup();
@@ -392,7 +406,7 @@ public class DatabaseBackupFragment extends Fragment {
                             Log.e(LOG_TAG, "Could not create backup file " + backup.getFilename());
                         }
                         return null;
-                    }, Dispatchers.getIO());
+                    }, Dispatchers.getIO());*/
                 }
             } else {
                 // inform the user, that no write permission is granted
