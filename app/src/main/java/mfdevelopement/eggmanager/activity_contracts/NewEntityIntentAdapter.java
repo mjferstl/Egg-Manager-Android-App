@@ -10,6 +10,9 @@ import mfdevelopement.eggmanager.activities.NewEntityActivity;
 import mfdevelopement.eggmanager.data_models.daily_balance.DailyBalance;
 import mfdevelopement.eggmanager.fragments.DatabaseFragment;
 
+/**
+ * Class for creating an {@link Intent} for use in the {@link NewEntityContract}
+ */
 public class NewEntityIntentAdapter {
 
     /*
@@ -45,8 +48,7 @@ public class NewEntityIntentAdapter {
      * @param data DailyBalance object to edit
      */
     public NewEntityIntentAdapter(@NonNull final DailyBalance data) {
-        this.requestCode = IntentCodes.Request.EDIT_ENTITY.id;
-        this.dailyBalance = data;
+        this(IntentCodes.Request.EDIT_ENTITY, data);
     }
 
     /**
@@ -62,6 +64,7 @@ public class NewEntityIntentAdapter {
 
     /**
      * Convert to an object of class {@link Intent}
+     * This {@link Intent} can be used to start a {@link NewEntityActivity}
      *
      * @param context {@link Context}
      * @return {@link Intent}

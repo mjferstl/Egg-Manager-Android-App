@@ -11,7 +11,7 @@ import androidx.annotation.Nullable;
 
 public class NewEntityContract extends ActivityResultContract<NewEntityIntentAdapter, Integer> {
 
-    private final String LOG_TAG = "NewEntityContract";
+    private static final String LOG_TAG = "NewEntityContract";
 
     @NonNull
     @Override

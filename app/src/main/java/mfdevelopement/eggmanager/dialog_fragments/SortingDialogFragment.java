@@ -50,14 +50,9 @@ public class SortingDialogFragment extends DialogFragment {
         if (context instanceof OnSortingItemClickListener) {
             listener = (OnSortingItemClickListener) context;
         } else {
-            throw new ClassCastException(context.toString()
+            throw new ClassCastException(context
                     + " must implement SortingDialogFragment.OnSortingItemClickListener");
         }
-    }
-
-    @Override
-    public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
     }
 
     @Override
