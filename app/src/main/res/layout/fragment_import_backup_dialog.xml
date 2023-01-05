@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginStart="@dimen/large_padding"
+    android:layout_marginTop="@dimen/large_padding"
+    android:layout_marginEnd="@dimen/large_padding"
+    android:layout_marginBottom="@dimen/large_padding"
+    android:orientation="vertical"
+    android:padding="@dimen/large_padding">
+
+    <TextView
+        android:id="@+id/txtv_import_backup_dialog_title"
+        style="@style/dialog_title"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="@dimen/HUGE_padding"
+        android:paddingStart="0dp"
+        android:paddingEnd="@dimen/HUGE_padding"
+        android:paddingBottom="@dimen/large_padding"
+        android:text="@string/dialog_import_backup_title" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:paddingBottom="@dimen/small_padding">
+
+        <TextView
+            android:id="@+id/txtv_import_backup_dialog_content"
+            style="@style/basic_text"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/dialog_import_backup_text_w_duplicates" />
+
+        <CheckBox
+            android:id="@+id/checkBox_import_backup_dialog_overwrite_existing_items"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            style="@style/basic_text"
+            android:text="@string/dialog_import_backup_check_box_overwrite_existing"
+            android:padding="@dimen/small_padding" />
+
+    </LinearLayout>
+
+
+    <TextView
+        android:id="@+id/txtv_import_backup_dialog_question"
+        android:layout_width="match_parent"
+        style="@style/basic_text"
+        android:layout_height="wrap_content"
+        android:paddingBottom="@dimen/small_padding"
+        android:text="@string/dialog_import_backup_question" />
+
+    <LinearLayout
+        android:id="@+id/linLay_import_backup_dialog_buttons"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="end"
+        android:orientation="horizontal">
+
+        <Button
+            android:id="@+id/btn_import_backup_dialog_ok"
+            style="@style/button_outlined"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:contentDescription="@string/btn_text_ok"
+            android:minWidth="48dp"
+            android:text="@string/btn_text_ok" />
+
+        <Button
+            android:id="@+id/btn_import_backup_dialog_cancel"
+            style="@style/button_outlined"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:contentDescription="@string/btn_text_cancel"
+            android:minWidth="48dp"
+            android:text="@string/btn_text_cancel" />
+
+    </LinearLayout>
+
+</LinearLayout>

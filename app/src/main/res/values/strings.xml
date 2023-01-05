@@ -102,12 +102,14 @@
     <string name="dialog_title_delete_item">Eintrag löschen</string>
     <string name="dialog_message_delete_item">"Möchten Sie den Eintrag löschen?"</string>
 
-    <!-- Import dialog -->
+    <!-- Import backup dialog -->
     <string name="dialog_import_backup_text_cannot_load">Die Datensicherung %s kann nicht geladen werden.</string>
     <string name="dialog_import_backup_text_no_items">Die Datensicherung enthält keine Einträge.</string>
     <string name="dialog_import_backup_text_wo_duplicates">Die Datensicherung enthält %d Einträge.</string>
     <string name="dialog_import_backup_text_w_duplicates">Die Datensicherung enthält %d Einträge.\nDavon sind für %d Tage bereits Einträge in der Datenbank vorhanden.</string>
     <string name="dialog_import_backup_check_box_overwrite_existing">Vorhandene Einträge überschreiben</string>
+    <string name="dialog_import_backup_title">Datensicherung importieren</string>
+    <string name="dialog_import_backup_question">Sollen die Einträge aus der Datensicherung jetzt importiert werden?</string>
 
     <!-- hints -->
     <string name="hint_eggs_collected">gelegt</string>
