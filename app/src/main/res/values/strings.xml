@@ -22,6 +22,13 @@
     <string name="snackbar_permission_ext_storage_denied">Zugriff auf externen Speicher verweigert. Backup kann nicht durchgeführt werden.</string>
     <string name="snackbar_data_imported_successfully">Daten für %d Tage erfolgreich importiert.</string>
     <string name="snackbar_no_data_to_filter">Es sind noch keine Daten vorhanden</string>
+    <string name="snackbar_error_delete_backup">Fehler beim Löschen der Datensicherung</string>
+    <!-- ... in DatabaseFragment -->
+    <string name="snachkbar_database_not_filtered">"Daten nicht gefiltert"</string>
+    <string name="snackbar_database_filtered_by">"Daten nach %s gefiltert"</string>
+
+    <!-- Notifications -->
+    <string name="notification_backup_created">Datensicherung "%s" mit %d Einträgen erstellt.</string>
 
     <!-- database activity -->
     <string name="button_save">@string/action_save</string>

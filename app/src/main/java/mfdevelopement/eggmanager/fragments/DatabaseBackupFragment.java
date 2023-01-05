@@ -89,6 +89,7 @@ public class DatabaseBackupFragment extends Fragment {
 
         publicDataDir = FileUtil.getExternalDirPath(this.getContext());
 
+        // Initialize UI Elements
         initRecyclerView();
         initFab();
         initListeners();
@@ -107,16 +108,20 @@ public class DatabaseBackupFragment extends Fragment {
         updateRecyclerView();
     }
 
+    /**
+     * Initialize listeners for items of the recyclerview, which can be clicked by the user
+     * These listeners handle the execution of the corresponding tasks like importing a backup or deleting a backup
+     */
     private void initListeners() {
         // add BackupListener
         // when the user changes the sorting order, then the recycler view needs to be updated manually
         if (getActivity() != null)
-            ((MainNavigationActivity)getActivity()).setBackupListener(new MainNavigationActivity.BackupListener() {
+            ((MainNavigationActivity) getActivity()).setBackupListener(new MainNavigationActivity.BackupListener() {
 
                 @Override
                 public void onBackupImportClicked(int position) {
                     DatabaseBackup backup = adapter.getItem(position);
-                    Log.d(LOG_TAG,"user wants to import the backup with the name \"" + backup.getBackupName() + "\"");
+                    Log.d(LOG_TAG, "user wants to import the backup with the name \"" + backup.getBackupName() + "\"");
                     importBackup(backup);
                 }
 
@@ -134,6 +139,9 @@ public class DatabaseBackupFragment extends Fragment {
             });
     }
 
+    /**
+     * Initialize the {@link RecyclerView}, which shows the available backups
+     */
     private void initRecyclerView() {
         List<DatabaseBackup> backupList = getBackupFiles();
 
@@ -143,6 +151,9 @@ public class DatabaseBackupFragment extends Fragment {
         recyclerView.setAdapter(adapter);
     }
 
+    /**
+     * Update the {@link RecyclerView}, which shows the available backup files
+     */
     private void updateRecyclerView() {
         List<DatabaseBackup> backupList = getBackupFiles();
         adapter.setDatabaseBackupList(backupList);
@@ -161,29 +172,34 @@ public class DatabaseBackupFragment extends Fragment {
         }
     }
 
+    /**
+     * Delete a file from the device.
+     * A {@link Snackbar} will be shown when the file can not be deleted
+     *
+     * @param filename Name of the file to be deleted
+     */
     private void deleteFile(String filename) {
 
         // Delete the file
         File file = new File(publicDataDir, filename);
         boolean fileDeleted = file.delete();
 
-        // show a snackbar to inform the user if deleting the file was not finished successfully
+        // show a Snackbar to inform the user if deleting the file was not finished successfully
         if (!fileDeleted)
-            Snackbar.make(mainRoot.findViewById(idSnackbarContainer), "Fehler beim Löschen der Datensicherung", Snackbar.LENGTH_SHORT).show();
+            Snackbar.make(mainRoot.findViewById(idSnackbarContainer), getString(R.string.snackbar_error_delete_backup), Snackbar.LENGTH_SHORT).show();
 
         // update the entries in the recycler view
         updateRecyclerView();
     }
 
     /**
-     * Import data from a backup file and overwrite existing entries in the database
-     * @param backup DatabaseBackup
+     * Import data from a backup file
+     * This overwrites existing entries in the database
+     *
+     * @param backup DatabaseBackup object
      */
     private void importBackup(DatabaseBackup backup) {
         Log.d(LOG_TAG, "importBackup()");
-
-        // load the backup in an async task
-        //new importBackupAsyncTask((MainNavigationActivity) getActivity()).execute();
 
         MyCoroutines.Companion.doAsync(() -> {
             importDataTask(backup);
@@ -191,6 +207,11 @@ public class DatabaseBackupFragment extends Fragment {
         }, Dispatchers.getIO());
     }
 
+    /**
+     * Task to import data from a backup file
+     *
+     * @param databaseBackup DatabaseBackup object which contains information about the backup to be imported
+     */
     private void importDataTask(DatabaseBackup databaseBackup) {
         final String logIdentifier = "importBackup():Coroutine: ";
 

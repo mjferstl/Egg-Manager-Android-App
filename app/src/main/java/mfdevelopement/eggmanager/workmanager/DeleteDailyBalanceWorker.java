@@ -11,6 +11,7 @@ import mfdevelopement.eggmanager.data_models.daily_balance.DailyBalanceWorkerDat
 import mfdevelopement.eggmanager.database.EggManagerRoomDatabase;
 
 public class DeleteDailyBalanceWorker extends Worker {
+
     public DeleteDailyBalanceWorker(@NonNull Context context, @NonNull WorkerParameters workerParams) {
         super(context, workerParams);
     }

@@ -17,7 +17,8 @@ public class DailyBalanceJsonUtils {
     private static final String LOG_TAG = "DailyBalanceJsonUtils";
 
     /**
-     * create a JSONArray from a list of DailyBalance objects
+     * Create a JSONArray from a list of DailyBalance objects
+     *
      * @param dailyBalanceList List of DailyBalance objects
      * @return JSONArray
      */
