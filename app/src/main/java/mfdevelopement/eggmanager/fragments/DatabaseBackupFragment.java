@@ -424,37 +424,6 @@ public class DatabaseBackupFragment extends Fragment {
                         }
                     });
                     cor.create(backupName, allDailyBalances, getContext());
-                    // Write file in a coroutine
-                    /*MyCoroutines.Companion.doAsync(() -> {
-
-                        // Create a new backup
-                        DatabaseBackup backup = new DatabaseBackup();
-                        backup.setBackupName(backupName);
-
-                        // Create a notification
-                        DatabaseBackupCreateNotificationManager notificationManager = new DatabaseBackupCreateNotificationManager(this.getContext());
-                        notificationManager.showFileCreateNotification(backup.getFilename());
-
-                        // Create a JSONArray and write it to the file
-                        JSONArray jsonArray = createJsonArrayFromDailyBalance(allDailyBalances);
-                        int status = FileUtil.writeContentToFile(getContext(), backup.getFilename(), jsonArray.toString());
-
-                        // Update the notification
-                        String msg = String.format(Locale.getDefault(), "Datensicherung \"%s\" mit %d Einträgen erstellt.", backup.getBackupName(), allDailyBalances.size());
-                        notificationManager.setFileCreateNotificationFinished(msg);
-
-                        if (status == 0) {
-                            if (getActivity() != null) {
-                                ((MainNavigationActivity) getActivity()).onBackupCreated(backup.getFilename());
-                                updateRecyclerView();
-                            } else {
-                                Log.d(LOG_TAG, "createNewBackup(): getActivity returned null");
-                            }
-                        } else {
-                            Log.e(LOG_TAG, "Could not create backup file " + backup.getFilename());
-                        }
-                        return null;
-                    }, Dispatchers.getIO());*/
                 }
             } else {
                 // inform the user, that no write permission is granted

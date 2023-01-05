@@ -51,7 +51,6 @@ public class NewEntityViewModel extends AndroidViewModel {
         String keyPricePerEgg = getApplication().getString(R.string.preferences_key_pricePerEgg_cent);
         String defaultPricePerEgg = getApplication().getString(R.string.preferences_pricePerEgg_cent_default);
         String stringValue = sharedPreferences.getString(keyPricePerEgg, defaultPricePerEgg);
-        if (stringValue == null) stringValue = defaultPricePerEgg;
         double value = Double.parseDouble(stringValue) / 100;
         Log.d(LOG_TAG, String.format("loaded price per egg in Euro from preferences: %f", value));
         return value;
