@@ -83,8 +83,8 @@ dependencies {
 
     def roomVersion = '2.4.3'
     def coreTestingVersion = '2.1.0'
-    def materialVersion = '1.8.0-beta01'
-    def navigationVersion = '2.4.3'
+    def materialVersion = '1.6.0'
+    def navigationVersion = '2.5.3'
 
     // Layout
     implementation 'androidx.constraintlayout:constraintlayout:2.1.4'
