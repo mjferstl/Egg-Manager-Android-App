@@ -104,7 +104,12 @@ public class DailyBalance implements Serializable, Comparable<DailyBalance>, Has
 
         if (userCreated != null) setUserCreated(userCreated);
 
-        if (date != null) this.date = date;
+        if (date == null) {
+            this.date = null;
+            this.date = getDate();
+        } else {
+            this.date = date;
+        }
     }
 
     private double calcMoneyEarned(int eggsSold, double pricePerEgg) {

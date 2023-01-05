@@ -1,5 +1,8 @@
 package mfdevelopement.eggmanager.data_models.daily_balance;
 
+import static mfdevelopement.eggmanager.data_models.daily_balance.DailyBalance.COL_DATE_CREATED;
+import static mfdevelopement.eggmanager.data_models.daily_balance.DailyBalance.COL_DATE_KEY;
+
 import android.util.Log;
 
 import org.json.JSONException;
@@ -8,9 +11,6 @@ import org.json.JSONObject;
 import java.util.Date;
 
 import mfdevelopement.eggmanager.utils.type_converter.DateTypeConverter;
-
-import static mfdevelopement.eggmanager.data_models.daily_balance.DailyBalance.COL_DATE_CREATED;
-import static mfdevelopement.eggmanager.data_models.daily_balance.DailyBalance.COL_DATE_KEY;
 
 public class DailyBalanceJsonAdapter {
 
@@ -36,7 +36,7 @@ public class DailyBalanceJsonAdapter {
             long timeInMillis = item.getLong(COL_DATE_CREATED);
             dateCreated = DateTypeConverter.fromTimestamp(timeInMillis);
         } catch (JSONException e) {
-            Log.d(LOG_TAG, "Could not convert timestamp (" + COL_DATE_CREATED + ") from item: " + item.toString());
+            Log.d(LOG_TAG, "Could not convert timestamp (" + COL_DATE_CREATED + ") from item: " + item);
         }
 
         Date dateKey = null;
@@ -44,7 +44,7 @@ public class DailyBalanceJsonAdapter {
             long timeInMillis = item.getLong(COL_DATE_KEY);
             dateKey = DateTypeConverter.fromTimestamp(timeInMillis);
         } catch (JSONException e) {
-            Log.d(LOG_TAG, "Could not convert timestamp (" + COL_DATE_KEY + ") from item: " + item.toString());
+            Log.d(LOG_TAG, "Could not convert timestamp (" + COL_DATE_KEY + ") from item: " + item);
         }
 
         // add DailyBalance object to the List
@@ -69,7 +69,7 @@ public class DailyBalanceJsonAdapter {
             jsonObject.put(DailyBalance.COL_NUMBER_HENS, this.dailyBalance.getNumHens());
             jsonObject.put(DailyBalance.COL_USER_CREATED, this.dailyBalance.getUserCreated());
             jsonObject.put(COL_DATE_CREATED, DateTypeConverter.dateToTimestamp(this.dailyBalance.getDateCreated()));
-            jsonObject.put(COL_DATE_KEY, DateTypeConverter.dateToTimestamp(this.dailyBalance.getDateCreated()));
+            jsonObject.put(COL_DATE_KEY, DateTypeConverter.dateToTimestamp(this.dailyBalance.getDate()));
         } catch (JSONException e) {
             e.printStackTrace();
             Log.d(LOG_TAG, "Error when adding fields to JSONObject");
