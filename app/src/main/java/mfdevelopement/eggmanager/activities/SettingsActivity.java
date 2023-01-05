@@ -1,15 +1,20 @@
 package mfdevelopement.eggmanager.activities;
 
+import android.content.Intent;
+import android.os.Build;
 import android.os.Bundle;
+import android.provider.Settings;
 import android.text.InputType;
 import android.util.Log;
 
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.preference.EditTextPreference;
+import androidx.preference.Preference;
 import androidx.preference.PreferenceFragmentCompat;
 
 import mfdevelopement.eggmanager.R;
+import mfdevelopement.eggmanager.utils.notifications.DatabaseBackupImportNotificationManager;
 
 public class SettingsActivity extends AppCompatActivity {
 
@@ -62,6 +67,21 @@ public class SettingsActivity extends AppCompatActivity {
                 Log.d(LOG_TAG, "The EditTextPreference is null. The field may not work as expected.");
             }
 
+            Preference openNotificationSettings = findPreference(getString(R.string.preference_key_backup_import_notifications));
+            if (openNotificationSettings != null) {
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O && getContext() != null) {
+
+                    openNotificationSettings.setOnPreferenceClickListener(preference -> {
+                        Intent intent = new Intent(Settings.ACTION_CHANNEL_NOTIFICATION_SETTINGS);
+                        intent.putExtra(Settings.EXTRA_APP_PACKAGE, getContext().getPackageName());
+                        intent.putExtra(Settings.EXTRA_CHANNEL_ID, DatabaseBackupImportNotificationManager.CHANNEL_ID);
+                        startActivity(intent);
+                        return true;
+                    });
+                } else {
+                    openNotificationSettings.setEnabled(false);
+                }
+            }
         }
     }
 }

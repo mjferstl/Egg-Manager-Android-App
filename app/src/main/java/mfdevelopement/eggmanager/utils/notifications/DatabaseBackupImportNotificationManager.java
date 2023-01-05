@@ -1,6 +1,9 @@
 package mfdevelopement.eggmanager.utils.notifications;
 
+import android.app.NotificationChannel;
+import android.app.NotificationManager;
 import android.content.Context;
+import android.os.Build;
 import android.util.Log;
 
 import androidx.core.app.NotificationCompat;
@@ -19,9 +22,27 @@ public class DatabaseBackupImportNotificationManager extends AppNotificationMana
      * ID of the notification
      */
     private static final int notificationId = AppNotificationManagerID.IMPORT_BACKUP_FILE.id;
+    public static final String CHANNEL_ID = "EggManagerDatabaseImport";
 
     public DatabaseBackupImportNotificationManager(Context context) {
         super(context);
+        createNotificationChannel(context);
+    }
+
+    private void createNotificationChannel(Context context) {
+        // Create the NotificationChannel, but only on API 26+ because
+        // the NotificationChannel class is new and not in the support library
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            CharSequence name = context.getString(R.string.notification_channel_name_import_backup);
+            String description = context.getString(R.string.notification_channel_description_import_backup);
+            int importance = NotificationManager.IMPORTANCE_LOW;
+            NotificationChannel channel = new NotificationChannel(CHANNEL_ID, name, importance);
+            channel.setDescription(description);
+            // Register the channel with the system; you can't change the importance
+            // or other notification behaviors after this
+            NotificationManager notificationManager = context.getSystemService(NotificationManager.class);
+            notificationManager.createNotificationChannel(channel);
+        }
     }
 
     public void showImportNotification(String backupName) {
