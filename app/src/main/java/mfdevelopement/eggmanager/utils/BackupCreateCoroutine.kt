@@ -50,7 +50,8 @@ class BackupCreateCoroutine {
     ) {
 
         // Move the execution of the coroutine to the I/O dispatcher
-        val result = withContext(Dispatchers.IO) {
+        // val result =
+        withContext(Dispatchers.IO) {
 
             // Create a new backup
             val backup = DatabaseBackup()
@@ -67,8 +68,8 @@ class BackupCreateCoroutine {
             // Create a JSONArray and write it to the file
             val jsonArray: JSONArray =
                 DailyBalanceJsonUtils.createJsonArrayFromDailyBalance(dailyBalanceList)
-            val status =
-                FileUtil.writeContentToFile(context, backup.filename, jsonArray.toString())
+            //val status =
+            FileUtil.writeContentToFile(context, backup.filename, jsonArray.toString())
 
             // Update the notification
             val msg = String.format(
