@@ -238,10 +238,28 @@ public class DailyBalance implements Serializable, Comparable<DailyBalance>, Has
     @Override
     public int compareTo(DailyBalance otherDailyBalance) {
 
+        // compare the date
         int dateKeyInt1 = Integer.parseInt(this.dateKey);
         int dateKeyInt2 = Integer.parseInt(otherDailyBalance.getDateKey());
         int diff = dateKeyInt2 - dateKeyInt1;
+        if (diff != 0)
+            return Integer.compare(diff, 0);
 
-        return Integer.compare(diff, 0);
+        // compare the collected eggs
+        int diffEggsCollected = this.eggsCollected - otherDailyBalance.getEggsCollected();
+        if (diffEggsCollected != 0)
+            return diffEggsCollected;
+
+        // compare the sold eggs
+        int diffEggsSold = this.eggsSold - otherDailyBalance.getEggsSold();
+        if (diffEggsSold != 0)
+            return diffEggsSold;
+
+        // compare the earned money
+        double diffMoneyEarned = this.getMoneyEarned() - otherDailyBalance.getMoneyEarned();
+        if (diffMoneyEarned != 0)
+            return (int) (diffMoneyEarned * 100.0); // Multiply by 100 to respect differences in cents
+
+        return 0;
     }
 }
