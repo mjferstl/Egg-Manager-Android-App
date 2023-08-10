@@ -102,7 +102,7 @@ public class ImportBackupDialog extends DialogFragment {
 
         // Check if there are any items, which already exist in the database
         long numExistingItems = 0;
-        if (!this.existingDailyBalances.isEmpty()) {
+        if (this.existingDailyBalances != null && !this.existingDailyBalances.isEmpty()) {
             List<String> dailyBalanceDateKeys = new ArrayList<>();
             for (DailyBalance db : existingDailyBalances) {
                 dailyBalanceDateKeys.add(db.getDateKey());
