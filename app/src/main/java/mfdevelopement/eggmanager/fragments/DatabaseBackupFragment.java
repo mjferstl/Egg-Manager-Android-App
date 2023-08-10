@@ -36,18 +36,16 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
 
-import kotlinx.coroutines.Dispatchers;
 import mfdevelopement.eggmanager.R;
 import mfdevelopement.eggmanager.activities.MainNavigationActivity;
-import mfdevelopement.eggmanager.coroutines.MyCoroutines;
 import mfdevelopement.eggmanager.data_models.DatabaseBackup;
 import mfdevelopement.eggmanager.data_models.daily_balance.DailyBalance;
 import mfdevelopement.eggmanager.dialog_fragments.ImportBackupDialog;
 import mfdevelopement.eggmanager.list_adapters.DatabaseBackupListAdapter;
 import mfdevelopement.eggmanager.utils.BackupCreateCoroutine;
+import mfdevelopement.eggmanager.utils.DailyBalanceImportManager;
 import mfdevelopement.eggmanager.utils.FileUtil;
 import mfdevelopement.eggmanager.utils.JSONUtil;
-import mfdevelopement.eggmanager.utils.notifications.DatabaseBackupImportNotificationManager;
 import mfdevelopement.eggmanager.viewmodels.SharedViewModel;
 
 public class DatabaseBackupFragment extends Fragment {
@@ -204,18 +202,15 @@ public class DatabaseBackupFragment extends Fragment {
         dialog.setOnButtonClickListener(new ImportBackupDialog.OnButtonClickListener() {
             @Override
             public void onOkClicked(boolean overwriteExisting) {
-                MyCoroutines.Companion.doAsync(() -> {
-                    importDataTask(backup, overwriteExisting);
-                    return null;
-                }, Dispatchers.getIO());
                 dialog.dismiss();
+                importDataTask(backup, overwriteExisting);
             }
 
             @Override
             public void onCancelClicked() {
+                dialog.dismiss();
                 String snackbarMessage = getString(R.string.snackbar_import_backup_cancelled);
                 Snackbar.make(mainRoot, snackbarMessage, Snackbar.LENGTH_SHORT).show();
-                dialog.dismiss();
             }
         });
 
@@ -246,19 +241,19 @@ public class DatabaseBackupFragment extends Fragment {
         int executionProgress = 0;
 
         // Create a notification
-        DatabaseBackupImportNotificationManager notificationManager = new DatabaseBackupImportNotificationManager(this.getContext());
-        notificationManager.showImportNotification(databaseBackup.getBackupName());
+        //DatabaseBackupImportNotificationManager notificationManager = new DatabaseBackupImportNotificationManager(this.getContext());
+        //notificationManager.showImportNotification(databaseBackup.getBackupName());
 
         // read the content of the file
         File file = new File(publicDataDir, databaseBackup.getFilename());
         String content = FileUtil.readFile(file);
         // Update notification progress
-        notificationManager.updateImportNotification(++executionProgress, maxProgress);
+        //notificationManager.updateImportNotification(++executionProgress, maxProgress);
 
         // convert String to JSONObject
         JSONArray jsonArray = JSONUtil.getJSONObject(content);
         // Update notification progress
-        notificationManager.updateImportNotification(++executionProgress, maxProgress);
+        //notificationManager.updateImportNotification(++executionProgress, maxProgress);
 
         // check if data was loaded
         if (jsonArray == null) {
@@ -270,9 +265,19 @@ public class DatabaseBackupFragment extends Fragment {
             return;
         }
 
-        // import data to the database. If data exists, it gets overwritten
+        // Import data to the database. If data exists, it gets overwritten
         List<DailyBalance> loadedDailyBalances = DailyBalance.getDailyBalanceFromJSON(jsonArray);
-        // Update notification progress
+
+        DailyBalanceImportManager importManager = new DailyBalanceImportManager(viewModel);
+        importManager.setImportData(loadedDailyBalances);
+        importManager.setOverwriteExisting(overwriteExisting);
+        importManager.enableDialog(getActivity().getSupportFragmentManager());
+
+        importManager.setOnDataImportListener(() -> Log.d(LOG_TAG, "DailyBalanceImportManager: Import finished"));
+
+        importManager.importData();
+
+/*        // Update notification progress
         notificationManager.updateImportNotification(++executionProgress, maxProgress);
 
         // Load the entries into the database
@@ -281,16 +286,19 @@ public class DatabaseBackupFragment extends Fragment {
 
         // Store the dateKeys for the items, which should not be overwritten
         List<String> dailyBalanceDateKeysSkip = new ArrayList<>();
+        //HashMap<String, DailyBalance> dailyBalancesToSkip = new HashMap<>();
         if (!overwriteExisting) {
             List<DailyBalance> existingDailyBalances = viewModel.getAllDailyBalances().getValue();
             if (existingDailyBalances != null) {
                 for (DailyBalance dailyBalance : existingDailyBalances) {
                     dailyBalanceDateKeysSkip.add(dailyBalance.getDateKey());
+                    //dailyBalancesToSkip.put(dailyBalance.getDateKey(), dailyBalance);
                 }
             }
         }
 
         long importCounter = 0;
+        //List<String> dateKeysExisting = new ArrayList<>(dailyBalancesToSkip.keySet());
         for (int i = 0; i < loadedDailyBalances.size(); i++) {
             DailyBalance currentDailyBalance = loadedDailyBalances.get(i);
             if (!dailyBalanceDateKeysSkip.contains(currentDailyBalance.getDateKey())) {
@@ -304,7 +312,7 @@ public class DatabaseBackupFragment extends Fragment {
 
         Log.d(LOG_TAG, String.format(logIdentifier + "import of %d items finished", importCounter));
         String notificationMessage = String.format(Locale.getDefault(), getString(R.string.notification_backup_import_finished), importCounter);
-        notificationManager.setImportNotificationFinished(notificationMessage);
+        notificationManager.setImportNotificationFinished(notificationMessage);*/
     }
 
 
