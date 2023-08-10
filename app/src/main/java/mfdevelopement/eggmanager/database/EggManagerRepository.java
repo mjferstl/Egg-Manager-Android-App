@@ -14,12 +14,13 @@ import androidx.work.WorkRequest;
 
 import java.util.List;
 
+import kotlinx.coroutines.Dispatchers;
+import mfdevelopement.eggmanager.coroutines.MyCoroutines;
 import mfdevelopement.eggmanager.data_models.daily_balance.DailyBalance;
 import mfdevelopement.eggmanager.data_models.daily_balance.DailyBalanceDao;
 import mfdevelopement.eggmanager.data_models.daily_balance.DailyBalanceWorkerDataUtil;
 import mfdevelopement.eggmanager.workmanager.CleanupDatabaseWorker;
 import mfdevelopement.eggmanager.workmanager.DeleteDailyBalanceWorker;
-import mfdevelopement.eggmanager.workmanager.InsertToDatabaseWorker;
 
 public class EggManagerRepository {
 
@@ -67,11 +68,10 @@ public class EggManagerRepository {
     }
 
     public void insert(DailyBalance dailyBalance) {
-        Data inputData = DailyBalanceWorkerDataUtil.convertToData(dailyBalance);
-        WorkRequest workRequest = new OneTimeWorkRequest.Builder(InsertToDatabaseWorker.class)
-                .setInputData(inputData)
-                .build();
-        WorkManager.getInstance(application.getBaseContext()).enqueue(workRequest);
+        MyCoroutines.Companion.doAsync(() -> {
+            dailyBalanceDao.insert(dailyBalance);
+            return null;
+        }, Dispatchers.getIO());
     }
 
     public void delete(DailyBalance dailyBalance) {
