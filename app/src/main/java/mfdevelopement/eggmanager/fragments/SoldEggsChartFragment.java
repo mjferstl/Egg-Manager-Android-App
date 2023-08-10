@@ -90,9 +90,6 @@ public class SoldEggsChartFragment extends Fragment {
         // make sure the filter is up to date, e.g. when the user switched to this fragment
         viewModel.setDateFilter(viewModel.loadDateFilter());
 
-        // this fragment has its own options menu
-        setHasOptionsMenu(true);
-
         // get references to GUI elements
         TextView txtv_title = rootView.findViewById(R.id.txtv_chart_title);
         txtv_title.setText(getString(R.string.txt_title_eggs_sold));
@@ -124,8 +121,6 @@ public class SoldEggsChartFragment extends Fragment {
 
     @Override
     public void onViewCreated(@NonNull View view, @Nullable @org.jetbrains.annotations.Nullable Bundle savedInstanceState) {
-        super.onViewCreated(view, savedInstanceState);
-
         // The usage of an interface lets you inject your own implementation
         MenuHost menuHost = requireActivity();
 

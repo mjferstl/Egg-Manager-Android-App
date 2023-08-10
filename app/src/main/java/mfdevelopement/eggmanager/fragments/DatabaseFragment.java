@@ -15,10 +15,14 @@ import android.widget.TextView;
 
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.constraintlayout.widget.ConstraintLayout;
+import androidx.core.view.MenuHost;
+import androidx.core.view.MenuProvider;
 import androidx.fragment.app.DialogFragment;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentTransaction;
+import androidx.lifecycle.Lifecycle;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -149,9 +153,6 @@ public class DatabaseFragment extends Fragment {
         // when the user changes the sorting order, then the recycler view needs to be updated manually
         ((MainNavigationActivity) getActivity()).setSortingOrderChangedListener(this::reverseRecyclerView);
 
-        // this fragment has its own options menu
-        setHasOptionsMenu(true);
-
         // get all GUI elements
         linLay_summary = root.findViewById(R.id.fragment_summary);
         txtv_summary_eggs_collected = root.findViewById(R.id.txtv_summary_eggsCollected);
@@ -174,6 +175,50 @@ public class DatabaseFragment extends Fragment {
         initObservers();
 
         return root;
+    }
+
+    @Override
+    public void onViewCreated(@NonNull View view, @Nullable @org.jetbrains.annotations.Nullable Bundle savedInstanceState) {
+        // The usage of an interface lets you inject your own implementation
+        MenuHost menuHost = requireActivity();
+
+        // Add menu items without using the Fragment Menu APIs
+        // Note how we can tie the MenuProvider to the viewLifecycleOwner
+        // and an optional Lifecycle.State (here, RESUMED) to indicate when
+        // the menu should be visible
+        menuHost.addMenuProvider(new MenuProvider() {
+            @Override
+            public void onCreateMenu(@NonNull Menu menu, @NonNull MenuInflater menuInflater) {
+                // Add menu items here
+                menuInflater.inflate(R.menu.menu_database, menu);
+            }
+
+            @Override
+            public boolean onMenuItemSelected(@NonNull MenuItem menuItem) {
+                int id = menuItem.getItemId();
+
+                if (!(entriesCount > 0)) {
+                    Snackbar.make(rootView.findViewById(R.id.main_container), getString(R.string.snackbar_no_data_to_filter), Snackbar.LENGTH_SHORT).show();
+                } else {
+                    if (id == R.id.action_data_filter) {// Open filter activity, if there's some data in the database
+                        openFilterActivity();
+                        return true;
+                    } else if (id == R.id.action_data_sort) {// Show options for list sorting, if there's some data in the database
+                        showSortingDialog();
+                        return true;
+                    } else if (id == R.id.action_completeness_check) {// Show completeness check activity, if there's some data in the database
+                        openCompletenessCheckActivity();
+                        return true;
+                    } else if (id == R.id.action_delete_database) {// Delete all items of the database
+                        showDeleteDialog();
+                        return true;
+                    }
+                }
+
+                // Return false if the selection has not been handled
+                return false;
+            }
+        }, getViewLifecycleOwner(), Lifecycle.State.RESUMED);
     }
 
     @Override
@@ -260,41 +305,6 @@ public class DatabaseFragment extends Fragment {
     private void showSummary() {
         if (linLay_summary != null)
             linLay_summary.setVisibility(View.VISIBLE);
-    }
-
-    @Override
-    public void onCreateOptionsMenu(@NonNull Menu menu, MenuInflater inflater) {
-        inflater.inflate(R.menu.menu_database, menu);
-        super.onCreateOptionsMenu(menu, inflater);
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
-        int id = item.getItemId();
-
-        if (!(entriesCount > 0)) {
-            Snackbar.make(rootView.findViewById(R.id.main_container), getString(R.string.snackbar_no_data_to_filter), Snackbar.LENGTH_SHORT).show();
-        } else {
-            if (id == R.id.action_data_filter) {// Open filter activity, if there's some data in the database
-                openFilterActivity();
-                return true;
-            } else if (id == R.id.action_data_sort) {// Show options for list sorting, if there's some data in the database
-                showSortingDialog();
-                return true;
-            } else if (id == R.id.action_completeness_check) {// Show completeness check activity, if there's some data in the database
-                openCompletenessCheckActivity();
-                return true;
-            } else if (id == R.id.action_delete_database) {// Delete all items of the database
-                showDeleteDialog();
-                return true;
-            }
-        }
-
-        // call the super method, if the item selection has not been handeled
-        return super.onOptionsItemSelected(item);
     }
 
     /**
