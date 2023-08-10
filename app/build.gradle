@@ -10,14 +10,14 @@ android {
             keyPassword "KeyPassword"
         }
     }
-    compileSdkVersion 33
     buildFeatures.viewBinding = true
     defaultConfig {
         applicationId "mfdevelopement.eggmanager"
         minSdkVersion 21
         targetSdkVersion 33
+        compileSdk 33
         versionCode 1
-        versionName "2.1.1"
+        versionName "2.1.2"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
 
         // export the database schema
@@ -71,7 +71,7 @@ android {
         sourceCompatibility JavaVersion.VERSION_1_8
         targetCompatibility JavaVersion.VERSION_1_8
     }
-    tasks.withType(JavaCompile) {
+    tasks.withType(JavaCompile).configureEach {
         options.compilerArgs << '-Xlint:unchecked'
         options.deprecation = true
     }
@@ -97,7 +97,7 @@ dependencies {
     implementation 'androidx.legacy:legacy-support-v4:1.0.0'
     implementation "androidx.navigation:navigation-fragment-ktx:$navigationVersion"
     implementation "androidx.navigation:navigation-ui-ktx:$navigationVersion"
-    implementation 'androidx.preference:preference-ktx:1.2.0'
+    implementation 'androidx.preference:preference-ktx:1.2.1'
     annotationProcessor "androidx.room:room-compiler:$roomVersion"
     androidTestImplementation "androidx.room:room-testing:$roomVersion"
 
