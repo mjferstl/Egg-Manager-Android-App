@@ -23,7 +23,7 @@ import mfdevelopement.eggmanager.data_models.daily_balance.DailyBalanceUpgradeHe
 import mfdevelopement.eggmanager.data_models.daily_balance.DateKeyUtils;
 import mfdevelopement.eggmanager.database.EggManagerRepository;
 
-public class SharedViewModel extends AndroidViewModel {
+public class SharedViewModel extends AndroidViewModel implements DailyBalanceViewModel {
 
     // String for assignment when printing out logs
     private final String LOG_TAG = "SharedViewModel";
