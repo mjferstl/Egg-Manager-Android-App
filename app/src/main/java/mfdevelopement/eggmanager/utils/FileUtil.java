@@ -22,7 +22,7 @@ public class FileUtil {
     public static String readFile(File file) {
 
         StringBuilder builder = new StringBuilder();
-        Log.e(LOG_TAG, "readFile::start to read file " + file.getAbsolutePath());
+        Log.d(LOG_TAG, "readFile::start to read file " + file.getAbsolutePath());
 
         try {
             BufferedReader br = new BufferedReader(new FileReader(file));
