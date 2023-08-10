@@ -1,5 +1,7 @@
 package mfdevelopement.eggmanager.fragments;
 
+import static mfdevelopement.eggmanager.fragments.DatabaseFragment.EXTRA_REQUEST_CODE_NAME;
+
 import android.app.Activity;
 import android.content.Intent;
 import android.graphics.Paint;
@@ -16,9 +18,14 @@ import android.widget.TextView;
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.constraintlayout.widget.ConstraintLayout;
+import androidx.core.content.ContextCompat;
+import androidx.core.view.MenuHost;
+import androidx.core.view.MenuProvider;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentTransaction;
+import androidx.lifecycle.Lifecycle;
 import androidx.lifecycle.ViewModelProvider;
 
 import com.github.mikephil.charting.charts.Chart;
@@ -45,8 +52,6 @@ import mfdevelopement.eggmanager.charts.axis_formatters.ChartAxisFormatterFactor
 import mfdevelopement.eggmanager.data_models.TextWithIconItem;
 import mfdevelopement.eggmanager.dialog_fragments.ChartStyleDialogFragment;
 import mfdevelopement.eggmanager.viewmodels.SharedViewModel;
-
-import static mfdevelopement.eggmanager.fragments.DatabaseFragment.EXTRA_REQUEST_CODE_NAME;
 
 public class SoldEggsChartFragment extends Fragment {
 
@@ -117,6 +122,45 @@ public class SoldEggsChartFragment extends Fragment {
         return rootView;
     }
 
+    @Override
+    public void onViewCreated(@NonNull View view, @Nullable @org.jetbrains.annotations.Nullable Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
+
+        // The usage of an interface lets you inject your own implementation
+        MenuHost menuHost = requireActivity();
+
+        // Add menu items without using the Fragment Menu APIs
+        // Note how we can tie the MenuProvider to the viewLifecycleOwner
+        // and an optional Lifecycle.State (here, RESUMED) to indicate when
+        // the menu should be visible
+        menuHost.addMenuProvider(new MenuProvider() {
+            @Override
+            public void onCreateMenu(@NonNull Menu menu, @NonNull MenuInflater menuInflater) {
+                // Add menu items here
+                menuInflater.inflate(R.menu.menu_charts, menu);
+            }
+
+            @Override
+            public boolean onMenuItemSelected(@NonNull MenuItem menuItem) {
+                if (databaseEntryCount <= 0) {
+                    Snackbar.make(rootView.findViewById(R.id.main_chart_container), getString(R.string.snackbar_no_data_to_filter), Snackbar.LENGTH_SHORT).show();
+                    return true;
+                }
+
+                if (menuItem.getItemId() == R.id.menu_date_filter) {// Show the filter activity if there's some data in the database
+                    openFilterActivity();
+                    return true;
+                } else if (menuItem.getItemId() == R.id.menu_charts_style) {
+                    showChartStyleDialog();
+                    return true;
+                }
+
+                // Return false if the selection has not been handled
+                return false;
+            }
+        }, getViewLifecycleOwner(), Lifecycle.State.RESUMED);
+    }
+
     private <T extends ChartData<? extends IDataSet<? extends Entry>>> void addChartView(ViewGroup parent, Chart<T> chart, View viewAbove) {
         // Create the layout params
         // The view will be at the bottom of the other views
@@ -142,31 +186,6 @@ public class SoldEggsChartFragment extends Fragment {
         super.onResume();
         Log.d(LOG_TAG, "onResume()");
         viewModel.setDateFilter(viewModel.loadDateFilter());
-    }
-
-    @Override
-    public void onCreateOptionsMenu(@NonNull Menu menu, @NonNull MenuInflater inflater) {
-        inflater.inflate(R.menu.menu_charts, menu);
-        super.onCreateOptionsMenu(menu, inflater);
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
-
-        if (databaseEntryCount <= 0) {
-            Snackbar.make(rootView.findViewById(R.id.main_chart_container), getString(R.string.snackbar_no_data_to_filter), Snackbar.LENGTH_SHORT).show();
-            return true;
-        }
-
-        if (item.getItemId() == R.id.menu_date_filter) {// Show the filter activity if there's some data in the database
-            openFilterActivity();
-            return true;
-        } else if (item.getItemId() == R.id.menu_charts_style) {
-            showChartStyleDialog();
-            return true;
-        }
-
-        return super.onOptionsItemSelected(item);
     }
 
     private void showChartStyleDialog() {
@@ -257,7 +276,7 @@ public class SoldEggsChartFragment extends Fragment {
     }
 
     private void initObservers() {
-        if (getActivity() == null)
+        if (getActivity() == null || this.getContext() == null)
             Log.e(LOG_TAG, "initObservers(): observers cannot be initialized, because getActivity() returned null");
         else {
             viewModel.getFilteredDailyBalance().observe(getViewLifecycleOwner(), dailyBalanceList -> {
@@ -273,7 +292,7 @@ public class SoldEggsChartFragment extends Fragment {
                     genericChart.showChart();
 
                     // update the content of the chart
-                    barDataSet.setColor(getResources().getColor(R.color.colorPrimary));
+                    barDataSet.setColor(ContextCompat.getColor(this.getContext(), R.color.colorPrimary));
                     genericChart.setChartData(this.getContext(), barDataSet);
                 } else {
                     Log.d(LOG_TAG, "initObservers(): The received daily balance list is null or empty");
