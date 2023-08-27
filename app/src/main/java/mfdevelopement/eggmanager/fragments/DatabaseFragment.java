@@ -100,7 +100,7 @@ public class DatabaseFragment extends Fragment {
         if (result == IntentCodes.Result.FILTER_OK.id) {
             Log.v(LOG_TAG, "filter has been set successfully");
 
-            // show a Snackbar to inform the user about the new filter
+            // show a Snack bar to inform the user about the new filter
             if (filterString.isEmpty()) {
                 showSnackbarText(getString(R.string.snachkbar_database_not_filtered));
             } else {
@@ -118,8 +118,8 @@ public class DatabaseFragment extends Fragment {
                 }
 
                 if (!filterName.isEmpty()) {
-                    String snackbarMessage = String.format(Locale.getDefault(), getString(R.string.snackbar_database_filtered_by), filterName);
-                    showSnackbarText(snackbarMessage);
+                    String snackBarMessage = String.format(Locale.getDefault(), getString(R.string.snackbar_database_filtered_by), filterName);
+                    showSnackbarText(snackBarMessage);
                 }
             }
         } else if (result == IntentCodes.Result.FILTER_CANCEL.id) {
@@ -272,7 +272,7 @@ public class DatabaseFragment extends Fragment {
 
         if (adapter != null) {
             int numItems = adapter.getItemCount();
-            String extraInfo = numItems + " Einträge";
+            String extraInfo = String.format(Locale.getDefault(), getString(R.string.text_formatted_num_entries), numItems);
             if (numItems >= 2)
                 showSummary();
             else {
@@ -349,8 +349,8 @@ public class DatabaseFragment extends Fragment {
 
             //
             SortingItemCollection sortingList = new SortingItemCollection();
-            sortingList.addItem(new SortingItem("Aufsteigend", "ASC", false));
-            sortingList.addItem(new SortingItem("Absteigend", "DESC", false));
+            sortingList.addItem(new SortingItem(getString(R.string.text_sort_ascending), "ASC", false));
+            sortingList.addItem(new SortingItem(getString(R.string.text_sort_descending), "DESC", false));
             String savedSortingOrder = viewModel.getSortingOrder();
             for (SortingItem item : sortingList.getItems()) {
                 if (item.getSortingOrder().equals(savedSortingOrder))

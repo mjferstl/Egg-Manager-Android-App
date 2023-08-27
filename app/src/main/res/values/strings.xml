@@ -28,6 +28,10 @@
     <string name="snachkbar_database_not_filtered">"Daten nicht gefiltert"</string>
     <string name="snackbar_database_filtered_by">"Daten nach %1$s gefiltert"</string>
 
+    <!-- Sorting dialog -->
+    <string name="text_sort_ascending">Aufsteigend</string>
+    <string name="text_sort_descending">Absteigend</string>
+
     <!-- database activity -->
     <string name="button_save" translatable="false">@string/action_save</string>
     <string name="entry_not_added">Kein Eintrag erstellt</string>
@@ -39,6 +43,7 @@
     <string name="text_empty_recyclerview">Keine Daten vorhanden.\nKlicken Sie dazu auf das + um Daten einzutragen.</string>
     <string name="text_recyclerview_not_visible">Die Daten wurden ausgeblendet</string>
     <string name="text_no_date">Kein Datum</string>
+    <string name="text_formatted_num_entries">%1$d Einträge</string>
 
     <!-- database backup activity -->
     <string name="txt_backup">Sichern Sie Ihre Daten in einer Datei auf dem Gerät. Gespeicherte Daten können Sie bei Bedarf wieder laden.</string>
@@ -46,6 +51,7 @@
     <string name="heading_found_backups">Vorhandene Datensicherungen</string>
     <string name="dialog_button_backup_create">Erstellen</string>
     <string name="dialog_button_cancel">Abbruch</string>
+
     <!-- notifications -->
     <string name="notification_import_title_prefix">Import des Backups \"%1$s\"</string>
     <string name="notification_import_finished">Import abgeschlossen</string>
@@ -138,11 +144,11 @@
     <string name="nav_header_subtitle" translatable="false">https://mjferstl.github.io/</string>
     <string name="nav_header_desc" translatable="false">Navigation header</string>
 
-    <string name="menu_main_database" translatable="false">Übersicht</string>
-    <string name="menu_diagrams" translatable="false">Statistik</string>
-    <string name="menu_about" translatable="false">Über EggManager</string>
-    <string name="menu_backup_data" translatable="false">Datensicherung</string>
-    <string name="menu_settings" translatable="false">Einstellungen</string>
+    <string name="menu_main_database">Übersicht</string>
+    <string name="menu_diagrams">Statistik</string>
+    <string name="menu_about">Über EggManager</string>
+    <string name="menu_backup_data">Datensicherung</string>
+    <string name="menu_settings">Einstellungen</string>
 
     <!-- month names -->
     <string name="january">Januar</string>
@@ -171,7 +177,7 @@
     <string name="content_description_button_expand_collapse">Button zum Auf- und Zuklappen der fehlenden Einträge</string>
     <string name="content_description_icon_error_success">Icon, welches das Ergebnis der Datenprüfung für einen Monat bewertet</string>
     <string name="content_description_icon_money">Icon für den Erlös</string>
-    <string name="title_activity_settings">SettingsActivity</string>
+    <string name="title_activity_settings">Einstellungen</string>
 
     <!-- Preference Groups -->
     <string name="settings_header_user">Nutzer</string>
@@ -197,5 +203,8 @@
 
     <string name="txt_example_day_month">02. Januar</string>
     <string name="txt_year">Jahr</string>
+    <string name="dialog_title_new_backup">Neue Datensicherung</string>
+    <string name="dialog_text_enter_backup_name">Geben Sie einen Namen für die Datensicherung ein</string>
+    <string name="dialog_backup_hint_name">Name der Datensicherung</string>
 
 </resources>

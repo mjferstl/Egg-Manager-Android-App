@@ -380,22 +380,22 @@ public class DatabaseBackupFragment extends Fragment {
         // create an EditText field for entering a backup name
         float factor = getActivity().getResources().getDisplayMetrics().density;
         final EditText input = new EditText(getActivity());
-        input.setHint("Names des Backups");
+        input.setHint(R.string.dialog_backup_hint_name);
         int small_margin = (int) (getActivity().getResources().getDimension(R.dimen.small_padding) * factor);
         int large_margin = (int) (getActivity().getResources().getDimension(R.dimen.large_padding) * factor);
         int medium_margin = (small_margin + large_margin) / 2;
 
         // create a new AlertDialog, which contains the EditText field
         final AlertDialog alertDialog = new AlertDialog.Builder(getActivity()).create();
-        alertDialog.setTitle("Neue Datensicherung");
-        alertDialog.setMessage("Geben Sie einen Namen für das Backup ein");
+        alertDialog.setTitle(getString(R.string.dialog_title_new_backup));
+        alertDialog.setMessage(getString(R.string.dialog_text_enter_backup_name));
         alertDialog.setView(input, medium_margin, 0, medium_margin, 0);
-        alertDialog.setButton(DialogInterface.BUTTON_POSITIVE, "Erstellen", (dialog, which) -> {
+        alertDialog.setButton(DialogInterface.BUTTON_POSITIVE, getString(R.string.dialog_button_backup_create), (dialog, which) -> {
             String newBackupName = input.getText().toString().trim();
             Log.d(LOG_TAG, "create new Backup with title: \"" + newBackupName + "\"");
             createNewBackup(newBackupName);
         });
-        alertDialog.setButton(DialogInterface.BUTTON_NEUTRAL, "Abbruch", (dialog, which) -> alertDialog.dismiss());
+        alertDialog.setButton(DialogInterface.BUTTON_NEUTRAL, getString(R.string.btn_text_cancel), (dialog, which) -> alertDialog.dismiss());
 
         alertDialog.show();
     }
