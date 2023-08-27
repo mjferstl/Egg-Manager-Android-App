@@ -31,6 +31,7 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
+import java.util.Objects;
 
 import mfdevelopement.eggmanager.IntentCodes;
 import mfdevelopement.eggmanager.R;
@@ -90,9 +91,9 @@ public class NewEntityActivity extends AppCompatActivity implements DatePickerFr
     private List<String> listDateKeys;
 
     /**
-     * Snackbar to display information to the user
+     * Snack bar to display information to the user
      */
-    private Snackbar snackbarEggsCollectedEmpty;
+    private Snackbar snackBarEggsCollectedEmpty;
 
     /**
      * Locale
@@ -131,8 +132,8 @@ public class NewEntityActivity extends AppCompatActivity implements DatePickerFr
 
         locale = Locale.ENGLISH;
 
-        // create snackbar
-        snackbarEggsCollectedEmpty = Snackbar.make(findViewById(R.id.new_entity_container), getString(R.string.number_eggs_collected_empty), Snackbar.LENGTH_INDEFINITE);
+        // create snack-bar
+        snackBarEggsCollectedEmpty = Snackbar.make(findViewById(R.id.new_entity_container), getString(R.string.number_eggs_collected_empty), Snackbar.LENGTH_INDEFINITE);
 
         // set the current date as default user selection
         updateDate(Calendar.getInstance().getTime());
@@ -189,8 +190,8 @@ public class NewEntityActivity extends AppCompatActivity implements DatePickerFr
             if (loadedDailyBalance.getEggsSold() != NOT_SET) {
                 int loadedEggsSold = loadedDailyBalance.getEggsSold();
                 eggsSoldEditText.setText(String.valueOf(loadedEggsSold));
-                double calcedPricePerEgg = loadedMoneyEarned / loadedEggsSold;
-                pricePerEggEditText.setText(String.format(locale, PRICE_FORMAT, calcedPricePerEgg));
+                double calculatedPricePerEgg = loadedMoneyEarned / loadedEggsSold;
+                pricePerEggEditText.setText(String.format(locale, PRICE_FORMAT, calculatedPricePerEgg));
             }
 
             // get the date from the dateKey String and update the TextView containing the date
@@ -292,7 +293,7 @@ public class NewEntityActivity extends AppCompatActivity implements DatePickerFr
             pricePerEgg = moneyEarned / eggsSold;
         }
 
-        DailyBalance dailyBalance = new DailyBalance(dateToString(selectedDate), eggsCollected, eggsSold, pricePerEgg);
+        DailyBalance dailyBalance = new DailyBalance(Objects.requireNonNull(dateToString(selectedDate)), eggsCollected, eggsSold, pricePerEgg);
         dailyBalance.setUserCreated(username);
         return dailyBalance;
     }
@@ -311,7 +312,7 @@ public class NewEntityActivity extends AppCompatActivity implements DatePickerFr
     /**
      * create a date object from a String containing a date in the format EE, dd.MM.yyyy
      *
-     * @param dateWeekday String containig the formatted date
+     * @param dateWeekday String containing the formatted date
      * @return Date object
      * @throws ParseException if the String parameter is not formatted correctly
      */
@@ -370,7 +371,7 @@ public class NewEntityActivity extends AppCompatActivity implements DatePickerFr
         InputManager.hideKeyboard(fragmentActivity);
 
         if (eggsCollectedEditText.getText().toString().isEmpty()) {
-            snackbarEggsCollectedEmpty.show();
+            snackBarEggsCollectedEmpty.show();
             return;
         }
 
@@ -442,7 +443,7 @@ public class NewEntityActivity extends AppCompatActivity implements DatePickerFr
         if (this.dateTextView != null) {
             return sdf_weekday.parse(dateTextView.getText().toString());
         } else {
-            Log.e(LOG_TAG, "dateTextView has not been initilized. dateTextView is null.");
+            Log.e(LOG_TAG, "dateTextView has not been initialized. dateTextView is null.");
             return null;
         }
     }
@@ -544,7 +545,7 @@ public class NewEntityActivity extends AppCompatActivity implements DatePickerFr
             @Override
             public void afterTextChanged(Editable s) {
                 if (!s.toString().isEmpty()) {
-                    snackbarEggsCollectedEmpty.dismiss();
+                    snackBarEggsCollectedEmpty.dismiss();
                 }
             }
         });
@@ -621,7 +622,7 @@ public class NewEntityActivity extends AppCompatActivity implements DatePickerFr
                 }
 
 
-                Log.d(LOG_TAG, "updated pricePerEggEditText. New content: " + s.toString());
+                Log.d(LOG_TAG, "updated pricePerEggEditText. New content: " + s);
 
                 if (!s.toString().equals("") && isValidDouble(s.toString())) {
                     // update the color of the price
