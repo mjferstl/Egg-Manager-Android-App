@@ -44,29 +44,6 @@ android {
             debuggable true
         }
     }
-    lintOptions {
-        // set to true to turn off analysis progress reporting by lint
-        quiet true
-        // set to true to have all release builds run lint on issues with severity=fatal
-        // and abort the build (controlled by abortOnError above) if fatal issues are found
-        checkReleaseBuilds true
-        // if true, stop the gradle build if errors are found
-        abortOnError false
-        // if true, check all issues, including those that are off by default
-        checkAllWarnings true
-        // if true, show all locations for an error, do not truncate lists, etc.
-        showAll true
-        // whether lint should include full issue explanations in the text error output
-        explainIssues true
-        // Normally lint will skip generated sources, but you can turn it on with this flag
-        checkGeneratedSources true
-        // Normally lint will analyze all dependencies along with each module; this ensures
-        // that lint can correctly (for example) determine if a resource declared in a library
-        // is unused; checking only the library in isolation would not be able to identify this
-        // problem. However, this leads to quite a bit of extra computation; a library is
-        // analyzed repeatedly, for each module that it is used in.
-        checkDependencies true
-    }
     compileOptions {
         sourceCompatibility JavaVersion.VERSION_1_8
         targetCompatibility JavaVersion.VERSION_1_8
@@ -77,6 +54,30 @@ android {
     }
     kotlinOptions {
         jvmTarget = '1.8'
+    }
+    namespace 'mfdevelopement.eggmanager'
+    lint {
+        // if true, stop the gradle build if errors are found
+        abortOnError false
+        // if true, check all issues, including those that are off by default
+        checkAllWarnings true
+        // Normally lint will analyze all dependencies along with each module; this ensures
+        // that lint can correctly (for example) determine if a resource declared in a library
+        // is unused; checking only the library in isolation would not be able to identify this
+        // problem. However, this leads to quite a bit of extra computation; a library is
+        // analyzed repeatedly, for each module that it is used in.
+        checkDependencies true
+        // Normally lint will skip generated sources, but you can turn it on with this flag
+        checkGeneratedSources true
+        // set to true to have all release builds run lint on issues with severity=fatal
+        // and abort the build (controlled by abortOnError above) if fatal issues are found
+        checkReleaseBuilds true
+        // whether lint should include full issue explanations in the text error output
+        explainIssues true
+        // set to true to turn off analysis progress reporting by lint
+        quiet true
+        // if true, show all locations for an error, do not truncate lists, etc.
+        showAll true
     }
 }
 
