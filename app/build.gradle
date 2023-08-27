@@ -14,11 +14,13 @@ android {
     defaultConfig {
         applicationId "mfdevelopement.eggmanager"
         minSdkVersion 21
-        targetSdkVersion 33
+        targetSdkVersion 34
         compileSdk 33
         versionCode 1
-        versionName "2.1.2"
+        versionName "2.2"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+
+        //resourceConfigurations += ["en", "de"]
 
         // export the database schema
         javaCompileOptions {
@@ -30,6 +32,9 @@ android {
         sourceSets {
             androidTest.assets.srcDirs += files("$projectDir/schemas".toString())
         }
+    }
+    androidResources {
+        generateLocaleConfig true
     }
     buildTypes {
         release {
@@ -124,8 +129,8 @@ dependencies {
     implementation "androidx.lifecycle:lifecycle-viewmodel-ktx:2.6.1"
 
     // Kotlin
-    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:1.8.0"
-    implementation "org.jetbrains.kotlinx:kotlinx-coroutines-jdk8:1.6.4"
+    implementation 'org.jetbrains.kotlin:kotlin-stdlib-jdk7:1.8.20'
+    implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-jdk8:1.7.3'
 
     // WorkManager
     def work_version = "2.8.1"
