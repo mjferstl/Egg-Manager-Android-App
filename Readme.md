@@ -4,7 +4,7 @@ Mit dieser App speichern Sie ganz einfacht die Anzahl der Eier, die Ihre Hühner
 Sie können diese Daten individuell nach Jahren oder Monaten filtern und so einfach einen Überblick über die Produktivität Ihres Hühnerhofs erhalten.
 
 ## Download
-Das aktuelle Release v1.0.0 kann [hier](https://github.com/mjferstl/Egg-Manager-Android-App/releases/download/v2.2/EggManager_v2.2_release.apk) als APK-Datei heruntergeladen werden.  
+Das aktuelle Release v2.2 kann [hier](https://github.com/mjferstl/Egg-Manager-Android-App/releases/download/v2.2/EggManager_v2.2_release.apk) als APK-Datei heruntergeladen werden.  
 Die App können Sie dann auf Ihrem Android-Gerät installieren.
 
 ## Screenshots
