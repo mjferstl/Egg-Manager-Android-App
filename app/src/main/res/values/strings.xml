@@ -20,13 +20,13 @@
     <string name="snackbar_no_external_storage">Kein externer Speicher im Gerät verfügbar. Bitte legen Sie einen externen Speicher in das Gerät ein.</string>
     <string name="snackbar_permission_ext_storage_granted">Zugriff auf externen Speicher gewährt. Sie können die Daten jetzt auf dem Gerät sichern.</string>
     <string name="snackbar_permission_ext_storage_denied">Zugriff auf externen Speicher verweigert. Backup kann nicht durchgeführt werden.</string>
-    <string name="snackbar_data_imported_successfully">Daten für %d Tage erfolgreich importiert.</string>
+    <string name="snackbar_data_imported_successfully">Daten für %1$d Tage erfolgreich importiert.</string>
     <string name="snackbar_no_data_to_filter">Es sind noch keine Daten vorhanden</string>
     <string name="snackbar_error_delete_backup">Fehler beim Löschen der Datensicherung</string>
     <string name="snackbar_import_backup_cancelled">Import abgebrochen</string>
     <!-- ... in DatabaseFragment -->
     <string name="snachkbar_database_not_filtered">"Daten nicht gefiltert"</string>
-    <string name="snackbar_database_filtered_by">"Daten nach %s gefiltert"</string>
+    <string name="snackbar_database_filtered_by">"Daten nach %1$s gefiltert"</string>
 
     <!-- database activity -->
     <string name="button_save">@string/action_save</string>
@@ -49,14 +49,14 @@
     <string name="dialog_button_backup_create">Erstellen</string>
     <string name="dialog_button_cancel">Abbruch</string>
     <!-- notifications -->
-    <string name="notification_import_title_prefix">Import des Backups \"%s\"</string>
+    <string name="notification_import_title_prefix">Import des Backups \"%1$s\"</string>
     <string name="notification_import_finished">Import abgeschlossen</string>
     <string name="notification_importing_backup">Backup wird eingelesen</string>
     <string name="notification_backup_create_title">Datensicherung</string>
-    <string name="notification_backup_create_string_formatter">Datensicherung \"%s\" wird erstellt…</string>
+    <string name="notification_backup_create_string_formatter">Datensicherung \"%1$s\" wird erstellt…</string>
     <string name="notification_backup_create_finished_text">Datensicherung erstellt</string>
-    <string name="notification_backup_created">Datensicherung "%s" mit %d Einträgen erstellt.</string>
-    <string name="notification_backup_import_finished">"Import abgeschlossen.\n%d Einträge importiert."</string>
+    <string name="notification_backup_created">Datensicherung \"%1$s\" mit %2$d Einträgen erstellt.</string>
+    <string name="notification_backup_import_finished">Import abgeschlossen.\n%1$d Einträge importiert.</string>
 
     <!-- new entity activity -->
     <string name="symbol_price_per_piece">&#8364;/St.</string>
@@ -74,7 +74,7 @@
     <string name="from">von</string>
     <string name="to">bis</string>
     <string name="data_check_no_data_missing">Im ausgwählten Zeitraum sind für alle Tage Einträge vorhanden</string>
-    <string name="data_check_info">Im ausgewählten Zeitraum sind für %d Tage keine Einträge vorhanden</string>
+    <string name="data_check_info">Im ausgewählten Zeitraum sind für %1$d Tage keine Einträge vorhanden</string>
     <string name="content_description_icon_success">Symbol für eine erfolgreiche Prüfung</string>
 
     <!-- chart fragment -->
@@ -103,10 +103,10 @@
     <string name="dialog_message_delete_item">"Möchten Sie den Eintrag löschen?"</string>
 
     <!-- Import backup dialog -->
-    <string name="dialog_import_backup_text_cannot_load">Die Datensicherung %s kann nicht geladen werden.</string>
+    <string name="dialog_import_backup_text_cannot_load">Die Datensicherung \"%1$s\" kann nicht geladen werden.</string>
     <string name="dialog_import_backup_text_no_items">Die Datensicherung enthält keine Einträge.</string>
-    <string name="dialog_import_backup_text_wo_duplicates">Die Datensicherung enthält %d Einträge.</string>
-    <string name="dialog_import_backup_text_w_duplicates">Die Datensicherung enthält %d Einträge.\nDavon sind für %d Tage bereits Einträge in der Datenbank vorhanden.</string>
+    <string name="dialog_import_backup_text_wo_duplicates">Die Datensicherung enthält %1$d Einträge.</string>
+    <string name="dialog_import_backup_text_w_duplicates">Die Datensicherung enthält %1$d Einträge.\nDavon sind für %2$d Tage bereits Einträge in der Datenbank vorhanden.</string>
     <string name="dialog_import_backup_check_box_overwrite_existing">Vorhandene Einträge überschreiben</string>
     <string name="dialog_import_backup_title">Datensicherung importieren</string>
     <string name="dialog_import_backup_question">Sollen die Einträge aus der Datensicherung jetzt importiert werden?</string>
@@ -132,7 +132,7 @@
 
     <!-- About fragment -->
     <string name="icon_credits_header">Credits:</string>
-    <string name="icon_creadits_flaticon">Icons made by Freepik and Gregor Cresnar from www.flaticon.com</string>
+    <string name="icon_credits_flaticon">Icons made by Freepik and Gregor Cresnar from www.flaticon.com</string>
     <string name="app_developer">Entwickler: Mathias Ferstl</string>
 
 
