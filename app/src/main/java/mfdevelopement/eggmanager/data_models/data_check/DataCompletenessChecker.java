@@ -28,25 +28,33 @@ public class DataCompletenessChecker implements ExpandableListCompatible {
 
     private static final String LOG_TAG = "DataCompletenessChecker";
 
-    private static final SimpleDateFormat sdfYear = new SimpleDateFormat("yyyy", Locale.getDefault());
-    private static final SimpleDateFormat sdfMonthYear = new SimpleDateFormat("MMMM yyyy", Locale.getDefault());
-    private static final SimpleDateFormat sdfDayMonth = new SimpleDateFormat("dd. MMMM", Locale.getDefault());
-    private static final SimpleDateFormat sdfDayMonthYear = new SimpleDateFormat("dd. MMMM yyyy", Locale.getDefault());
+    private static SimpleDateFormat sdfYear = new SimpleDateFormat("yyyy", Locale.getDefault());
+    private static SimpleDateFormat sdfMonthYear = new SimpleDateFormat("MMMM yyyy", Locale.getDefault());
+    private static SimpleDateFormat sdfDayMonth = new SimpleDateFormat("dd. MMMM", Locale.getDefault());
+    private static SimpleDateFormat sdfDayMonthYear = new SimpleDateFormat("dd. MMMM yyyy", Locale.getDefault());
 
     public DataCompletenessChecker(@NonNull Calendar startDate, @NonNull Calendar endDate, @NonNull List<HasDateInterface> databaseItems) {
-        Date d = new Date();
-        d.setTime(startDate.getTimeInMillis());
-        this.startDate = d;
-        Date d2 = new Date();
-        d2.setTime(endDate.getTimeInMillis());
-        this.endDate = d2;
-        this.data = databaseItems;
+        this(calendarToDate(startDate), calendarToDate(endDate), databaseItems);
     }
 
     public DataCompletenessChecker(@NonNull Date startDate, @NonNull Date endDate, @NonNull List<HasDateInterface> databaseItems) {
         this.startDate = startDate;
         this.endDate = endDate;
         this.data = databaseItems;
+        initSimpleDateFormatters();
+    }
+
+    private static Date calendarToDate(Calendar date) {
+        Date d = new Date();
+        d.setTime(date.getTimeInMillis());
+        return d;
+    }
+
+    private void initSimpleDateFormatters() {
+        sdfYear = new SimpleDateFormat("yyyy", Locale.getDefault());
+        sdfMonthYear = new SimpleDateFormat("MMMM yyyy", Locale.getDefault());
+        sdfDayMonth = new SimpleDateFormat("dd. MMMM", Locale.getDefault());
+        sdfDayMonthYear = new SimpleDateFormat("dd. MMMM yyyy", Locale.getDefault());
     }
 
     private List<Date> checkDataCompleteness() {
