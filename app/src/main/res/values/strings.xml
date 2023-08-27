@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">EggManager</string>
+    <string name="app_name" translatable="false">EggManager</string>
 
     <!-- activity names -->
     <string name="title_activity_about">\u00DCber EggManager</string> <!-- \u00DC = Ü -->
@@ -29,15 +29,13 @@
     <string name="snackbar_database_filtered_by">"Daten nach %1$s gefiltert"</string>
 
     <!-- database activity -->
-    <string name="button_save">@string/action_save</string>
+    <string name="button_save" translatable="false">@string/action_save</string>
     <string name="entry_not_added">Kein Eintrag erstellt</string>
     <string name="new_entity_saved">Neuer Eintrag gespeichert</string>
     <string name="changes_saved">Änderungen gespeichert</string>
     <string name="changes_not_saved">Änderungen nicht übernommen</string>
     <string name="summary">Zusammenfassung</string>
     <string name="number_eggs_collected_empty">Anzahl abgenommener Eier fehlt</string>
-    <string name="selected_filter_part1">Daten nach\u0020</string>
-    <string name="selected_filter_part2">\u0020gefiltert</string>
     <string name="text_empty_recyclerview">Keine Daten vorhanden.\nKlicken Sie dazu auf das + um Daten einzutragen.</string>
     <string name="text_recyclerview_not_visible">Die Daten wurden ausgeblendet</string>
     <string name="text_no_date">Kein Datum</string>
@@ -59,7 +57,7 @@
     <string name="notification_backup_import_finished">Import abgeschlossen.\n%1$d Einträge importiert.</string>
 
     <!-- new entity activity -->
-    <string name="symbol_price_per_piece">&#8364;/St.</string>
+    <string name="symbol_price_per_piece" translatable="false">&#8364;/St.</string>
     <string name="alter_title_overwrite_entry">Eintrag überschreiben</string>
     <string name="alert_msg_overwrite_entry">Für den ausgewählten Tag ist bereits ein Eintrag vorhanden. Soll dieser Eintrag überschrieben werden?</string>
     <string name="alter_msg_invalid_price_per_egg">Der eingegebene Preis pro Ei ist ungültig</string>
@@ -84,8 +82,8 @@
     <string name="tab_name_sold">verkauft</string>
     <string name="chart_no_data_text">Keine Daten vorhanden</string>
     <string name="menu_chart_style">Diagramm Typ</string>
-    <string name="content_description_chart_icon">chart icon</string>
-    <string name="dialog_title_chart_style">@string/menu_chart_style</string>
+    <string name="content_description_chart_icon" translatable="false">chart icon</string>
+    <string name="dialog_title_chart_style" translatable="false">@string/menu_chart_style</string>
     <string name="chart_style_bar">Balkendiagramm</string>
     <string name="chart_style_line">Liniendiagramm</string>
 
@@ -105,7 +103,7 @@
     <!-- Import backup dialog -->
     <string name="dialog_import_backup_text_cannot_load">Die Datensicherung \"%1$s\" kann nicht geladen werden.</string>
     <string name="dialog_import_backup_text_no_items">Die Datensicherung enthält keine Einträge.</string>
-    <string name="dialog_import_backup_text_wo_duplicates">Die Datensicherung enthält %1$d Einträge.</string>
+    <string name="dialog_import_backup_text_wo_duplicates">Die Datensicherung enthält Daten für %1$d Tage.</string>
     <string name="dialog_import_backup_text_w_duplicates">Die Datensicherung enthält %1$d Einträge.\nDavon sind für %2$d Tage bereits Einträge in der Datenbank vorhanden.</string>
     <string name="dialog_import_backup_check_box_overwrite_existing">Vorhandene Einträge überschreiben</string>
     <string name="dialog_import_backup_title">Datensicherung importieren</string>
@@ -118,7 +116,7 @@
     <string name="hint_money_earned">Erlös</string>
 
     <!-- buttons -->
-    <string name="btn_text_ok">OK</string>
+    <string name="btn_text_ok" translatable="false">OK</string>
     <string name="btn_text_cancel">Abbrechen</string>
 
     <!-- symbols -->
@@ -131,8 +129,8 @@
     <string name="transition_imgv_eggs_sold" translatable="false">imageEggsSold</string>
 
     <!-- About fragment -->
-    <string name="icon_credits_header">Credits:</string>
-    <string name="icon_credits_flaticon">Icons made by Freepik and Gregor Cresnar from www.flaticon.com</string>
+    <string name="icon_credits_header" translatable="false">Credits:</string>
+    <string name="icon_credits_flaticon" translatable="false">Icons made by Freepik and Gregor Cresnar from www.flaticon.com</string>
     <string name="app_developer">Entwickler: Mathias Ferstl</string>
 
 
@@ -163,12 +161,12 @@
     <!-- image content descriptions -->
     <string name="content_description_icon_calendar">Kalender Icon</string>
     <string name="content_description_button_next_day">Button zum Ändern des Datums auf den Folgetag</string>
-    <string name="content_description_button_previous_day">Button zum Ändern des Datums auf dem Vortag</string>
+    <string name="content_description_button_previous_day">Button zum Ändern des Datums auf den Vortag</string>
     <string name="content_description_icon_eggs_collected">Icon für die abgenommenen Eier</string>
     <string name="content_description_icon_eggs_sold">Icon für die verkauften Eier</string>
     <string name="content_description_icon_price_per_egg">Icon für den Preis pro Ei</string>
     <string name="content_description_button_add">Button zum Hinzufügen eines Eintrags</string>
-    <string name="content_description_empty" />
+    <string name="content_description_empty" translatable="false" />
     <string name="content_description_icon_sd_card">Icon für die Speicherkarte</string>
     <string name="content_description_button_expand_collapse">Button zum Auf- und Zuklappen der fehlenden Einträge</string>
     <string name="content_description_icon_error_success">Icon, welches das Ergebnis der Datenprüfung für einen Monat bewertet</string>
@@ -184,16 +182,17 @@
     <string name="settings_title_price_per_egg">Preis pro Ei in Cent</string>
 
     <!-- Preference keys -->
-    <string name="preferences_key_pricePerEgg_cent">pricePerEgg</string>
-    <string name="preferences_pricePerEgg_cent_default">50</string>
-    <string name="preferences_key_username">username</string>
-    <string name="preferences_username_default">default_user</string>
-    <string name="preference_key_backup_import_notifications">openNotificationSettings</string>
+    <string name="preferences_key_pricePerEgg_cent" translatable="false">pricePerEgg</string>
+    <string name="preferences_pricePerEgg_cent_default" translatable="false">50</string>
+    <string name="preferences_key_username" translatable="false">username</string>
+    <string name="preferences_username_default" translatable="false">default_user</string>
+    <string name="preference_key_backup_import_notifications" translatable="false">openNotificationSettings</string>
     <string name="preference_title_backup_import_notification">Datensicherung</string>
     <string name="preference_summary_backup_import_notification">Öffnet die Benachrichtigungseinstellungen für das Laden von Datensicherungen</string>
 
-    <string name="notification_channel_name_import_backup">EggManagerImportBackup</string>
-    <string name="notification_channel_description_import_backup">Import of EggManager backup files</string>
+    <!-- Notifications -->
+    <string name="notification_channel_name_import_backup">Datensicherung laden</string>
+    <string name="notification_channel_description_import_backup">Import von EggManager Datensicherungen</string>
 
 
     <string name="txt_example_day_month">02. Januar</string>
