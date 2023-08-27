@@ -142,7 +142,10 @@ public abstract class AppNotificationManager {
         Intent intent = new Intent(getContext(), MainNavigationActivity.class);
         intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
         intent.setAction(notificationAction.actionName);
-        this.pendingIntent = PendingIntent.getActivity(getContext(), 0, intent, 0);
+
+        // For Android Versions S+  the mutability flags needs to be set
+        int mutabilityFlag = (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) ? PendingIntent.FLAG_MUTABLE : 0;
+        this.pendingIntent = PendingIntent.getActivity(getContext(), 0, intent, mutabilityFlag);
     }
 
 

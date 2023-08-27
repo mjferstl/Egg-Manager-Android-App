@@ -129,18 +129,17 @@ public class DataCompletenessCheckActivity extends AppCompatActivity implements 
         expandableListAdapter = new DataCompletenessCheckExpandableListAdapter(this, new ArrayList<>());
         expandableListAdapter.addOnChildAddButtonClickListener((groupPosition, childPosition) -> {
             GroupInfo gi = expandableListAdapter.getGroup(groupPosition);
-            Calendar groupDate = DataCompletenessChecker.convertToDate(gi);
-
             ChildInfo ci = expandableListAdapter.getChild(groupPosition, childPosition);
-            Calendar childDate = DataCompletenessChecker.convertToDate(ci);
+            Calendar date = DataCompletenessChecker.convertToDate(gi, ci);
 
-            Calendar cal = Calendar.getInstance();
-            cal.set(groupDate.get(Calendar.YEAR), groupDate.get(Calendar.MONTH), childDate.get(Calendar.DAY_OF_MONTH));
+            if (date != null) {
+                String dateKey = DateFormatter.getHumanReadableDate(date);
 
-            String dateKey = DateFormatter.getHumanReadableDate(cal);
-
-            // Create a new entity
-            createNewEntity(dateKey);
+                // Create a new entity
+                createNewEntity(dateKey);
+            } else {
+                Log.e(LOG_TAG, "Cannot start activity to create new entity, because the parsed date is null");
+            }
         });
         expandableListView.setAdapter(expandableListAdapter);
     }

@@ -1,7 +1,7 @@
 package mfdevelopement.eggmanager.database;
 
 import android.content.Context;
-import android.os.AsyncTask;
+import android.util.Log;
 
 import androidx.annotation.NonNull;
 import androidx.room.Database;
@@ -10,6 +10,9 @@ import androidx.room.RoomDatabase;
 import androidx.room.TypeConverters;
 import androidx.room.migration.Migration;
 import androidx.sqlite.db.SupportSQLiteDatabase;
+
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 import mfdevelopement.eggmanager.data_models.daily_balance.DailyBalance;
 import mfdevelopement.eggmanager.data_models.daily_balance.DailyBalanceDao;
@@ -22,6 +25,8 @@ public abstract class EggManagerRoomDatabase extends RoomDatabase {
     public abstract DailyBalanceDao dailyBalanceDao();
 
     private static volatile EggManagerRoomDatabase INSTANCE;
+    private static final int NUMBER_OF_THREADS = 4;
+    static final ExecutorService databaseWriteExecutor = Executors.newFixedThreadPool(NUMBER_OF_THREADS);
     private static final String dataBaseName = "eggManagerDatabase";
 
     public static EggManagerRoomDatabase getDatabase(final Context context) {
@@ -46,24 +51,16 @@ public abstract class EggManagerRoomDatabase extends RoomDatabase {
                 @Override
                 public void onOpen(@NonNull SupportSQLiteDatabase db) {
                     super.onOpen(db);
-                    new PopulateDbAsync(INSTANCE).execute();
+
+                    // If you want to keep data through app restarts,
+                    // comment out the following block
+                    databaseWriteExecutor.execute(() -> {
+                        Log.d("RoomDatabase.Callback", "databaseWriteExecutor.execute()");
+                        // Add code to add items to the database or to remove all
+                        // will get executed, when the app restarts
+                    });
                 }
             };
-
-    private static class PopulateDbAsync extends AsyncTask<Void, Void, Void> {
-
-        private final DailyBalanceDao mDao;
-
-        PopulateDbAsync(EggManagerRoomDatabase db) {
-            mDao = db.dailyBalanceDao();
-        }
-
-        @Override
-        protected Void doInBackground(final Void... params) {
-            mDao.getAscendingItems();
-            return null;
-        }
-    }
 
     // Add a column for storing the date, when the entry has been created
     private static final Migration MIGRATION_1_2 = new Migration(1, 2) {

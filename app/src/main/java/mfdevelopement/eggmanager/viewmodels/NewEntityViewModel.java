@@ -62,6 +62,7 @@ public class NewEntityViewModel extends AndroidViewModel {
      * @param dailyBalance DailyBalance
      */
     public void addDailyBalance(DailyBalance dailyBalance) {
+        // TODO: Let the worker pass this to the repo
         repository.insert(dailyBalance);
     }
 

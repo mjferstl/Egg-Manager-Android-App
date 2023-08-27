@@ -9,18 +9,30 @@ import kotlinx.coroutines.withContext
 class MyCoroutines {
 
     companion object {
+//
+//        *
+//         * Helper function to use Kotlin coroutine to execute a task in the background
+//        fun <T> doAsync(func: () -> Void, dispatcher: CoroutineDispatcher = Dispatchers.Default) : CompletableFuture<Void> =
+//                GlobalScope.future {
+//
+//                    // Move the execution of the coroutine a dispatcher
+//                    withContext(dispatcher) {
+//                        // Call the function
+//                        func()
+//                    }
+//                }
 
         /**
-         * Helper function to use Kotlin coroutine to run a function in another thread
+         * Helper function to use Kotlin coroutine to execute a task in the background
          */
         fun doAsync(func: () -> Unit, dispatcher: CoroutineDispatcher = Dispatchers.Default) =
-                GlobalScope.future {
+            GlobalScope.future {
 
-                    // Move the execution of the coroutine to the I/O dispatcher
-                    withContext(dispatcher) {
-                        // Call the function
-                        func()
-                    }
+                // Move the execution of the coroutine a dispatcher
+                withContext(dispatcher) {
+                    // Call the function
+                    func()
                 }
+            }
     }
 }

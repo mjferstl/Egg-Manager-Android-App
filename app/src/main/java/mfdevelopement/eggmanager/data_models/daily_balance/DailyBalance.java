@@ -71,38 +71,27 @@ public class DailyBalance implements Serializable, Comparable<DailyBalance>, Has
     @ColumnInfo(name = COL_USER_CREATED)
     private String userCreated;
 
-    public DailyBalance(String dateKey, int eggsCollected, int eggsSold, double pricePerEgg) {
+    public DailyBalance(@NonNull String dateKey, int eggsCollected, int eggsSold, double pricePerEgg) {
         this(dateKey, eggsCollected, eggsSold, pricePerEgg, 0);
     }
 
     @Ignore
-    public DailyBalance(String dateKey, int eggsCollected, int eggsSold, double pricePerEgg, int numHens) {
+    public DailyBalance(@NonNull String dateKey, int eggsCollected, int eggsSold, double pricePerEgg, int numHens) {
         this(dateKey, eggsCollected, eggsSold, pricePerEgg, numHens, null);
     }
 
     @Ignore
-    public DailyBalance(String dateKey, int eggsCollected, int eggsSold, double pricePerEgg, int numHens, Date dateCreated) {
+    public DailyBalance(@NonNull String dateKey, int eggsCollected, int eggsSold, double pricePerEgg, int numHens, Date dateCreated) {
         this(dateKey, eggsCollected, eggsSold, pricePerEgg, numHens, dateCreated, null);
     }
 
     @Ignore
-    public DailyBalance(String dateKey, int eggsCollected, int eggsSold, double pricePerEgg, int numHens, Date dateCreated, String userCreated) {
-        setDateKey(dateKey);
-        setDateByDateKey();
-        this.eggsCollected = eggsCollected;
-        this.eggsSold = eggsSold;
-        this.pricePerEgg = pricePerEgg;
-        setNumHens(numHens);
-        setMoneyEarned(calcMoneyEarned(eggsSold, pricePerEgg));
-
-        if (dateCreated != null) setDateCreated(dateCreated);
-        else setDateCreated(getCurrentDate());
-
-        if (userCreated != null) setUserCreated(userCreated);
+    public DailyBalance(@NonNull String dateKey, int eggsCollected, int eggsSold, double pricePerEgg, int numHens, Date dateCreated, String userCreated) {
+        this(dateKey, eggsCollected, eggsSold, pricePerEgg, numHens, dateCreated, userCreated, null);
     }
 
     @Ignore
-    public DailyBalance(String dateKey, int eggsCollected, int eggsSold, double pricePerEgg, int numHens, Date dateCreated, String userCreated, Date date) {
+    public DailyBalance(@NonNull String dateKey, int eggsCollected, int eggsSold, double pricePerEgg, int numHens, Date dateCreated, String userCreated, @Nullable Date date) {
         setDateKey(dateKey);
         this.eggsCollected = eggsCollected;
         this.eggsSold = eggsSold;
@@ -115,7 +104,12 @@ public class DailyBalance implements Serializable, Comparable<DailyBalance>, Has
 
         if (userCreated != null) setUserCreated(userCreated);
 
-        this.date = date;
+        if (date == null) {
+            this.date = null;
+            this.date = getDate();
+        } else {
+            this.date = date;
+        }
     }
 
     private double calcMoneyEarned(int eggsSold, double pricePerEgg) {
@@ -244,10 +238,28 @@ public class DailyBalance implements Serializable, Comparable<DailyBalance>, Has
     @Override
     public int compareTo(DailyBalance otherDailyBalance) {
 
+        // compare the date
         int dateKeyInt1 = Integer.parseInt(this.dateKey);
         int dateKeyInt2 = Integer.parseInt(otherDailyBalance.getDateKey());
         int diff = dateKeyInt2 - dateKeyInt1;
+        if (diff != 0)
+            return Integer.compare(diff, 0);
 
-        return Integer.compare(diff, 0);
+        // compare the collected eggs
+        int diffEggsCollected = this.eggsCollected - otherDailyBalance.getEggsCollected();
+        if (diffEggsCollected != 0)
+            return diffEggsCollected;
+
+        // compare the sold eggs
+        int diffEggsSold = this.eggsSold - otherDailyBalance.getEggsSold();
+        if (diffEggsSold != 0)
+            return diffEggsSold;
+
+        // compare the earned money
+        double diffMoneyEarned = this.getMoneyEarned() - otherDailyBalance.getMoneyEarned();
+        if (diffMoneyEarned != 0)
+            return (int) (diffMoneyEarned * 100.0); // Multiply by 100 to respect differences in cents
+
+        return 0;
     }
 }

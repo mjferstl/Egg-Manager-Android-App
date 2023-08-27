@@ -16,16 +16,14 @@ import java.util.Calendar;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
-import kotlinx.coroutines.Dispatchers;
 import mfdevelopement.eggmanager.R;
 import mfdevelopement.eggmanager.charts.ReferenceDate;
-import mfdevelopement.eggmanager.coroutines.MyCoroutines;
 import mfdevelopement.eggmanager.data_models.daily_balance.DailyBalance;
 import mfdevelopement.eggmanager.data_models.daily_balance.DailyBalanceUpgradeHelper;
 import mfdevelopement.eggmanager.data_models.daily_balance.DateKeyUtils;
 import mfdevelopement.eggmanager.database.EggManagerRepository;
 
-public class SharedViewModel extends AndroidViewModel {
+public class SharedViewModel extends AndroidViewModel implements DailyBalanceViewModel {
 
     // String for assignment when printing out logs
     private final String LOG_TAG = "SharedViewModel";
@@ -79,15 +77,15 @@ public class SharedViewModel extends AndroidViewModel {
     }
 
     private void upgradeMigration3_4(List<DailyBalance> dailyBalanceList) {
-        MyCoroutines.Companion.doAsync(() -> {
+        //MyCoroutines.Companion.doAsync(() -> {
             for (DailyBalance db : dailyBalanceList) {
                 if (!DailyBalanceUpgradeHelper.hasValidDate(db)) {
                     db.setDate(db.getDate());
                     this.insert(db);
                 }
             }
-            return null;
-        }, Dispatchers.getIO());
+            //return null;
+        //}, Dispatchers.getIO());
     }
 
     public LiveData<List<DailyBalance>> getAllDailyBalances() {
@@ -246,6 +244,6 @@ public class SharedViewModel extends AndroidViewModel {
         int diffYear = endCalendar.get(Calendar.YEAR) - startCalendar.get(Calendar.YEAR);
         int diffMonth = endCalendar.get(Calendar.MONTH) - startCalendar.get(Calendar.MONTH);
 
-        return diffYear * 12 + diffMonth;
+        return diffYear * 12L + diffMonth;
     }
 }

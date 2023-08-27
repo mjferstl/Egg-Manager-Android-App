@@ -13,8 +13,12 @@ import android.widget.TextView;
 
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.constraintlayout.widget.ConstraintLayout;
+import androidx.core.view.MenuHost;
+import androidx.core.view.MenuProvider;
 import androidx.fragment.app.Fragment;
+import androidx.lifecycle.Lifecycle;
 import androidx.lifecycle.ViewModelProvider;
 
 import com.github.mikephil.charting.charts.Chart;
@@ -79,9 +83,6 @@ public class CollectedEggsChartFragment extends Fragment {
         // make sure the filter is up to date, e.g. when the user switched to this fragment
         viewModel.setDateFilter(viewModel.loadDateFilter());
 
-        // this fragment has its own options menu
-        setHasOptionsMenu(true);
-
         // get references to GUI elements
         TextView txtv_title = rootView.findViewById(R.id.txtv_chart_title);
         txtv_title.setText(getString(R.string.txt_title_eggs_collected));
@@ -110,6 +111,40 @@ public class CollectedEggsChartFragment extends Fragment {
         initObservers();
 
         return rootView;
+    }
+
+    @Override
+    public void onViewCreated(@NonNull View view, @Nullable @org.jetbrains.annotations.Nullable Bundle savedInstanceState) {
+        // The usage of an interface lets you inject your own implementation
+        MenuHost menuHost = requireActivity();
+
+        // Add menu items without using the Fragment Menu APIs
+        // Note how we can tie the MenuProvider to the viewLifecycleOwner
+        // and an optional Lifecycle.State (here, RESUMED) to indicate when
+        // the menu should be visible
+        menuHost.addMenuProvider(new MenuProvider() {
+            @Override
+            public void onCreateMenu(@NonNull Menu menu, @NonNull MenuInflater menuInflater) {
+                // Add menu items here
+                menuInflater.inflate(R.menu.menu_charts, menu);
+                MenuItem item = menu.findItem(R.id.menu_charts_style);
+                item.setVisible(false);
+            }
+
+            @Override
+            public boolean onMenuItemSelected(@NonNull MenuItem menuItem) {
+                if (menuItem.getItemId() == R.id.menu_date_filter) {// Show the filter activity if there's some data in the database
+                    if (databaseEntryCount > 0) {
+                        openFilterActivity();
+                    } else {
+                        Snackbar.make(rootView.findViewById(R.id.main_chart_container), getString(R.string.snackbar_no_data_to_filter), Snackbar.LENGTH_SHORT).show();
+                    }
+                }
+
+                // Return false if the selection has not been handled
+                return false;
+            }
+        }, getViewLifecycleOwner(), Lifecycle.State.RESUMED);
     }
 
     /**
@@ -145,29 +180,6 @@ public class CollectedEggsChartFragment extends Fragment {
         super.onResume();
         Log.d(LOG_TAG, "onResume()");
         viewModel.setDateFilter(viewModel.loadDateFilter());
-    }
-
-    @Override
-    public void onCreateOptionsMenu(@NonNull Menu menu, @NonNull MenuInflater inflater) {
-        inflater.inflate(R.menu.menu_charts, menu);
-        MenuItem item = menu.findItem(R.id.menu_charts_style);
-        item.setVisible(false);
-
-        super.onCreateOptionsMenu(menu, inflater);
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
-
-        if (item.getItemId() == R.id.menu_date_filter) {// Show the filter activity if there's some data in the database
-            if (databaseEntryCount > 0) {
-                openFilterActivity();
-            } else {
-                Snackbar.make(rootView.findViewById(R.id.main_chart_container), getString(R.string.snackbar_no_data_to_filter), Snackbar.LENGTH_SHORT).show();
-            }
-        }
-
-        return super.onOptionsItemSelected(item);
     }
 
     private void openFilterActivity() {

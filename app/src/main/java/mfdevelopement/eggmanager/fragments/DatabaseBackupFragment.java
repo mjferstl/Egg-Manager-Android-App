@@ -19,6 +19,7 @@ import androidx.appcompat.app.AlertDialog;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentTransaction;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -27,7 +28,6 @@ import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.snackbar.Snackbar;
 
 import org.json.JSONArray;
-import org.json.JSONException;
 
 import java.io.File;
 import java.text.SimpleDateFormat;
@@ -36,40 +36,32 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
 
-import kotlinx.coroutines.Dispatchers;
 import mfdevelopement.eggmanager.R;
 import mfdevelopement.eggmanager.activities.MainNavigationActivity;
-import mfdevelopement.eggmanager.coroutines.MyCoroutines;
 import mfdevelopement.eggmanager.data_models.DatabaseBackup;
 import mfdevelopement.eggmanager.data_models.daily_balance.DailyBalance;
-import mfdevelopement.eggmanager.data_models.daily_balance.DailyBalanceJsonAdapter;
+import mfdevelopement.eggmanager.dialog_fragments.ImportBackupDialog;
 import mfdevelopement.eggmanager.list_adapters.DatabaseBackupListAdapter;
+import mfdevelopement.eggmanager.utils.BackupCreateCoroutine;
+import mfdevelopement.eggmanager.utils.DailyBalanceImportManager;
 import mfdevelopement.eggmanager.utils.FileUtil;
 import mfdevelopement.eggmanager.utils.JSONUtil;
-import mfdevelopement.eggmanager.utils.notifications.DatabaseBackupCreateNotificationManager;
-import mfdevelopement.eggmanager.utils.notifications.DatabaseBackupImportNotificationManager;
 import mfdevelopement.eggmanager.viewmodels.SharedViewModel;
 
 public class DatabaseBackupFragment extends Fragment {
 
-    // LOG_TAG containing the name of the current class for debugging purpose
-    private final String LOG_TAG = "DatabaseImportExportAct";
-
-    // Locale is ENGLISH for importing and exporting data
-    private final Locale stringFormatLocale = Locale.ENGLISH;
-
     // get path to the directory, where the EggManager backup files are stored
     private static String publicDataDir;
-
-    // View Model
-    private SharedViewModel viewModel;
-
-    // id of container for showing Snackbars
-    private int idSnackbarContainer;
-
+    // LOG_TAG containing the name of the current class for debugging purpose
+    private final String LOG_TAG = "DatabaseImportExportAct";
+    // Locale is ENGLISH for importing and exporting data
+    private final Locale stringFormatLocale = Locale.ENGLISH;
     // request codes
     private final int REQUEST_CODE_WRITE_EXTERNAL_STORAGE_PERMISSION = 20;
-
+    // View Model
+    private SharedViewModel viewModel;
+    // id of container for showing Snackbars
+    private int idSnackbarContainer;
     private View mainRoot;
     private DatabaseBackupListAdapter adapter;
 
@@ -80,7 +72,7 @@ public class DatabaseBackupFragment extends Fragment {
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
 
-        View root = inflater.inflate(R.layout.fragment_database_backup, container,false);
+        View root = inflater.inflate(R.layout.fragment_database_backup, container, false);
         mainRoot = root;
 
         // get the view model
@@ -89,6 +81,7 @@ public class DatabaseBackupFragment extends Fragment {
 
         publicDataDir = FileUtil.getExternalDirPath(this.getContext());
 
+        // Initialize UI Elements
         initRecyclerView();
         initFab();
         initListeners();
@@ -107,23 +100,27 @@ public class DatabaseBackupFragment extends Fragment {
         updateRecyclerView();
     }
 
+    /**
+     * Initialize listeners for items of the recyclerview, which can be clicked by the user
+     * These listeners handle the execution of the corresponding tasks like importing a backup or deleting a backup
+     */
     private void initListeners() {
         // add BackupListener
         // when the user changes the sorting order, then the recycler view needs to be updated manually
         if (getActivity() != null)
-            ((MainNavigationActivity)getActivity()).setBackupListener(new MainNavigationActivity.BackupListener() {
+            ((MainNavigationActivity) getActivity()).setBackupListener(new MainNavigationActivity.BackupListener() {
 
                 @Override
                 public void onBackupImportClicked(int position) {
                     DatabaseBackup backup = adapter.getItem(position);
-                    Log.d(LOG_TAG,"user wants to import the backup with the name \"" + backup.getBackupName() + "\"");
+                    Log.d(LOG_TAG, "user wants to import the backup with the name \"" + backup.getBackupName() + "\"");
                     importBackup(backup);
                 }
 
                 @Override
                 public void onBackupDeleteClicked(int position) {
                     DatabaseBackup backup = adapter.getItem(position);
-                    Log.d(LOG_TAG,"user wants to delete the backup with the name \"" + backup.getBackupName() + "\"");
+                    Log.d(LOG_TAG, "user wants to delete the backup with the name \"" + backup.getBackupName() + "\"");
                     deleteFile(backup.getFilename());
                 }
 
@@ -134,6 +131,9 @@ public class DatabaseBackupFragment extends Fragment {
             });
     }
 
+    /**
+     * Initialize the {@link RecyclerView}, which shows the available backups
+     */
     private void initRecyclerView() {
         List<DatabaseBackup> backupList = getBackupFiles();
 
@@ -143,6 +143,9 @@ public class DatabaseBackupFragment extends Fragment {
         recyclerView.setAdapter(adapter);
     }
 
+    /**
+     * Update the {@link RecyclerView}, which shows the available backup files
+     */
     private void updateRecyclerView() {
         List<DatabaseBackup> backupList = getBackupFiles();
         adapter.setDatabaseBackupList(backupList);
@@ -161,54 +164,96 @@ public class DatabaseBackupFragment extends Fragment {
         }
     }
 
+    /**
+     * Delete a file from the device.
+     * A {@link Snackbar} will be shown when the file can not be deleted
+     *
+     * @param filename Name of the file to be deleted
+     */
     private void deleteFile(String filename) {
 
         // Delete the file
         File file = new File(publicDataDir, filename);
         boolean fileDeleted = file.delete();
 
-        // show a snackbar to inform the user if deleting the file was not finished successfully
+        // show a Snackbar to inform the user if deleting the file was not finished successfully
         if (!fileDeleted)
-            Snackbar.make(mainRoot.findViewById(idSnackbarContainer), "Fehler beim Löschen der Datensicherung", Snackbar.LENGTH_SHORT).show();
+            Snackbar.make(mainRoot.findViewById(idSnackbarContainer), getString(R.string.snackbar_error_delete_backup), Snackbar.LENGTH_SHORT).show();
 
         // update the entries in the recycler view
         updateRecyclerView();
     }
 
     /**
-     * Import data from a backup file and overwrite existing entries in the database
-     * @param backup DatabaseBackup
+     * Import data from a backup file
+     * This overwrites existing entries in the database
+     *
+     * @param backup DatabaseBackup object
      */
     private void importBackup(DatabaseBackup backup) {
         Log.d(LOG_TAG, "importBackup()");
 
-        // load the backup in an async task
-        //new importBackupAsyncTask((MainNavigationActivity) getActivity()).execute();
+        // TODO: Show a dialog to inform the user, how many items are in the backup and if there are any duplicates
+        ImportBackupDialog dialog = ImportBackupDialog.newInstance(backup.getFilename());
+        List<DailyBalance> existingDailyBalances = viewModel.getAllDailyBalances().getValue();
+        dialog.setExistingDailyBalances(existingDailyBalances);
 
-        MyCoroutines.Companion.doAsync(() -> {
-            importDataTask(backup);
-            return null;
-        }, Dispatchers.getIO());
+        // Handle button clicks on the dialog
+        dialog.setOnButtonClickListener(new ImportBackupDialog.OnButtonClickListener() {
+            @Override
+            public void onOkClicked(boolean overwriteExisting) {
+                dialog.dismiss();
+                importDataTask(backup, overwriteExisting);
+            }
+
+            @Override
+            public void onCancelClicked() {
+                dialog.dismiss();
+                String snackbarMessage = getString(R.string.snackbar_import_backup_cancelled);
+                Snackbar.make(mainRoot, snackbarMessage, Snackbar.LENGTH_SHORT).show();
+            }
+        });
+
+        // Show the dialog
+        if (getActivity() != null) {
+            String dialogFragmentTag = "ImportBackupDialog";
+            FragmentTransaction ft = getActivity().getSupportFragmentManager().beginTransaction();
+            Fragment prev = getActivity().getSupportFragmentManager().findFragmentByTag(dialogFragmentTag);
+            if (prev != null) {
+                ft.remove(prev);
+            }
+            ft.addToBackStack(null);
+            dialog.show(ft, dialogFragmentTag);
+        }
     }
 
-    private void importDataTask(DatabaseBackup databaseBackup) {
+    /**
+     * Task to import data from a backup file
+     *
+     * @param databaseBackup    DatabaseBackup object which contains information about the backup to be imported
+     * @param overwriteExisting Flag to activate overwriting existing entries in the database
+     */
+    private void importDataTask(DatabaseBackup databaseBackup, boolean overwriteExisting) {
         final String logIdentifier = "importBackup():Coroutine: ";
 
-        // Create a notification
-        DatabaseBackupImportNotificationManager notificationManager = new DatabaseBackupImportNotificationManager(this.getContext());
-        notificationManager.showImportNotification(databaseBackup.getBackupName());
+        // Variables for the progress
         final int maxProgress = 5;
+        int executionProgress = 0;
+
+        // Create a notification
+        //DatabaseBackupImportNotificationManager notificationManager = new DatabaseBackupImportNotificationManager(this.getContext());
+        //notificationManager.showImportNotification(databaseBackup.getBackupName());
 
         // read the content of the file
         File file = new File(publicDataDir, databaseBackup.getFilename());
         String content = FileUtil.readFile(file);
         // Update notification progress
-        notificationManager.updateImportNotification(1, maxProgress);
+        //notificationManager.updateImportNotification(++executionProgress, maxProgress);
 
         // convert String to JSONObject
         JSONArray jsonArray = JSONUtil.getJSONObject(content);
         // Update notification progress
-        notificationManager.updateImportNotification(2, maxProgress);
+        //notificationManager.updateImportNotification(++executionProgress, maxProgress);
 
         // check if data was loaded
         if (jsonArray == null) {
@@ -220,23 +265,54 @@ public class DatabaseBackupFragment extends Fragment {
             return;
         }
 
-        // import data to the database. If data exists, it gets overwritten
-        List<DailyBalance> dailyBalances = DailyBalance.getDailyBalanceFromJSON(jsonArray);
-        // Update notification progress
-        notificationManager.updateImportNotification(3, maxProgress);
+        // Import data to the database. If data exists, it gets overwritten
+        List<DailyBalance> loadedDailyBalances = DailyBalance.getDailyBalanceFromJSON(jsonArray);
+
+        DailyBalanceImportManager importManager = new DailyBalanceImportManager(viewModel);
+        importManager.setImportData(loadedDailyBalances);
+        importManager.setOverwriteExisting(overwriteExisting);
+        importManager.enableDialog(getActivity().getSupportFragmentManager());
+
+        importManager.setOnDataImportListener(() -> Log.d(LOG_TAG, "DailyBalanceImportManager: Import finished"));
+
+        importManager.importData();
+
+/*        // Update notification progress
+        notificationManager.updateImportNotification(++executionProgress, maxProgress);
 
         // Load the entries into the database
-        Log.d(LOG_TAG, logIdentifier + "backup contains " + dailyBalances.size() + " entries.");
+        Log.d(LOG_TAG, logIdentifier + "backup contains " + loadedDailyBalances.size() + " entries.");
         Log.d(LOG_TAG, logIdentifier + "starting the import...");
 
-        for (int i = 0; i < dailyBalances.size(); i++) {
-            viewModel.insert(dailyBalances.get(i));
-            float progress = 3 + ((i + 1) / (float) dailyBalances.size() * 2); // Multiplied by 2, as the database insert is represented as 2/5 of the doing
+        // Store the dateKeys for the items, which should not be overwritten
+        List<String> dailyBalanceDateKeysSkip = new ArrayList<>();
+        //HashMap<String, DailyBalance> dailyBalancesToSkip = new HashMap<>();
+        if (!overwriteExisting) {
+            List<DailyBalance> existingDailyBalances = viewModel.getAllDailyBalances().getValue();
+            if (existingDailyBalances != null) {
+                for (DailyBalance dailyBalance : existingDailyBalances) {
+                    dailyBalanceDateKeysSkip.add(dailyBalance.getDateKey());
+                    //dailyBalancesToSkip.put(dailyBalance.getDateKey(), dailyBalance);
+                }
+            }
+        }
+
+        long importCounter = 0;
+        //List<String> dateKeysExisting = new ArrayList<>(dailyBalancesToSkip.keySet());
+        for (int i = 0; i < loadedDailyBalances.size(); i++) {
+            DailyBalance currentDailyBalance = loadedDailyBalances.get(i);
+            if (!dailyBalanceDateKeysSkip.contains(currentDailyBalance.getDateKey())) {
+                viewModel.insert(currentDailyBalance);
+                importCounter++;
+            }
+            int remainingProgress = Math.max(1, maxProgress - executionProgress);
+            float progress = executionProgress + ((i + 1) / (float) loadedDailyBalances.size() * (float) remainingProgress);
             notificationManager.updateImportNotification(progress, maxProgress);
         }
 
-        Log.d(LOG_TAG, String.format(logIdentifier + "import of %d items finished", dailyBalances.size()));
-        notificationManager.setImportNotificationFinished("Import abgeschlossen.\n" + dailyBalances.size() + " Einträge importiert.");
+        Log.d(LOG_TAG, String.format(logIdentifier + "import of %d items finished", importCounter));
+        String notificationMessage = String.format(Locale.getDefault(), getString(R.string.notification_backup_import_finished), importCounter);
+        notificationManager.setImportNotificationFinished(notificationMessage);*/
     }
 
 
@@ -251,7 +327,7 @@ public class DatabaseBackupFragment extends Fragment {
         if (getActivity() != null) {
             writeExternalStoragePermission = ContextCompat.checkSelfPermission(getActivity(), Manifest.permission.WRITE_EXTERNAL_STORAGE);
         } else {
-            Log.d(LOG_TAG,"isWritePermissionGranted(): failed, because getActivity = null");
+            Log.d(LOG_TAG, "isWritePermissionGranted(): failed, because getActivity = null");
         }
 
         return (writeExternalStoragePermission == PackageManager.PERMISSION_GRANTED);
@@ -267,38 +343,17 @@ public class DatabaseBackupFragment extends Fragment {
             if (!isWritePermissionGranted()) {
                 // Request user to grant write external storage permission.
                 ActivityCompat.requestPermissions(getActivity(), new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, REQUEST_CODE_WRITE_EXTERNAL_STORAGE_PERMISSION);
-                Log.d(LOG_TAG,"requestWritePermission(): requesting user to grant write permission");
+                Log.d(LOG_TAG, "requestWritePermission(): requesting user to grant write permission");
             } else {
-                Log.d(LOG_TAG,"requestWritePermission(): write permission is granted");
+                Log.d(LOG_TAG, "requestWritePermission(): write permission is granted");
             }
         } else {
-            Log.e(LOG_TAG,"requestWritePermission(): getActivity = null");
+            Log.e(LOG_TAG, "requestWritePermission(): getActivity = null");
         }
     }
 
     /**
-     * create a JSONArray from a list of DailyBalance objects
-     * @param dailyBalanceList List of DailyBalance objects
-     * @return JSONArray
-     */
-    private JSONArray createJsonArrayFromDailyBalance(@NonNull List<DailyBalance> dailyBalanceList) {
-
-        JSONArray jsonArray = new JSONArray();
-
-        for (int i = 0; i < dailyBalanceList.size(); i++) {
-            try {
-                DailyBalanceJsonAdapter adapter = new DailyBalanceJsonAdapter(dailyBalanceList.get(i));
-                jsonArray.put(i, adapter.toJSON());
-            } catch (JSONException e) {
-                e.printStackTrace();
-                Log.e(LOG_TAG, "createJsonArrayFromDailyBalance(): Error encountered while creating JSONArray");
-            }
-        }
-        return jsonArray;
-    }
-
-    /**
-     *  Checks if external storage is available for read and write
+     * Checks if external storage is available for read and write
      */
     private boolean isExternalStorageWritable() {
         String state = Environment.getExternalStorageState();
@@ -306,7 +361,7 @@ public class DatabaseBackupFragment extends Fragment {
     }
 
     /**
-     *  Checks if external storage is available to at least read
+     * Checks if external storage is available to at least read
      */
     private boolean isExternalStorageReadable() {
         String state = Environment.getExternalStorageState();
@@ -337,10 +392,10 @@ public class DatabaseBackupFragment extends Fragment {
         alertDialog.setView(input, medium_margin, 0, medium_margin, 0);
         alertDialog.setButton(DialogInterface.BUTTON_POSITIVE, "Erstellen", (dialog, which) -> {
             String newBackupName = input.getText().toString().trim();
-            Log.d(LOG_TAG,"create new Backup with title: \"" + newBackupName + "\"");
+            Log.d(LOG_TAG, "create new Backup with title: \"" + newBackupName + "\"");
             createNewBackup(newBackupName);
         });
-        alertDialog.setButton(DialogInterface.BUTTON_NEUTRAL,"Abbruch", (dialog, which) -> alertDialog.dismiss());
+        alertDialog.setButton(DialogInterface.BUTTON_NEUTRAL, "Abbruch", (dialog, which) -> alertDialog.dismiss());
 
         alertDialog.show();
     }
@@ -348,6 +403,7 @@ public class DatabaseBackupFragment extends Fragment {
 
     /**
      * Create a new backup file in JSON-Format containing all Entries of the database
+     *
      * @param backupName Name of the backup used for the filename and for displaying in the GUI
      */
     private void createNewBackup(String backupName) {
@@ -362,37 +418,20 @@ public class DatabaseBackupFragment extends Fragment {
                 if (allDailyBalances == null)
                     Snackbar.make(mainRoot.findViewById(idSnackbarContainer), getString(R.string.snackbar_error_loading_data_from_database), Snackbar.LENGTH_LONG).show();
                 else {
-                    // Write file in a coroutine
-                    MyCoroutines.Companion.doAsync(() -> {
-
-                        // Create a new backup
-                        DatabaseBackup backup = new DatabaseBackup();
-                        backup.setBackupName(backupName);
-
-                        // Create a notification
-                        DatabaseBackupCreateNotificationManager notificationManager = new DatabaseBackupCreateNotificationManager(this.getContext());
-                        notificationManager.showFileCreateNotification(backup.getFilename());
-
-                        // Create a JSONArray and write it to the file
-                        JSONArray jsonArray = createJsonArrayFromDailyBalance(allDailyBalances);
-                        int status = FileUtil.writeContentToFile(getContext(), backup.getFilename(), jsonArray.toString());
-
-                        // Update the notification
-                        String msg = String.format(Locale.getDefault(), "Datensicherung \"%s\" mit %d Einträgen erstellt.", backup.getBackupName(), allDailyBalances.size());
-                        notificationManager.setFileCreateNotificationFinished(msg);
-
-                        if (status == 0) {
-                            if (getActivity() != null) {
-                                ((MainNavigationActivity) getActivity()).onBackupCreated(backup.getFilename());
-                                updateRecyclerView();
-                            } else {
-                                Log.d(LOG_TAG, "createNewBackup(): getActivity returned null");
-                            }
-                        } else {
-                            Log.e(LOG_TAG, "Could not create backup file " + backup.getFilename());
+                    BackupCreateCoroutine cor = new BackupCreateCoroutine();
+                    cor.addBackupCreateListener(new BackupCreateCoroutine.BackupCreateListener() {
+                        @Override
+                        public void onSuccess() {
+                            Log.d(LOG_TAG, "Successfully created backup file " + backupName);
+                            updateRecyclerView();
                         }
-                        return null;
-                    }, Dispatchers.getIO());
+
+                        @Override
+                        public void onFailure() {
+                            Log.e(LOG_TAG, "Could not create backup file " + backupName);
+                        }
+                    });
+                    cor.create(backupName, allDailyBalances, getContext());
                 }
             } else {
                 // inform the user, that no write permission is granted
@@ -405,6 +444,7 @@ public class DatabaseBackupFragment extends Fragment {
 
     /**
      * Get all EggManager backup files on the device
+     *
      * @return List<DatabaseBackup> containing all backups found
      */
     private List<DatabaseBackup> getBackupFiles() {
@@ -424,7 +464,7 @@ public class DatabaseBackupFragment extends Fragment {
             File[] files = directory.listFiles();
 
             if (files == null) {
-                Log.e(LOG_TAG,"Files[]  is null");
+                Log.e(LOG_TAG, "Files[]  is null");
             } else {
                 SimpleDateFormat simpleDateFormat = new SimpleDateFormat("dd.MM.yyyy HH:mm", stringFormatLocale);
                 for (File file : files) {
@@ -446,8 +486,8 @@ public class DatabaseBackupFragment extends Fragment {
                 Log.d(LOG_TAG, "Found " + backupFiles.size() + " backup files");
             }
         } else {
-            Log.e(LOG_TAG,"external storage is not readable");
-            Snackbar.make(mainRoot.findViewById(idSnackbarContainer),"Berechtigung zum Lesen des Speichers fehlt", Snackbar.LENGTH_LONG).show();
+            Log.e(LOG_TAG, "external storage is not readable");
+            Snackbar.make(mainRoot.findViewById(idSnackbarContainer), "Berechtigung zum Lesen des Speichers fehlt", Snackbar.LENGTH_LONG).show();
         }
 
         return backupFiles;
@@ -474,7 +514,7 @@ public class DatabaseBackupFragment extends Fragment {
     private void initFab() {
         FloatingActionButton fab = mainRoot.findViewById(R.id.fab_database_content);
         fab.setOnClickListener(v -> {
-            Log.d(LOG_TAG,"user wants to create a new backup");
+            Log.d(LOG_TAG, "user wants to create a new backup");
             showDialogCreateBackup();
         });
     }

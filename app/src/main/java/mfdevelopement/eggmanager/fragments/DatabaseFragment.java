@@ -15,10 +15,14 @@ import android.widget.TextView;
 
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.constraintlayout.widget.ConstraintLayout;
+import androidx.core.view.MenuHost;
+import androidx.core.view.MenuProvider;
 import androidx.fragment.app.DialogFragment;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentTransaction;
+import androidx.lifecycle.Lifecycle;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -82,7 +86,12 @@ public class DatabaseFragment extends Fragment {
      */
     private int entriesCount;
 
+    /**
+     * RecyclerView to show the daily balance objects
+     */
     private RecyclerView recyclerView;
+
+
     private final ActivityResultLauncher<Long> showFilterActivity = registerForActivityResult(new OpenFilterActivityContract(), result -> {
 
         // Update the filter string
@@ -91,9 +100,9 @@ public class DatabaseFragment extends Fragment {
         if (result == IntentCodes.Result.FILTER_OK.id) {
             Log.v(LOG_TAG, "filter has been set successfully");
 
-            // show a snackbar to inform the user about the new filter
+            // show a Snackbar to inform the user about the new filter
             if (filterString.isEmpty()) {
-                showSnackbarText("Daten nicht gefiltert");
+                showSnackbarText(getString(R.string.snachkbar_database_not_filtered));
             } else {
                 String filterName = "";
                 if (filterString.length() == 4) {
@@ -108,8 +117,10 @@ public class DatabaseFragment extends Fragment {
                     filterName = month + " " + year;
                 }
 
-                if (!filterName.isEmpty())
-                    showSnackbarText("Daten nach " + filterName + " gefiltert");
+                if (!filterName.isEmpty()) {
+                    String snackbarMessage = String.format(Locale.getDefault(), getString(R.string.snackbar_database_filtered_by), filterName);
+                    showSnackbarText(snackbarMessage);
+                }
             }
         } else if (result == IntentCodes.Result.FILTER_CANCEL.id) {
             Log.v(LOG_TAG, "Editing the filter has been cancelled");
@@ -142,9 +153,6 @@ public class DatabaseFragment extends Fragment {
         // when the user changes the sorting order, then the recycler view needs to be updated manually
         ((MainNavigationActivity) getActivity()).setSortingOrderChangedListener(this::reverseRecyclerView);
 
-        // this fragment has its own options menu
-        setHasOptionsMenu(true);
-
         // get all GUI elements
         linLay_summary = root.findViewById(R.id.fragment_summary);
         txtv_summary_eggs_collected = root.findViewById(R.id.txtv_summary_eggsCollected);
@@ -170,34 +178,96 @@ public class DatabaseFragment extends Fragment {
     }
 
     @Override
+    public void onViewCreated(@NonNull View view, @Nullable @org.jetbrains.annotations.Nullable Bundle savedInstanceState) {
+        // The usage of an interface lets you inject your own implementation
+        MenuHost menuHost = requireActivity();
+
+        // Add menu items without using the Fragment Menu APIs
+        // Note how we can tie the MenuProvider to the viewLifecycleOwner
+        // and an optional Lifecycle.State (here, RESUMED) to indicate when
+        // the menu should be visible
+        menuHost.addMenuProvider(new MenuProvider() {
+            @Override
+            public void onCreateMenu(@NonNull Menu menu, @NonNull MenuInflater menuInflater) {
+                // Add menu items here
+                menuInflater.inflate(R.menu.menu_database, menu);
+            }
+
+            @Override
+            public boolean onMenuItemSelected(@NonNull MenuItem menuItem) {
+                int id = menuItem.getItemId();
+
+                if (!(entriesCount > 0)) {
+                    Snackbar.make(rootView.findViewById(R.id.main_container), getString(R.string.snackbar_no_data_to_filter), Snackbar.LENGTH_SHORT).show();
+                } else {
+                    if (id == R.id.action_data_filter) {// Open filter activity, if there's some data in the database
+                        openFilterActivity();
+                        return true;
+                    } else if (id == R.id.action_data_sort) {// Show options for list sorting, if there's some data in the database
+                        showSortingDialog();
+                        return true;
+                    } else if (id == R.id.action_completeness_check) {// Show completeness check activity, if there's some data in the database
+                        openCompletenessCheckActivity();
+                        return true;
+                    } else if (id == R.id.action_delete_database) {// Delete all items of the database
+                        showDeleteDialog();
+                        return true;
+                    }
+                }
+
+                // Return false if the selection has not been handled
+                return false;
+            }
+        }, getViewLifecycleOwner(), Lifecycle.State.RESUMED);
+    }
+
+    @Override
     public void onResume() {
         super.onResume();
         if (adapter != null)
             adapter.setItemsUnselected();
     }
 
+    /**
+     * Update the UI everywhere, where the number of collected eggs is displayed
+     *
+     * @param numEggs number of collected eggs
+     */
     private void updateEggsCollected(int numEggs) {
         Log.d(LOG_TAG, "updateEggsCollected(): updating number of collected eggs. New value: " + numEggs);
         txtv_summary_eggs_collected.setText(String.format(Locale.getDefault(), "%d", numEggs));
         updateSummary();
     }
 
+    /**
+     * Update the UI everywhere, where the number of sold eggs is displayed
+     *
+     * @param numEggs number of sold eggs
+     */
     private void updateEggsSold(int numEggs) {
         Log.d(LOG_TAG, "updateEggsSold(): updating number of sold eggs. New value: " + numEggs);
         txtv_summary_eggs_sold.setText(String.format(Locale.getDefault(), "%d", numEggs));
         updateSummary();
     }
 
+    /**
+     * Update the UI everywhere, where the amount of money earned is displayed
+     *
+     * @param amountMoney amount of money which has been earned
+     */
     private void updateMoneyEarned(double amountMoney) {
         Log.d(LOG_TAG, "updateMoneyEarned(): updating the amount of money earned. New value: " + amountMoney);
         txtv_summary_money_earned.setText(String.format(Locale.getDefault(), "%.2f", amountMoney));
         updateSummary();
     }
 
+    /**
+     * Update the summary UI element
+     */
     private void updateSummary() {
         // hide summary and show text field if the recycler view is not visible or contains less than 2 items
         // show summary if the recycler view contains 2 or more items
-        boolean recyclerViewNotVisibile = (recyclerView.getVisibility() == View.GONE) || (recyclerView.getVisibility() == View.INVISIBLE);
+        boolean recyclerViewNotVisible = (recyclerView.getVisibility() == View.GONE) || (recyclerView.getVisibility() == View.INVISIBLE);
         showTextEmptyRecyclerview(false);
 
         if (adapter != null) {
@@ -211,7 +281,7 @@ public class DatabaseFragment extends Fragment {
                     Log.d(LOG_TAG, "recyclerView contains no items");
                     showTextEmptyRecyclerview(true);
                     txtv_empty_recyclerview.setText(getString(R.string.text_empty_recyclerview));
-                } else if (recyclerViewNotVisibile) {
+                } else if (recyclerViewNotVisible) {
                     Log.d(LOG_TAG, "recyclerView is not visible");
                     //showTextEmptyRecyclerview(true);
                     txtv_empty_recyclerview.setText(getString(R.string.text_recyclerview_not_visible));
@@ -221,51 +291,25 @@ public class DatabaseFragment extends Fragment {
         }
     }
 
+    /**
+     * Hide the summary UI element
+     */
     private void hideSummary() {
         if (linLay_summary != null)
             linLay_summary.setVisibility(View.GONE);
     }
 
+    /**
+     * Show the summary UI element
+     */
     private void showSummary() {
         if (linLay_summary != null)
             linLay_summary.setVisibility(View.VISIBLE);
     }
 
-    @Override
-    public void onCreateOptionsMenu(@NonNull Menu menu, MenuInflater inflater) {
-        inflater.inflate(R.menu.menu_database, menu);
-        super.onCreateOptionsMenu(menu, inflater);
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
-        int id = item.getItemId();
-
-        if (!(entriesCount > 0)) {
-            Snackbar.make(rootView.findViewById(R.id.main_container), getString(R.string.snackbar_no_data_to_filter), Snackbar.LENGTH_SHORT).show();
-        } else {
-            if (id == R.id.action_data_filter) {// Open filter activity, if there's some data in the database
-                openFilterActivity();
-                return true;
-            } else if (id == R.id.action_data_sort) {// Show options for list sorting, if there's some data in the database
-                showSortingDialog();
-                return true;
-            } else if (id == R.id.action_completeness_check) {// Show completeness check activity, if there's some data in the database
-                openCompletenessCheckActivity();
-                return true;
-            } else if (id == R.id.action_delete_database) {// Delete all items of the database
-                showDeleteDialog();
-                return true;
-            }
-        }
-
-        // call the super method, if the item selection has not been handeled
-        return super.onOptionsItemSelected(item);
-    }
-
+    /**
+     * Show a dialog for deleting the content of the database
+     */
     private void showDeleteDialog() {
         // DialogFragment.show() will take care of adding the fragment
         // in a transaction.  We also want to remove any currently showing
@@ -287,6 +331,9 @@ public class DatabaseFragment extends Fragment {
         }
     }
 
+    /**
+     * Show a dialog for changing the sorting order of the items in the recycler view
+     */
     private void showSortingDialog() {
         // DialogFragment.show() will take care of adding the fragment
         // in a transaction.  We also want to remove any currently showing
@@ -340,6 +387,9 @@ public class DatabaseFragment extends Fragment {
         }
     }
 
+    /**
+     * Initialize the {@link RecyclerView}
+     */
     private void initRecyclerView() {
         adapter = new DailyBalanceListAdapter(getActivity());
         adapter.addOnItemActionClickListener(new DailyBalanceListAdapter.OnItemActionClickListener() {
@@ -390,12 +440,20 @@ public class DatabaseFragment extends Fragment {
         adapter.setDailyBalances(currentList);
     }
 
+    /**
+     * Show a {@link Snackbar}
+     *
+     * @param text String to be displayed in the Snackbar
+     */
     private void showSnackbarText(@NonNull String text) {
         // create a snackbar and display it
         if (!text.isEmpty())
             Snackbar.make(rootView.findViewById(R.id.main_container), text, Snackbar.LENGTH_SHORT).show();
     }
 
+    /**
+     * Initialize the {@link FloatingActionButton}
+     */
     private void initFab() {
         FloatingActionButton fab = rootView.findViewById(R.id.fab);
         fab.setOnClickListener(view -> {
@@ -407,7 +465,7 @@ public class DatabaseFragment extends Fragment {
     }
 
     /**
-     * set observers for LiveData using the Room Database
+     * Initialize observers for LiveData using the Room Database
      */
     private void initObservers() {
 
