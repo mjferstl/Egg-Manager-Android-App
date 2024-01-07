@@ -17,7 +17,7 @@ android {
         targetSdkVersion 34
         compileSdk 33
         versionCode 1
-        versionName "2.2"
+        versionName "2.3"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
 
         //resourceConfigurations += ["en", "de"]
@@ -90,10 +90,10 @@ dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
     implementation 'androidx.appcompat:appcompat:1.6.1'
 
-    def roomVersion = '2.5.2'
+    def roomVersion = '2.6.1'
     def coreTestingVersion = '2.2.0'
-    def materialVersion = '1.6.0'
-    def navigationVersion = '2.6.0'
+    def materialVersion = '1.11.0'
+    def navigationVersion = '2.7.6'
 
     // Layout
     implementation 'androidx.constraintlayout:constraintlayout:2.1.4'
@@ -109,7 +109,7 @@ dependencies {
 
     // Lifecycle components
     implementation "androidx.lifecycle:lifecycle-extensions:2.2.0"
-    implementation "androidx.lifecycle:lifecycle-common-java8:2.6.1"
+    implementation "androidx.lifecycle:lifecycle-common-java8:2.6.2"
 
     // UI
     implementation "com.google.android.material:material:$materialVersion"
@@ -125,15 +125,15 @@ dependencies {
     androidTestImplementation 'androidx.test.ext:junit:1.1.5'
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.5.1'
     testImplementation 'junit:junit:4.13.2'
-    implementation "androidx.core:core-ktx:1.10.1"
-    implementation "androidx.lifecycle:lifecycle-viewmodel-ktx:2.6.1"
+    implementation "androidx.core:core-ktx:1.12.0"
+    implementation "androidx.lifecycle:lifecycle-viewmodel-ktx:2.6.2"
 
     // Kotlin
-    implementation 'org.jetbrains.kotlin:kotlin-stdlib-jdk7:1.8.20'
+    implementation 'org.jetbrains.kotlin:kotlin-stdlib-jdk7:1.8.22'
     implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-jdk8:1.7.3'
 
     // WorkManager
-    def work_version = "2.8.1"
+    def work_version = "2.9.0"
     implementation "androidx.work:work-runtime:$work_version"
 
 }
