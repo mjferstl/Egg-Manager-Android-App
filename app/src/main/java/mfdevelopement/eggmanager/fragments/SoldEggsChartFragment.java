@@ -190,6 +190,28 @@ public class SoldEggsChartFragment extends Fragment {
         chartStyleList.add(ChartStyle.BAR);
         items.add(new TextWithIconItem(getString(R.string.chart_style_line), R.drawable.ic_baseline_line_chart_24));
         chartStyleList.add(ChartStyle.LINE);
+        ChartStyleDialogFragment fragment = getChartStyleDialogFragment(items, chartStyleList);
+
+        // FragmentActivity.getSupportFragmentManager()
+        final String fragmentTag = "ChartStyleDialogFragment";
+        if (getActivity() == null) {
+            Log.e(LOG_TAG, "showChartStyleDialog(): getActivity() == null");
+            return;
+        }
+
+        FragmentTransaction ft = getActivity().getSupportFragmentManager().beginTransaction();
+        Fragment prev = getActivity().getSupportFragmentManager().findFragmentByTag(fragmentTag);
+        if (prev != null) {
+            ft.remove(prev);
+        }
+        ft.addToBackStack(null);
+
+        // Create and show the dialog.
+        fragment.show(ft, fragmentTag);
+    }
+
+    @NonNull
+    private ChartStyleDialogFragment getChartStyleDialogFragment(List<TextWithIconItem> items, List<ChartStyle> chartStyleList) {
         ChartStyleDialogFragment fragment = new ChartStyleDialogFragment(items);
 
         int initialPositionSelected = -1;
@@ -209,23 +231,7 @@ public class SoldEggsChartFragment extends Fragment {
                 changeChartStyle(chartStyleList.get(position));
             }
         });
-
-        // FragmentActivity.getSupportFragmentManager()
-        final String fragmentTag = "ChartStyleDialogFragment";
-        if (getActivity() == null) {
-            Log.e(LOG_TAG, "showChartStyleDialog(): getActivity() == null");
-            return;
-        }
-
-        FragmentTransaction ft = getActivity().getSupportFragmentManager().beginTransaction();
-        Fragment prev = getActivity().getSupportFragmentManager().findFragmentByTag(fragmentTag);
-        if (prev != null) {
-            ft.remove(prev);
-        }
-        ft.addToBackStack(null);
-
-        // Create and show the dialog.
-        fragment.show(ft, fragmentTag);
+        return fragment;
     }
 
     private void removeChart() {
