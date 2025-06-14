@@ -220,7 +220,7 @@ public class DataCompletenessCheckActivity extends AppCompatActivity implements 
             String errorMsg = "Cannot parse \"" + txtv_start_date.getText().toString() + "\" and \"" + txtv_end_date.getText().toString() + "\" to dates";
             Toast.makeText(this.getApplicationContext(), errorMsg, Toast.LENGTH_LONG).show();
             Log.e(LOG_TAG, errorMsg);
-            e.printStackTrace();
+            Log.e(LOG_TAG, Log.getStackTraceString(e));
         }
     }
 
@@ -271,7 +271,7 @@ public class DataCompletenessCheckActivity extends AppCompatActivity implements 
             DialogFragment dialogFragment = DatePickerFragment.newInstance(initialDate);
             dialogFragment.show(getSupportFragmentManager(), "datePicker");
         } catch (ParseException e) {
-            e.printStackTrace();
+            Log.e(LOG_TAG, Log.getStackTraceString(e));
         }
     }
 
